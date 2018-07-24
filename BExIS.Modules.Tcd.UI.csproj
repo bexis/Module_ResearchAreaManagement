@@ -12,8 +12,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BExIS.Modules.Lui.UI</RootNamespace>
-    <AssemblyName>BExIS.Modules.Lui.UI</AssemblyName>
+    <RootNamespace>BExIS.Modules.Tcd.UI</RootNamespace>
+    <AssemblyName>BExIS.Modules.Tcd.UI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
@@ -172,25 +172,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\MainController.cs" />
-    <Compile Include="Helper\CalculateLui.cs" />
-    <Compile Include="Helper\LUISeedDataGenerator.cs" />
-    <Compile Include="Helper\Settings.cs" />
-    <Compile Include="LUIModule.cs" />
-    <Compile Include="Models\LUIQueryModel.cs" />
+    <Compile Include="TcdModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\main.css" />
-    <Content Include="LUI.Manifest.xml" />
+    <Content Include="Tcd.Manifest.xml" />
     <Content Include="packages.config" />
-    <Content Include="Scripts\lui.js" />
     <Content Include="Views\Web.config" />
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="web.config" />
     <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Main\Index.cshtml" />
-    <Content Include="Views\Main\_results.cshtml" />
-    <Content Include="Views\Main\Error.cshtml" />
+    <Content Include="Views\Main\**" />
+    <Content Include="Stylesheets\**" />
+    <Content Include="Scripts\**" />
+    <Content Include="Images\**" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -199,7 +195,10 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="bin\" />
     <Folder Include="fonts\" />
+    <Folder Include="Helper\" />
+    <Folder Include="Models\" />
     <Folder Include="Properties\PublishProfiles\" />
   </ItemGroup>
   <ItemGroup>
@@ -222,6 +221,10 @@
     <ProjectReference Include="..\..\..\..\Components\IO\BExIS.IO.Transform.Output\BExIS.IO.Transform.Output.csproj">
       <Project>{455ec826-9a92-40ff-bd3b-388c288955ce}</Project>
       <Name>BExIS.IO.Transform.Output</Name>
+    </ProjectReference>
+    <ProjectReference Include="BExIS.Tcd.Helpers\BExIS.Tcd.Helpers.csproj">
+      <Project>{028FF94A-D430-4AA3-88B7-9538900328FB}</Project>
+      <Name>BExIS.Tcd.Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
