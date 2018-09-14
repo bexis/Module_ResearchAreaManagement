@@ -1,241 +1,196 @@
-﻿using System.Web.Mvc;
+﻿using BExIS.Modules.Lui.UI.Models;
+using System.Web.Mvc;
+using Vaiona.Web.Mvc.Models;
+using Vaiona.Web.Extensions;
+using System.Collections.Generic;
 using System;
+using System.Data;
+using System.Linq;
 using System.IO;
-using System.Threading.Tasks;
-using System.Net;
-using System.Web;
-using System.Web.Configuration;
-using System.Collections.Specialized;
-using System.Text;
-using BExIS.Tcd.Helpers;
+using BExIS.IO.Transform.Output;
+using BExIS.Dlm.Services.Data;
+using BExIS.Dlm.Services.DataStructure;
 
-namespace BExIS.Modules.Tcd.UI.Controllers
+namespace BExIS.Modules.Lui.UI.Controllers
 {
     public class MainController : Controller
     {
-        private String serverAddress = "";
-        public MainController()
-        {
-            ServerInformation serverInformation = new ServerInformation();
-            serverAddress = serverInformation.ServerAddress;
-        }
-        // GET: TDB/Climate
+        #region constants
+        // page title
+        private static string TITLE = "LUI Calculation";
+
+        // session variable names
+        private static string SESSION_TABLE = "lui:resultTable";
+        private static string SESSION_FILE = "lui:resultFile";
+
+        // namespace for download files
+        private static string FILE_NAMESPACE = Settings.get("lui:filename:namespace") as string;
+        #endregion
+
+        // GET: Main
         public ActionResult Index()
         {
-            return View();
-        }
-
-        public ActionResult visual_plotstation_raw()
-        {
-            return View();
-        }
-
-        public ActionResult visual_parameter_raw()
-        {
-            return View();
-        }
-
-        public ActionResult export()
-        {
-            return View();
-        }
-
-        public ActionResult map()
-        {
-            return View();
-        }
-
-        public ActionResult advanced_status()
-        {
-            return View();
-        }
-
-        public ActionResult status()
-        {
-            return View();
-        }
-
-        public ActionResult catalog()
-        {
-            return View();
-        }
-
-        public ActionResult map2()
-        {
-            return View();
-        }
-
-        public ActionResult info()
-        {
-            return View();
-        }
-
-        public ActionResult export_create()
-        {
-            return View();
-        }
-
-        public ActionResult export_sensors()
-        {
-            return View();
-        }
-
-        public ActionResult export_settings()
-        {
-            return View();
-        }
-
-        public ActionResult export_plots()
-        {
-            return View();
-        }
-
-        public ActionResult export_time()
-        {
-            return View();
-        }
-
-        public ActionResult supplement()
-        {
-            return View();
-        }
-
-        public ActionResult visualisation_meta()
-        {
-            return View();
-        }
-
-        public async Task<FileResult> ClimateData()
-        {
-            HttpWebResponse result = await GetClimateData();
-            TransferCookiesResponse(result, this.Response);
-            if (this.Response.ContentType.ToLower().Equals("application/zip; charset=UTF-8".ToLower()) || this.Response.ContentType.ToLower().Equals("application/zip;charset=utf-8".ToLower()) || this.Response.ContentType.ToLower().Equals("application/zip".ToLower()))
+            if( checkPreconditions() )
             {
-                this.Response.AppendHeader("Content-Disposition", "attachment; filename=climate_data.zip");
-                // log download in table
-            }
-            return File(result.GetResponseStream(), result.ContentType); ;
-        }
 
-        private Task<HttpWebResponse> GetClimateData()
-        {
-            return Task.Run(() =>
+                // set page title
+                ViewBag.Title = PresentationModel.GetViewTitleForTenant(TITLE, this.Session.GetTenant());
+
+                // show the view
+                LUIQueryModel model = new LUIQueryModel();
+                return View("Index", model);
+
+            } else
             {
-                String a = this.Request.RawUrl;
-                StreamReader reader = new StreamReader(Request.InputStream);
-                string requestFromPost = Uri.UnescapeDataString(reader.ReadToEnd());
-                String requestUrl = this.Request.RawUrl;
-                string drequestUrl = "";
-                string xxlClimateDataUrl = serverAddress;// "http://webislab16.medien.uni-weimar.de:8080/0123456789abcdef/";//WebConfigurationManager.AppSettings["xxlClimateDataUrl"];// 
-                HttpWebRequest request;
-                HttpWebResponse result = null;
 
-                if (this.Request.QueryString.HasKeys())
-                {
+                // preconditions failed, show error page
+                return View("Error");
 
-                    string v = Request.QueryString["request"];
-                    if (v != null)
-                    {
-
-                        if (this.Request.HttpMethod.Equals("GET"))
-                        {
-                            drequestUrl = xxlClimateDataUrl + HttpUtility.UrlDecode(v);
-                            NameValueCollection queryString = Request.QueryString;
-
-                            foreach (string key in queryString.AllKeys)
-                            {
-                                if (!key.ToLower().Equals("request"))
-                                    drequestUrl = drequestUrl + "&" + key + "=" + Request.QueryString[key];
-                            }
-                            request = (HttpWebRequest)WebRequest.Create(drequestUrl);
-                            Uri target = new Uri(drequestUrl);
-                            // Set the ContentType property of the WebRequest.
-                            request.Credentials = CredentialCache.DefaultCredentials;
-                            request.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-                            TransferCookies(Request, request);
-                            try
-                            {
-                                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-                                StreamReader sr = new StreamReader(response.GetResponseStream());
-                                String ax = response.ContentType;
-                                result = response;
-                            }
-                            catch (Exception e)
-                            {
-                                Console.WriteLine("Can not fetch address: " + drequestUrl);
-                            }
-                        }
-                        else
-                        {
-                            request = WebRequest.Create(xxlClimateDataUrl + HttpUtility.UrlDecode(v)) as HttpWebRequest;
-                            Uri target = new Uri(xxlClimateDataUrl + HttpUtility.UrlDecode(v));
-
-                            TransferCookies(Request, request);
-
-                            // Set the Method property of the request to POST.
-                            request.Method = "POST";
-                            // Create POST data and convert it to a byte array.
-                            byte[] byteArray = Encoding.UTF8.GetBytes(requestFromPost);
-                            // Set the ContentType property of the WebRequest.
-                            request.ContentType = "text";
-                            // Set the ContentLength property of the WebRequest.
-                            request.ContentLength = byteArray.Length;
-                            request.Credentials = CredentialCache.DefaultCredentials;
-                            // Get the request stream.
-                            Stream dataStream = request.GetRequestStream();
-                            // Write the data to the request stream.
-                            dataStream.Write(byteArray, 0, byteArray.Length);
-                            // Close the Stream object.
-                            dataStream.Close();
-                            HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-                            StreamReader sr = new StreamReader(response.GetResponseStream());
-                            String ax = response.ContentType;
-                            result = response;
-                        }
-                    }
-                }
-
-                // If required by the server, set the credentials.  
-
-                // Get the response.  
-                return result;
-            });
-        }
-
-        private void TransferCookies(HttpRequestBase SourceHttpRequest, HttpWebRequest TargetHttpWebRequest)
-        {
-            HttpCookieCollection sourceCookies = SourceHttpRequest.Cookies;
-            if (sourceCookies.Count > 0)
-            {
-                TargetHttpWebRequest.CookieContainer = new CookieContainer();
-                for (int i = 1; i < sourceCookies.Count; i++)
-                {
-                    HttpCookie cSource = sourceCookies[i];
-                    Cookie cookieTarget = new Cookie()
-                    {//cSource.Name
-                        Domain = TargetHttpWebRequest.RequestUri.Host,
-                        Name = cSource.Name,
-                        Path = "/0123456789abcdef/export",
-                        Secure = cSource.Secure,
-                        Value = cSource.Value
-                    };
-                    TargetHttpWebRequest.CookieContainer.Add(cookieTarget);
-                }
             }
         }
 
-
-        private void TransferCookiesResponse(HttpWebResponse SourceHttpResponse, HttpResponseBase TargetHttpWebResponse)
+        /// <summary>
+        /// trigger calculation of LUI values
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public ActionResult CalculateLUI(LUIQueryModel model)
         {
-            CookieCollection sourceCookies = SourceHttpResponse.Cookies;
-            if (sourceCookies.Count > 0)
+            // set page title
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant(TITLE, this.Session.GetTenant());
+
+            // do the calucaltion
+            var results = CalculateLui.DoCalc(model);
+
+            // store results in session
+            Session[SESSION_TABLE] = results;
+            if (null != Session[SESSION_FILE])
             {
-                for (int i = 0; i < sourceCookies.Count; i++)
+                ((Dictionary<string, string>)Session[SESSION_FILE]).Clear();
+            }
+
+            return PartialView("_results", results);
+        }
+
+        
+        /// <summary>
+        /// prepare the serialized data file for download
+        /// </summary>
+        /// <param name="mimeType"></param>
+        /// <returns></returns>
+        public ActionResult PrepareDownloadFile(string mimeType)
+        {
+
+            // if we have already a matching file cached, we can short circuit here
+            if ((null != Session[SESSION_FILE]) && ((Dictionary<string, string>)Session[SESSION_FILE]).ContainsKey(mimeType))
+            {
+                return Json(new { error = false, mimeType = mimeType }, JsonRequestBehavior.AllowGet);
+            }
+
+            // helper class
+            OutputDataManager outputDataManager = new OutputDataManager();
+
+            // filename
+            // use unix timestamp to make filenames unique
+            string filename = Settings.get("lui:filename:download") as string;
+            // https://stackoverflow.com/a/17632585/1169798
+            Int32 unixTimestamp = (Int32)(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalSeconds;
+            filename += "_" + unixTimestamp;
+
+            // datastructure ID
+            int dsId = (int)Settings.get("lui:datastructure");
+
+            // depends on the requested type
+            string path = "";
+            switch (mimeType)
+            {
+                case "text/csv":
+                case "text/tsv":
+                    path = outputDataManager.GenerateAsciiFile(FILE_NAMESPACE, Session[SESSION_TABLE] as DataTable, filename, mimeType, dsId);
+                    break;
+
+                case "application/vnd.ms-excel.sheet.macroEnabled.12":
+                case "application/vnd.ms-excel":
+                    path = outputDataManager.GenerateExcelFile(FILE_NAMESPACE, Session[SESSION_TABLE] as DataTable, filename, dsId);
+                    break;
+
+                default:
+                    Response.StatusCode = 420;
+                    return Json(new { error = true, msg = "Unknown file-type: " + mimeType }, JsonRequestBehavior.AllowGet);
+            }
+
+            // store path in session for further download
+            if (null == Session[SESSION_FILE])
+            {
+                Session[SESSION_FILE] = new Dictionary<string, string>();
+            }
+            ((Dictionary<string, string>)Session[SESSION_FILE])[mimeType] = path;
+
+            return Json(new { error = false, mimeType = mimeType }, JsonRequestBehavior.AllowGet);
+        }
+
+        /// <summary>
+        /// return the serialized data file
+        /// if the file does not exist yet, it will be created
+        /// </summary>
+        /// <param name="mimeType"></param>
+        /// <returns></returns>
+        public ActionResult DownloadFile(string mimeType)
+        {
+
+            // make sure the file was created
+            if ((null == Session[SESSION_FILE]) || !((Dictionary<string, string>)Session[SESSION_FILE]).ContainsKey(mimeType))
+            {
+                ActionResult res = PrepareDownloadFile(mimeType);
+
+                // check, if everything went ok
+                if (200 != Response.StatusCode)
                 {
-                    Cookie cSource = sourceCookies[i];
-                    TargetHttpWebResponse.Cookies[cSource.Name].Value = cSource.Value;
+                    return res;
                 }
             }
+
+            // get file path
+            string path = ((Dictionary<string, string>)Session[SESSION_FILE])[mimeType];
+
+            // return file for download
+            return File(path, mimeType, Path.GetFileName(path));
+        }
+
+    
+        /// <summary>
+        /// check for preconditions, so that we can do all computations
+        /// * Link to LUI dataset
+        /// * Link to result data structure
+        /// </summary>
+        /// <returns></returns>
+        private bool checkPreconditions()
+        {
+            // check for LUI dataset
+            DatasetManager dm = new DatasetManager();
+            int luiId = (int)Settings.get("lui:dataset");
+            bool exists = dm.DatasetRepo.Query()
+                                        .Where(x => x.Id == luiId )
+                                        .Any();
+            if (!exists)
+            {
+                return false;
+            }
+
+            // check for export data structure
+            DataStructureManager dsm = new DataStructureManager();
+            int dsdId = (int)Settings.get("lui:datastructure");
+            exists = dsm.StructuredDataStructureRepo.Query()
+                                    .Where(x => x.Id == dsdId)
+                                    .Any();
+            if(!exists)
+            {
+                return false;
+            }
+
+            // if we came that far, all conditions are met
+            return true;
         }
     }
 }

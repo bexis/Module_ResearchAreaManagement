@@ -1,15 +1,14 @@
-﻿using System;
+﻿using BExIS.Modules.Lui.UI.Helper;
+using System;
 using Vaiona.Logging;
 using Vaiona.Web.Mvc.Modularity;
 
-namespace BExIS.Modules.Tcd.UI
+namespace BExIS.Modules.Lui.UI
 {
-    public class TcdModule : ModuleBase
+    public class LUIModule : ModuleBase
     {
-        public TcdModule(): base("TCD")
+        public LUIModule(): base("LUI")
         {
-            LoggerFactory.GetFileLogger().LogCustom("...ctor of tcd...");
-
         }
 
         /// <summary>
@@ -40,7 +39,7 @@ namespace BExIS.Modules.Tcd.UI
             try
             {
                 base.Install();
-                //LUISeedDataGenerator.CreateFeatures();
+                LUISeedDataGenerator.CreateFeatures();
             }
             catch (Exception e)
             {
