@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BExIS.Modules.Pmm.UI.Helper;
+using System;
 using Vaiona.Logging;
 using Vaiona.Web.Mvc.Modularity;
 
@@ -38,7 +39,10 @@ namespace BExIS.Modules.Pmm.UI
             try
             {
                 base.Install();
-                //PMMSeedDataGenerator.CreateFeatures();
+                using (var pmmSeedDataGenerator = new PmmSeedDataGenerator())
+                {
+                    pmmSeedDataGenerator.GenerateSeedData();
+                }
             }
             catch (Exception e)
             {

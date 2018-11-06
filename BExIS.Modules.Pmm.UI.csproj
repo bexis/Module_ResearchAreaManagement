@@ -9,7 +9,7 @@
     <ProductVersion>
     </ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{0E5F4B53-398A-4634-9921-03B9CACBE8E0}</ProjectGuid>
+    <ProjectGuid>{12AEEBF4-63A3-4E2B-8085-8E0161540005}</ProjectGuid>
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
@@ -25,6 +25,7 @@
     <UseGlobalApplicationHostFile />
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <Use64BitIISExpress />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -178,6 +179,7 @@
   <ItemGroup>
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MainAdminController.cs" />
+    <Compile Include="Helper\PmmSeedDataGenerator.cs" />
     <Compile Include="PMMModule.cs" />
     <Compile Include="Models\PlotChartViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
