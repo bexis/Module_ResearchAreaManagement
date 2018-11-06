@@ -1,9 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Manifest moduleId="LUI" displayName="" version="1.0.0" builtin="false">
+<Manifest moduleId="PMM" displayName="" version="1.0.0" builtin="false">
   <Description>
     <!--add proper description-->
   </Description>
   <Assemblies>
+    <Assembly fullName="BExIS.Pmm.Entities"></Assembly>
+    <Assembly fullName="BExIS.Pmm.Services"></Assembly>
     <Assembly fullName="" role=""/>
   </Assemblies>
   <Dependencies>
@@ -12,8 +14,8 @@
   <Exports>
     <!--add proper menu items-->
 	
-    <Export tag="menubar" id="luiMenu" order="10"
-            title="LUI" description="LUI desc" icon=""
+    <Export tag="menubar" id="pmmMenu" order="10"
+            title="PMM" description="PMM desc" icon=""
             controller="main" action="index"
             extends="./menubarRoot" />
     

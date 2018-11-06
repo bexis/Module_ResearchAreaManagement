@@ -1,0 +1,598 @@
+﻿@using BExIS.Pmm.Entities;
+@using Telerik.Web.Mvc.UI;
+@model BExIS.Web.Shell.Areas.PMM.Models.PlotChartViewModel
+
+@{
+
+    int PageSize = Convert.ToInt16(ViewData["PageSize"]);
+    int CurrentPage = Convert.ToInt16(ViewData["CurrentPage"]);
+
+    GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
+    pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
+    pagerStyles |= GridPagerStyles.Numeric;
+
+    Model.gridsize = new List<int>(new int[] { 5, 10 });
+    Model.geometryType = new List<String>(new String[] { "rectangle", "linestring", "circle", "polygon" });
+    Model.colorList = new List<String>(new String[] { "#00ff00", "#ff0000", "#ffa07a", "#000000", "#bebebe", "#ffffff", "#ee82ee", "#add8e6", "#4682b4", "#00ffff", "#d8bfd8", "#0000ff", "#a020f0", "#2e8b57", "#b03060", "#f5deb3", "#d2691e", "ffa500", "#90ee90", "#ebebeb", "#ffff00", "#a52a2a", "#ffeeee", "#c71585" });
+    Model.coordinateType = new List<String>(new String[] { "xy", "polar" });
+
+}
+
+
+<div>
+    <table style="width:800px;">
+        <tr>
+            <td>
+                <input type='hidden' value=',' name='SelectedPlotsId' id="SelectedPlotsId" />
+                <input type='hidden' name='AllPlotsId' id="AllPlotsId" value="@Model.allPlots" />
+                
+                <input type="checkbox" id="DeactivePlot" />include former subplots
+                <br />
+                <input type="checkbox" id="BeyondBorder" />draw beyond plot borders
+                <br />
+                <input type="checkbox" id="Legend" />PDF without legend
+            </td>
+            <td>
+                Grid Size:
+            </td>
+            <td>
+                @(Html.Telerik().DropDownList()
+       .Name("Gridsize")
+       .BindTo(new SelectList(Model.gridsize))
+       .SelectedIndex(0))
+            </td>
+            <td valign="bottom" width="50px"><a href="#" title="Export CSV" onclick="exportAllPlots()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>
+            <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
+        </tr>
+    </table>
+    @(Html.Telerik().Grid<Plot>()
+            .Name("plotchart_geometries")
+            .DataBinding(dataBinding => dataBinding
+             //Ajax binding
+             .Ajax()
+                   //The action method which will return JSON and its arguments
+                   .Select("_AjaxBindingPlots", "Main")
+
+            )
+            .Pageable(paging =>
+                paging
+                        .Style(pagerStyles).Enabled(true)
+                        .PageSize(10)
+                    .Position(GridPagerPosition.Both)
+                        .PageTo(1)
+                    )
+            .Sortable()
+            .ClientEvents(x => x.OnDataBound("UpdateIcons"))
+            .Filterable()
+            .ClientEvents(events => events.OnRowSelect("PlotonRowSelect"))
+            .ClientEvents(events => events.OnRowDataBound("PlotOnRowDataBound"))
+            .Columns(columns =>
+            {
+            columns.Bound(x => x.Id).Format("<input type='checkbox'  value='{0}' onclick='OnChekBox(this)'>").Encoded(false).Width(60).Title("<input type='checkbox' onclick='selectAll(this)'>").Sortable(false).Filterable(false);
+            columns.Bound(c => c.PlotId);
+            columns.Bound(c => c.GeometryType).EditorViewData(new { geometryType = Model.geometryType });
+            columns.Bound(c => c.Coordinate);
+            columns.Bound(c => c.CoordinateType);
+            columns.Bound(c => c.Latitude);
+            columns.Bound(c => c.Longitude);
+
+            columns.Template(@<text></text>).ClientTemplate("<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updatePlot(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= PlotId #>', '<#= Latitude #>', '<#= Longitude #>', '<#= RefrencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
+            columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick=\"archivePlot(<#= Id #>, '<#= PlotId #>')\"><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
+            columns.Template(@<text></text>).ClientTemplate("<a title='download' href='#'" + "class='btn btn-sm' onclick='exportPlot(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/download.png' width='16'></a>").Title("Export").Width(60);
+            columns.Template(@<text></text>).ClientTemplate("<a title='pdf' href='#'" + "class='btn btn-sm' onclick='exportPlotPdf(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/pdf.png' width='16'></a>").Title("Pdf").Width(60);
+            columns.Template(@<text></text>).ClientTemplate("<a title='list' href='#'" + "class='btn btn-sm' onclick='openPlot(<#= Id #>)' id='list-<#= Id #>'><img src='../../Areas/PMM/Images/list.png' width='16'></a>").Title("List").Width(60);
+            }))
+</div>
+<div>
+    <table style="width:1200px;">
+        <tr>
+            <td colspan="6" id="errorPlaceHolder" style="color:red;"></td>
+        </tr>
+        <tr>
+            <td colspan="6"><b>Add & Update Plot</b></td>
+        </tr>
+        <tr>
+            <td>Name:</td>
+            <td>
+                <input type="text" style="height:28px;border-width:2px;" name="Name" id="Name" />
+            </td>
+            <td>Coordinate:</td>
+            <td>
+                <input type="hidden" name="PlotIdHolder" id="PlotIdHolder" value="" />
+                <input type="hidden" name="MultiSelectPlotIds" id="MultiSelectPlotIds" value="" />
+                <input type="text" style="height:28px;border-width:2px;" name="Coordinate" id="Coordinate" />
+            </td>
+            <td>Latitude:</td>
+            <td>
+                <input type="text" style="height:28px;border-width:2px;" name="Latitude" id="Latitude" />
+            </td>
+            <td>RefrencePoint:</td>
+            <td>
+                <input type="text" style="height:28px;border-width:2px;" name="RefrencePoint" id="RefrencePoint" />
+            </td>
+            </tr>
+        <tr>
+            <td>Geometry Type:</td>
+            <td>
+                @(Html.Telerik().DropDownList()
+       .Name("GeometryType")
+       .BindTo(new SelectList(Model.geometryType))
+       .HtmlAttributes(new { @style = "width:60%;" })
+       .SelectedIndex(0))
+            </td>
+            <td>Coordinate Type:</td>
+            <td>
+                @(Html.Telerik().DropDownList()
+       .Name("CoordinateType")
+       .BindTo(new SelectList(Model.coordinateType))
+       .HtmlAttributes(new { @style = "width:60%;" })
+       .SelectedIndex(0))
+            </td>
+            <td>Longitude:</td>
+            <td>
+                <input type="text" style="height:28px;border-width:2px;" name="Longitude" id="Longitude" />
+            </td>
+            <td><input type="button" id="newPlot" value="New" onclick="addNewPlot()"></td>
+            <td><input type="button" id="cancelUpdate" value="Cancel" onclick="cancelUpdate()" style="visibility:hidden;"></td>
+        </tr>
+    </table>
+</div>
+<div style="width:35%;float:right;">
+    <table align="left" style="font-size: xx-small;">
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; font-weight: bold;"
+                colspan="3"></td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; font-weight: bold;">
+                Geometry<b>
+                    <br />
+                    Type
+                </b>
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif">
+                <b>
+                    Coordinates Type<br />
+                    xy
+                </b>
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif">
+                <b>
+                    Coordinates Type<br />
+                    polar
+                </b>
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                rectangle
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                xStart,yStart,xEnd,yEnd
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                (alphaLowerLeft,distLowerLeft),(alphaUpperRight,distUpperRight)
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                &nbsp;&nbsp; example
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                -31,32.5,-28,35.5
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                (100,20.5),(100,30)
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                linestring
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                (x1, x2, ..., xn),(y1, y2, ..., yn)
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                (alpha1,dist1), (alpha2,dist2), ... (alphaN,distN)
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                &nbsp;&nbsp; example
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                (31.5, 34, 33),(10,12.5,9)
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                (0,10),(0,15),(100,5.5)
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                circle&nbsp;&nbsp;
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                xOrigin,yOrigin, radius
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                (alpha,distance),radius
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                &nbsp;&nbsp; example
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                15,15,10.6
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                (0,15),10.6
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                error_rect&nbsp;&nbsp;
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                -
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                (alpha,distance),(xEast,yNorth,xWest,ySouth)
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                &nbsp;&nbsp; example
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                &nbsp;
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                (0,15),(10,13,5,4.8)
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
+                polygon
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
+                (x1,x2,x3,...,xn),(y1,y2,y3,...,yn)
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
+                (alpha1,dist1),(alpha2,dist2),(alpha3,dist3),...,(alphaN,distN)
+            </td>
+        </tr>
+        <tr>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                &nbsp;&nbsp; example&nbsp;
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                (-10,10,12,-8),(2,-10,0,-10)
+            </td>
+            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                (0,10),(0,15),(100,5.5),(50,10)
+            </td>
+        </tr>
+    </table>
+</div>
+
+
+<script type="text/javascript">
+
+    function ComboBox_onChange(e) {
+        LoadPackageAndBindGrid();
+    }
+
+    function LoadPackageAndBindGrid() {
+        //var plotId = comboboxPlotChart.value();
+        //var deactiveplot = $('#DeactivePlot').is(':checked');
+        //var beyondborder = $('#BeyondBorder').is(':checked');
+        //var gridSize = comboboxGridSize.value();
+        /*
+        var data = {
+            id: plotId,
+            deactivePlot: deactiveplot,
+            beyondPlot: beyondborder,
+            area: "PTC",
+        }
+        var grid = $('#plotchart_geometries').data('tGrid');
+        grid.dataSource._data = [];
+            //grid.ajaxRequest(params);
+    */
+        //grid.rebind();
+        var grid = $('#plotchart_geometries').data('tGrid');
+        grid.ajaxRequest();
+        // Reload The Package Details
+    
+    }
+
+    function exportAllPlots() {
+        window.open("/PMM/MainAdmin/ExportAllPlots", "_blank");
+    }
+
+    function updatePlot(id, geometryType, coordinate, coordinateType, name, latitude, longitude, refrencePoint) {
+        removeErrors();
+        var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
+        
+        $('#CoordinateType').data('tDropDownList').value(coordinateType);
+        $('#Coordinate').val(coordinate);
+        if ($('#PlotIdHolder').val() != id && $('#PlotIdHolder').val() != "")
+            $("#edit-" + $('#PlotIdHolder').val()).attr("src", "../../Areas/PMM/Images/edit.png");
+        $('#PlotIdHolder').val(id);
+        $('#Name').val(name);
+        $('#Latitude').val(latitude);
+        $('#Longitude').val(longitude);
+        $('#RefrencePoint').val(refrencePoint);
+        $('#cancelUpdate').css('visibility', 'visible');
+        $("#newPlot").attr('value', 'Update');
+        $("#edit-" + id).attr("src", "../../Areas/PMM/Images/editactive.png");
+        //var plotid = $('#PlotChartList').data('tDropDownList').value();
+    }
+
+    function cancelUpdate() {
+        $("#edit-" + $('#PlotIdHolder').val()).attr("src", "../../Areas/PMM/Images/edit.png");
+        $('#PlotIdHolder').val("");
+        $('#Coordinate').val("");
+        $('#Name').val("");
+        $('#Latitude').val("");
+        $('#Longitude').val("");
+        $('#RefrencePoint').val("");
+        $('#cancelUpdate').css('visibility', 'hidden');
+        $("#newPlot").attr('value', 'New');
+        removeErrors();
+    }
+
+    function archivePlot(id, name) {
+        var data = {
+            plotid: id,
+            name: name
+        }
+        $.ajax({
+            url: '/PMM/PlotChartAdmin/_archivePlot',
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            error: function (xhr) {
+                alert('Error: ' + xhr.statusText);
+
+            },
+            success: function (result) {
+                if (result == "valid") {
+                    LoadPackageAndBindGrid();
+                    //UpdatePlotChart();
+                } else {
+
+                    alert(result);
+                }
+            }
+        });
+    }
+
+    function UpdateIcons() {
+        $('#plotchart_geometries input[type=hidden]').each(function () {
+            if ($(this).val() == "2") {
+                $("#archive-" + $(this).attr("name")).attr("src", "../../Areas/PMM/Images/archived.png");
+                $("#export-" + $(this).attr("name")).attr("onclick", "");
+                $("#list-" + $(this).attr("name")).attr("onclick", "");
+            }
+            else if (($(this).val() == "3"))
+                $("#delete-" + $(this).attr("name")).attr("src", "../../Areas/PMM/Images/deleted.png");
+                //$("#export-" + $(this).attr("name")).attr("onclick", "");
+                //$("#list-" + $(this).attr("name")).attr("onclick", "");
+        });
+    }
+
+    function exportPlot(id) {
+        window.open("/PMM/MainAdmin/ExportPlot?id=" + id, "_blank");
+    }
+
+    function selectPlot(id) {
+        var CurrentSelected = $('#MultiSelectPlotIds').val();
+        CurrentSelected += ',' + id;
+        $('#MultiSelectPlotIds').val(CurrentSelected);
+    }
+
+    function exportPlotPdf(id) {
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var gridSize = comboboxGridSize.value();
+        var params = "id=" + id + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize;
+        window.open("/PMM/MainAdmin/getpdf?" + params, "_blank");
+    }
+
+    function DownloadPdf() {
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var legend = $('#Legend').is(':checked');
+        var gridSize = comboboxGridSize.value();
+        var plotIds = $("#SelectedPlotsId").val();
+        if (plotIds == ",")
+            return;
+        var params = "ids=" + plotIds + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize + "&legend=" + legend;
+        window.open("/PMM/MainAdmin/GetPDFBatch?" + params, "_blank");
+    }
+    
+    function openPlot(id) {
+        window.open("/PMM/MainAdmin/SubPlots?plotId=" + id, "_blank");
+    }
+
+    function checkGeometry(geometryType, coordType, geometry) {
+        //Holds regular expression
+        var regGeometry = "";
+
+        //xy - Coordinates
+        if (coordType == "xy") {
+            if (geometryType == "rectangle") {
+                //x1.a1,y1.b1,x2.a2,y2.b2
+                regGeometry = "^-?\\d+(\\.\\d+)?,-?\\d+(\\.\\d+)?,-?\\d+(\\.\\d+)?,-?\\d+(\\.\\d+)?$";
+            }
+            else if (geometryType == "linestring") {
+                //(x1.a1,...xn.an),(y1.b1,...,yn.bn)
+                regGeometry = "^\\((-?\\d+(\\.\\d+)?\\,?)+\\),\\((-?\\d+(\\.\\d+)?\\,?)+\\)$";
+            }
+            else if (geometryType == "circle") {
+                //(x1.a1,...xn.an),(y1.b1,...,yn.bn)
+                regGeometry = "^-?\\d+(\\.\\d+)?\\,-?\\d+(\\.\\d+)?,\\d*(\\.\\d+)?$";
+            }
+            if (geometryType == "polygon") {
+                //(x1.a1,...xn.an),(y1.b1,...,yn.bn)
+                regGeometry = "^\\(-?\\d{1,}(\\.\\d{1,}){0,1}(,-?\\d{1,}(\\.\\d{1,}){0,1})+\\),\\(-?\\d{1,}(\\.\\d{1,}){0,1}(,-?\\d{1,}(\\.\\d{1,}){0,1})+\\)$";
+            }
+            else if (geometryType == "error_rect") {
+                regGeometry = "false";
+            }
+        }
+            //polar - Coordinates
+        else if (coordType == "polar") {
+            if (geometryType == "rectangle") {
+                regGeometry = "^\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\),\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\)$";
+            }
+            else if (geometryType == "linestring") {
+                regGeometry = "^\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\)(,\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\))*$";
+            }
+            else if (geometryType == "polygon") {
+                regGeometry = "^\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\)(,\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\))*$";
+            }
+            else if (geometryType == "circle") {
+                regGeometry = "^\\((-?\\d+(\\.\\d+)?\\,?)+\\),(-?\\d+(\\.\\d+)?\\,?)+$";
+            }
+            else if (geometryType == "error_rect") {
+                regGeometry = "^\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\),\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\)$";
+            }
+        }
+        //Delete white-space
+        geometry = geometry.replace(" ", "");
+
+        //Test regEx
+        if (new RegExp(regGeometry).test(geometry)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    function deletePlot(id, name) {
+        var data = {
+            plotid: id,
+            name: name
+        }
+        $.ajax({
+            url: '/PMM/PlotChartAdmin/_deletePlot',
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            error: function (xhr) {
+                alert('Error: ' + xhr.statusText);
+
+            },
+            success: function (result) {
+                if (result == "valid") {
+                    LoadPackageAndBindGrid();
+                } else {
+
+                    alert(result);
+                }
+            }
+        });
+    }
+
+    function addErrors(errorMessage, fieldid) {
+        var errorsPlaceHolder = $("#errorPlaceHolder");
+        errorsPlaceHolder.html(errorsPlaceHolder.html() + errorMessage + "<br>");
+        $(fieldid).css("border-color", "#FF0000");
+    }
+
+    function removeErrors() {
+        $("#errorPlaceHolder").html("");
+        $("#Coordinate").css("border-color", "#000000");
+        $("#Latitude").css("border-color", "#000000");
+        $("#Longitude").css("border-color", "#000000");
+        $("#Name").css("border-color", "#000000");
+    }
+
+    function selectAll(e) {
+        if ($(e).is(':checked')) {
+            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').attr("checked", true) : $('#plotchart_geometries input:checkbox').attr("checked", false);
+            $("#SelectedPlotsId").val($("#AllPlotsId").val());
+        } else {
+            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').attr("checked", true) : $('#plotchart_geometries input:checkbox').attr("checked", false);
+            $("#SelectedPlotsId").val(",");
+        }
+       
+    }
+
+
+    function addNewPlot() {
+        var errorsPlaceHolder = $("#errorPlaceHolder");
+        removeErrors();
+        var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value();
+        var CoordinateType = $('#CoordinateType').data('tDropDownList').value();
+        var Coordinate = $('#Coordinate').val();
+        var Latitude = $('#Latitude').val();
+        var Longitude = $('#Longitude').val();
+        var name = $('#Name').val();
+        var id = $('#PlotIdHolder').val();
+        var RefrencePoint = $('#RefrencePoint').val();
+        
+        if (!checkGeometry(GeometryType, CoordinateType, Coordinate)) 
+            addErrors("Coordinate data format is not correct.", "#Coordinate")
+        if (!$.isNumeric(Latitude))
+            addErrors("Latitude is needed to be numeric.", "#Latitude")
+        if (!$.isNumeric(Longitude))
+            addErrors("Longitude is needed to be numeric.", "#Longitude")
+        if (errorsPlaceHolder.html() != "")
+            return;
+        
+
+        var Url = '/PMM/PlotChartAdmin/_newPlot';
+        if ($("#newPlot").val() == "Update") {
+            Url = '/PMM/PlotChartAdmin/_updatePlot';
+            var geometryid = $('#PlotIdHolder').val();
+            var data = {
+                plotId: id,
+                coordinate: Coordinate,
+                geometryType: GeometryType,
+                coordinateType: CoordinateType,
+                name: name,
+                latitude: Latitude,
+                longitude: Longitude,
+                refrencePoint: RefrencePoint
+            }
+        } else {
+            var data = {
+                coordinate: Coordinate,
+                geometryType: GeometryType,
+                coordinateType: CoordinateType,
+                name: name,
+                latitude: Latitude,
+                longitude: Longitude,
+                refrencePoint: RefrencePoint
+            }
+        }
+
+
+        $.ajax({
+            url: Url,
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            error: function (xhr) {
+                alert('Error: ' + xhr.statusText);
+
+            },
+            success: function (result) {
+                if (result == "valid") {
+                    LoadPackageAndBindGrid();
+                    cancelUpdate();
+                } else {
+                    addErrors(result, "#Name");
+                }
+            }
+        });
+    }
+</script>

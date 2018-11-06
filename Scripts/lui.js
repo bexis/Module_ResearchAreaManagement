@@ -14,7 +14,7 @@
         .on('change', function () {
 
             // hide all further steps
-            $('#divQuery1, #divQuery2, #divQuery3, #divQuery4, #btnCalculateLUI').hide();
+            $('#divQuery1, #divQuery2, #divQuery3, #divQuery4, #btnCalculatePMM').hide();
             $("#divResultButtons").hide();
 
             // get selected option
@@ -29,7 +29,7 @@
             else {
                 // show complete dataset and leave wizzard steps hidden
                 $('#divResultGrid').empty();
-                $('#dtmLuiSpinner').show();
+                $('#dtmPmmSpinner').show();
                 $.ajax({
                     method: 'get',
                     url: showdataUrl,
@@ -43,7 +43,7 @@
                         $('#divResultGrid').html(data);
 
                         // disable loading spinner
-                        $('#dtmLuiSpinner').hide();
+                        $('#dtmPmmSpinner').hide();
 
                     })
                     .fail(function (err) {
@@ -52,7 +52,7 @@
                         $('#divResultGrid').html(err.responseText);
 
                         // disable loading spinner
-                        $('#dtmLuiSpinner').hide();
+                        $('#dtmPmmSpinner').hide();
 
                     });
             }
@@ -82,7 +82,7 @@
                 scrollTop: $("#divQuery2").offset().top
             }, 'slow');
 
-            $('#divQuery3, #divQuery4, #btnCalculateLUI').hide();
+            $('#divQuery3, #divQuery4, #btnCalculatePMM').hide();
 
         });
 
@@ -175,7 +175,7 @@
         .on('click', function () {
 
             // hide further steps
-            $('#divQuery3, #divQuery4, #btnCalculateLUI').hide();
+            $('#divQuery3, #divQuery4, #btnCalculatePMM').hide();
 
             // change active state for buttons
             $("#btnEditSelection")
@@ -205,7 +205,7 @@
             }, 'slow');
 
             // hide results and calculate button
-            $("#btnCalculateLUI").hide();
+            $("#btnCalculatePMM").hide();
             $('#divResultButtons').hide();
             $('#divResultGrid').empty();
 
@@ -221,9 +221,9 @@
             $('#divResultGrid').empty();
 
             // show calculate button
-            $("#btnCalculateLUI").show();
+            $("#btnCalculatePMM").show();
             $('html,body').animate({
-                scrollTop: $("#btnCalculateLUI").offset().top
+                scrollTop: $("#btnCalculatePMM").offset().top
             }, 'slow');;
 
         });

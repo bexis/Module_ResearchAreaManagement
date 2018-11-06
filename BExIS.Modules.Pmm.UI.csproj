@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props" Condition="Exists('..\..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" />
   <Import Project="..\..\..\..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props" Condition="Exists('..\..\..\..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -12,8 +13,8 @@
     <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BExIS.Modules.Lui.UI</RootNamespace>
-    <AssemblyName>BExIS.Modules.Lui.UI</AssemblyName>
+    <RootNamespace>BExIS.Modules.Pmm.UI</RootNamespace>
+    <AssemblyName>BExIS.Modules.Pmm.UI</AssemblyName>
     <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
@@ -45,6 +46,10 @@
   <ItemGroup>
     <Reference Include="Antlr3.Runtime">
       <HintPath>..\..\..\..\packages\Antlr.3.4.1.9004\lib\Antlr3.Runtime.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="GeoAPI, Version=1.7.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\packages\GeoAPI.1.7.2\lib\net403-client\GeoAPI.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
@@ -172,25 +177,21 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Controllers\MainController.cs" />
-    <Compile Include="Helper\CalculateLui.cs" />
-    <Compile Include="Helper\LUISeedDataGenerator.cs" />
-    <Compile Include="Helper\Settings.cs" />
-    <Compile Include="LUIModule.cs" />
-    <Compile Include="Models\LUIQueryModel.cs" />
+    <Compile Include="Controllers\MainAdminController.cs" />
+    <Compile Include="PMMModule.cs" />
+    <Compile Include="Models\PlotChartViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Content\main.css" />
-    <Content Include="LUI.Manifest.xml" />
+    <Content Include="PMM.Manifest.xml" />
+    <Content Include="PMM.Settings.xml" />
     <Content Include="packages.config" />
-    <Content Include="Scripts\lui.js" />
-    <Content Include="Views\Web.config" />
-    <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="web.config" />
-    <Content Include="Views\Shared\Error.cshtml" />
-    <Content Include="Views\Main\Index.cshtml" />
-    <Content Include="Views\Main\_results.cshtml" />
-    <Content Include="Views\Main\Error.cshtml" />
+    <Content Include="Content\**" />
+    <Content Include="Images\**" />
+    <Content Include="Scripts\**" />
+    <Content Include="Stylesheets\**" />
+    <Content Include="Views\**" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
@@ -222,6 +223,22 @@
     <ProjectReference Include="..\..\..\..\Components\IO\BExIS.IO.Transform.Output\BExIS.IO.Transform.Output.csproj">
       <Project>{455ec826-9a92-40ff-bd3b-388c288955ce}</Project>
       <Name>BExIS.IO.Transform.Output</Name>
+    </ProjectReference>
+    <ProjectReference Include="BExIS.Pmm.Entities\BExIS.Pmm.Entities.csproj">
+      <Project>{29f7ddae-22f0-4a3e-a5e3-a25869ebf3eb}</Project>
+      <Name>BExIS.Pmm.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="BExIS.Pmm.Model\BExIS.Pmm.Model.csproj">
+      <Project>{6969d8d0-de4c-4b07-b8a2-d06062ec0a45}</Project>
+      <Name>BExIS.Pmm.Model</Name>
+    </ProjectReference>
+    <ProjectReference Include="BExIS.Pmm.Orm.NH\BExIS.Pmm.Orm.NH.csproj">
+      <Project>{7213b1d8-2d5c-44da-9af1-1f22cd952709}</Project>
+      <Name>BExIS.Pmm.Orm.NH</Name>
+    </ProjectReference>
+    <ProjectReference Include="BExIS.Pmm.Services\BExIS.Pmm.Services.csproj">
+      <Project>{b16ea151-31a1-47cd-96fd-98c25dfe1968}</Project>
+      <Name>BExIS.Pmm.Services</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
@@ -259,6 +276,10 @@
     <Error Condition="!Exists('..\..\..\..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\Microsoft.Net.Compilers.1.3.2\build\Microsoft.Net.Compilers.props'))" />
     <Error Condition="!Exists('..\..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.3\build\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.props'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>mkdir "$(SolutionDir)Console\Workspace\Modules\PMM"
+C:\Windows\System32\xcopy "$(ProjectDir)Pmm.Settings.xml" "$(SolutionDir)Console\Workspace\Modules\PMM" /C /Y /I</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

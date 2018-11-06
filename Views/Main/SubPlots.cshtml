@@ -1,0 +1,260 @@
+﻿@using BExIS.Pmm.Entities;
+@using Telerik.Web.Mvc.UI;
+@model BExIS.Web.Shell.Areas.PMM.Models.PlotChartViewModel
+
+@{
+
+    int PageSize = Convert.ToInt16(ViewData["PageSize"]);
+    int CurrentPage = Convert.ToInt16(ViewData["CurrentPage"]);
+
+    GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
+    pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
+    pagerStyles |= GridPagerStyles.Numeric;
+
+    Model.gridsize = new List<int>(new int[] { 5, 10 });
+    Model.geometryType = new List<String>(new String[] { "rectangle", "linestring", "circle", "polygon" });
+    Model.colorList = new List<String>(new String[] { "#00ff00", "#ff0000", "#ffa07a", "#000000", "#bebebe", "#ffffff", "#ee82ee", "#add8e6", "#4682b4", "#00ffff", "#d8bfd8", "#0000ff", "#a020f0", "#2e8b57", "#b03060", "#f5deb3", "#d2691e", "ffa500", "#90ee90", "#ebebeb", "#ffff00", "#a52a2a", "#ffeeee", "#c71585" });
+    Model.coordinateType = new List<String>(new String[] { "xy", "polar" });
+
+}
+<div>
+    <table style="width:800px;">
+        <tr>
+            <td>
+                Plotchart:
+            </td>
+            <td>
+                @(Html.Telerik().DropDownList()
+       .Name("PlotChartList")
+       .BindTo(new SelectList(Model.plotList, "Id", "PlotId"))
+       .ClientEvents(events => events.OnChange("ComboBox_onChange"))
+       .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)))
+            </td>
+            <td>
+                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" />include former subplots
+                <br />
+                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" />draw beyond plot borders
+            </td>
+            <td>
+                Grid Size:
+            </td>
+            <td>
+                @(Html.Telerik().DropDownList()
+       .Name("Gridsize")
+       .BindTo(new SelectList(Model.gridsize))
+       .ClientEvents(events => events.OnChange("ComboBox_onChange"))
+       .SelectedIndex(0))
+            </td>
+
+            <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
+            <td valign="bottom"><a href="#" title="Export CSV" onclick="exportPlot()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>
+        </tr>
+
+    </table>
+</div>
+<div>
+    @(Html.Telerik().Grid<GeometryInformation>()
+            .Name("plotchart_geometries")
+            .DataBinding(dataBinding => dataBinding
+             //Ajax binding
+             .Ajax()
+                   //The action method which will return JSON and its arguments
+                   .Select("_AjaxBinding", "Main", new { id = Model.selectedPlot != null ? Model.selectedPlot.PlotId : "0", beyondborder = false, deactiveplot = false, area = "PMM" })
+            )
+            .Pageable(paging =>
+                paging
+                        .Style(pagerStyles).Enabled(true)
+                        .PageSize(10)
+                    .Position(GridPagerPosition.Both)
+                        .PageTo(1)
+                    )
+            .Sortable().ClientEvents(x => x.OnDataBound("UpdateGridColors"))
+            .Filterable()
+            .ClientEvents(x => x.OnDataBinding("Grid_onDataBinding"))
+            .Columns(columns =>
+            {
+                columns.Bound(c => c.Name);
+                columns.Bound(c => c.GeometryType).EditorViewData(new { geometryType = Model.geometryType });
+                columns.Bound(c => c.Coordinate);
+                columns.Bound(c => c.CoordinateType);
+                columns.Bound(c => c.LineWidth);
+
+                columns.Template(c => c.Color).ClientTemplate(
+                    "<input disabled='disabled' type='text' value='<#= Color #>' style='width:100px;background-color:<#= Color #>;color:<#= Color #>;'/>"
+                    ).Title("Color").HtmlAttributes("style='background-color:pink;'");
+                columns.Bound(c => c.Description);
+                columns.Bound(c => c.PlotId);
+                columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick='archiveGeometry(<#= Id #>)'><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
+                columns.Template(@<text></text>).ClientTemplate("<a title='delete' href='#'" + "class='btn btn-sm' onclick='deleteGeometry(<#= Id #>)'><img id='delete-<#= Id #>' src='../../Areas/PMM/Images/delete.png' width='16'></a>").Title("Delete").Width(60);
+            }))
+</div>
+<div style="width:65%;float:left;">
+    <img id="plotChartPicture" src="@Model.ImageSource" width="800" height="800" />
+</div>
+<script type="text/javascript">
+
+    $(document).ready(function () {
+
+        $('.demo').each(function () {
+            //
+            // Dear reader, it's actually very easy to initialize MiniColors. For example:
+            //
+            //  $(selector).minicolors();
+            //
+            // The way I've done it below is just for the demo, so don't get confused
+            // by it. Also, data- attributes aren't supported at this time. Again,
+            // they're only used for the purposes of this demo.
+            //
+            $(this).minicolors({
+                control: $(this).attr('data-control') || 'hue',
+                defaultValue: $(this).attr('data-defaultValue') || '',
+                format: $(this).attr('data-format') || 'hex',
+                keywords: $(this).attr('data-keywords') || '',
+                inline: $(this).attr('data-inline') === 'true',
+                letterCase: $(this).attr('data-letterCase') || 'lowercase',
+                opacity: $(this).attr('data-opacity'),
+                position: $(this).attr('data-position') || 'bottom left',
+                swatches: $(this).attr('data-swatches') ? $(this).attr('data-swatches').split('|') : [],
+                change: function (hex, opacity) {
+                    var log;
+                    try {
+                        log = hex ? hex : 'transparent';
+                        if (opacity) log += ', ' + opacity;
+                        console.log(log);
+                    } catch (e) { }
+                },
+                theme: 'default'
+            });
+
+        });
+
+    });
+
+    function ComboBox_onChange(e) {
+        LoadPackageAndBindGrid();
+        UpdatePlotChart();
+    }
+
+    function DownloadPdf() {
+        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var plotId = comboboxPlotChart.value();
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var gridSize = comboboxGridSize.value();
+        var params = "id=" + plotId + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize;
+        window.open("/PMM/Main/getpdf?" + params, "_blank");
+    }
+
+    function LoadPackageAndBindGrid() {
+        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var plotId = comboboxPlotChart.value();
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var gridSize = comboboxGridSize.value();
+
+        var data = {
+            id: plotId,
+            deactivePlot: deactiveplot,
+            beyondPlot: beyondborder,
+            area: "PMM",
+        }
+        var grid = $('#plotchart_geometries').data('tGrid');
+        grid.dataSource._data = [];
+
+        grid.rebind(data);
+        // Reload The Package Details
+        //grid.ajaxRequest(params);
+    }
+
+    function Grid_onDataBinding(e) {
+        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var plotId = comboboxPlotChart.value();
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var gridSize = comboboxGridSize.value();
+
+        var data = {
+            id: plotId,
+            deactivePlot: deactiveplot,
+            beyondPlot: beyondborder,
+            area: "PMM"
+        }
+        e.data = data;
+
+    }
+
+    function UpdatePlotChart() {
+        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var plotId = comboboxPlotChart.value();
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var gridSize = comboboxGridSize.value();
+
+        var data = {
+            id: plotId,
+            deactivePlot: deactiveplot,
+            beyondPlot: beyondborder,
+            gridsize: gridSize
+        }
+
+        $.ajax({
+            url: '/PMM/Main/_getPlotChart',
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            error: function (xhr) {
+                alert('Error: ' + xhr.statusText);
+
+            },
+            success: function (result) {
+                if (result) {
+                    $('#plotChartPicture').attr("src", result);
+                } else {
+
+                    alert("Dataset is locked. Please try again later.");
+                }
+            }
+        });
+
+        LoadPackageAndBindGrid();
+    }
+
+    function UpdateGridColors() {
+        $('#plotchart_geometries input[type=text]').each(function () {
+            var color = $(this).val();
+            $(this).val("");
+            if (color.length != 9)
+                return;
+            var colorCode = hexToRgb(color.substring(1, 7));
+            var opacity = parseInt(color.substring(7, 9), 16) / 255;
+            $(this).css("background-color", "rgba(" + colorCode + "," + opacity + ")");
+            $(this).css("color", "rgba(" + colorCode + "," + opacity + ")");
+        });
+        $('#plotchart_geometries input[type=hidden]').each(function () {
+            if ($(this).val() == "2")
+                $("#archive-" + $(this).attr("name")).attr("src", "../../Areas/PMM/Images/archived.png");
+            else if (($(this).val() == "3"))
+                $("#delete-" + $(this).attr("name")).attr("src", "../../Areas/PMM/Images/deleted.png");
+        });
+    }
+
+    function hexToRgb(hex) {
+        var bigint = parseInt(hex, 16);
+        var r = (bigint >> 16) & 255;
+        var g = (bigint >> 8) & 255;
+        var b = bigint & 255;
+
+        return r + "," + g + "," + b;
+    }
+
+    function exportPlot() {
+        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
+        var plotId = comboboxPlotChart.value();
+        window.open("/PMM/Main/ExportPlot?id=" + plotId, "_blank");
+    }
+</script>

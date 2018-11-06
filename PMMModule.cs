@@ -1,13 +1,12 @@
-﻿using BExIS.Modules.Lui.UI.Helper;
-using System;
+﻿using System;
 using Vaiona.Logging;
 using Vaiona.Web.Mvc.Modularity;
 
-namespace BExIS.Modules.Lui.UI
+namespace BExIS.Modules.Pmm.UI
 {
-    public class LUIModule : ModuleBase
+    public class PMMModule : ModuleBase
     {
-        public LUIModule(): base("LUI")
+        public PMMModule(): base("PMM")
         {
         }
 
@@ -35,11 +34,11 @@ namespace BExIS.Modules.Lui.UI
 
         public override void Install()
         {
-            LoggerFactory.GetFileLogger().LogCustom("... start install of LUI ...");
+            LoggerFactory.GetFileLogger().LogCustom("... start install of PMM ...");
             try
             {
                 base.Install();
-                LUISeedDataGenerator.CreateFeatures();
+                //PMMSeedDataGenerator.CreateFeatures();
             }
             catch (Exception e)
             {
@@ -47,7 +46,7 @@ namespace BExIS.Modules.Lui.UI
                 LoggerFactory.GetFileLogger().LogCustom(e.StackTrace);
             }
 
-            LoggerFactory.GetFileLogger().LogCustom("... end install of LUI ...");
+            LoggerFactory.GetFileLogger().LogCustom("... end install of PMM ...");
         }
     }
 }
