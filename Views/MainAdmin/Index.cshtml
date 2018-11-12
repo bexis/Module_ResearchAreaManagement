@@ -51,7 +51,7 @@
              //Ajax binding
              .Ajax()
                    //The action method which will return JSON and its arguments
-                   .Select("_AjaxBindingPlots", "Main")
+                   .Select("_AjaxBindingPlots", "MainAdmin")
 
             )
             .Pageable(paging =>
@@ -64,8 +64,8 @@
             .Sortable()
             .ClientEvents(x => x.OnDataBound("UpdateIcons"))
             .Filterable()
-            .ClientEvents(events => events.OnRowSelect("PlotonRowSelect"))
-            .ClientEvents(events => events.OnRowDataBound("PlotOnRowDataBound"))
+            //.ClientEvents(events => events.OnRowSelect("PlotonRowSelect"))
+            //.ClientEvents(events => events.OnRowDataBound("PlotOnRowDataBound"))
             .Columns(columns =>
             {
             columns.Bound(x => x.Id).Format("<input type='checkbox'  value='{0}' onclick='OnChekBox(this)'>").Encoded(false).Width(60).Title("<input type='checkbox' onclick='selectAll(this)'>").Sortable(false).Filterable(false);
@@ -348,7 +348,7 @@
             name: name
         }
         $.ajax({
-            url: '/PMM/PlotChartAdmin/_archivePlot',
+            url: '/PMM/MainAdmin/_archivePlot',
             type: 'POST',
             data: JSON.stringify(data),
             dataType: 'json',
@@ -480,7 +480,7 @@
             name: name
         }
         $.ajax({
-            url: '/PMM/PlotChartAdmin/_deletePlot',
+            url: '/PMM/MainAdmin/_deletePlot',
             type: 'POST',
             data: JSON.stringify(data),
             dataType: 'json',
@@ -548,9 +548,9 @@
             return;
         
 
-        var Url = '/PMM/PlotChartAdmin/_newPlot';
+        var Url = '/PMM/MainAdmin/_newPlot';
         if ($("#newPlot").val() == "Update") {
-            Url = '/PMM/PlotChartAdmin/_updatePlot';
+            Url = '/PMM/MainAdmin/_updatePlot';
             var geometryid = $('#PlotIdHolder').val();
             var data = {
                 plotId: id,

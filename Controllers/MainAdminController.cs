@@ -21,6 +21,10 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             helper = new BExIS.Pmm.Model.Plotchart();
         }
 
+        /// <summary>
+        /// Load plot admin view
+        /// </summary>
+        /// <returns>plot admin view</returns>
         public ActionResult Index()
         {
 
@@ -31,6 +35,17 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(plotviewmodel);
         }
 
+        /// <summary>
+        /// add new plot
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="name"></param>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns>if the action was successful or not</returns>
         [HttpPost]
         public ActionResult _newPlot(string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
         {
@@ -42,7 +57,18 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(message);
         }
 
-
+        /// <summary>
+        /// update information of a existing plot
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="name"></param>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns>if the action was successful or not</returns>
         [HttpPost]
         public ActionResult _updatePlot(int plotid, string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
         {
@@ -54,6 +80,12 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(message);
         }
 
+        /// <summary>
+        /// archive or unarchive a plot
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="name"></param>
+        /// <returns>if the action was successful or not</returns>
         [HttpPost]
         public ActionResult _archivePlot(long plotid, string name)
         {
@@ -66,6 +98,12 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(message);
         }
 
+        /// <summary>
+        /// delete a plot logically(not physically, it only changes the status)
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="name"></param>
+        /// <returns>if the action was successful or not</returns>
         [HttpPost]
         public ActionResult _deletePlot(long plotid, string name)
         {
@@ -78,6 +116,10 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(message);
         }
 
+        /// <summary>
+        /// grid action to load plots' list
+        /// </summary>
+        /// <returns>grid model</returns>
         [GridAction]
         public ActionResult _AjaxBindingPlots()
         {
@@ -96,6 +138,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(new GridModel<Plot> { Data = plots.ToList() });
         }
 
+        /// <summary>
+        /// load subplot view
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <returns>subplotview</returns>
         // GET: PlotChart
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
@@ -110,11 +157,27 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(plotviewmodel);
         }
 
+        /// <summary>
+        /// get subplots of a plot
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
         public ActionResult _getPlotChart(long id, Boolean deactivePlot = false, Boolean beyondPlot = false, int gridSize = 5)
         {
             return Json(helper.ProducePlot(helper.GetPlot(id), 1, deactivePlot, beyondPlot, gridSize));
         }
 
+        /// <summary>
+        /// Export a plot to PDF
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <param name="gridSize"></param>
+        /// <returns>PDF file</returns>
         public ActionResult GetPDF(long id, Boolean deactivePlot = false, Boolean beyondPlot = false, int gridSize = 5)
         {
             List<Plot> plotList = new List<Plot>();
@@ -122,6 +185,15 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return File(helper.generatePDF(plotList, 1, deactivePlot, beyondPlot, gridSize), "application/pdf", "filename.pdf");
         }
 
+        /// <summary>
+        /// Export several plots to PDF
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <param name="gridSize"></param>
+        /// <param name="legend"></param>
+        /// <returns>PDF file</returns>
         public ActionResult GetPDFBatch(String ids, Boolean deactivePlot = false, Boolean beyondPlot = false, int gridSize = 5, Boolean legend = false)
         {
             List<Plot> plotList = new List<Plot>();
@@ -134,6 +206,13 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return File(helper.generatePDF(plotList, 1, deactivePlot, beyondPlot, gridSize, legend), "application/pdf", "filename.pdf");
         }
 
+        /// <summary>
+        /// load subplots' list for a grid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <returns>grid model</returns>
         [GridAction]
         public virtual ActionResult _AjaxBinding(long id, Boolean deactivePlot, Boolean beyondPlot)
         {
@@ -148,6 +227,18 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(new GridModel<GeometryInformation> { Data = plot.Geometries.ToList() });
         }
 
+        /// <summary>
+        /// add new subplot
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="color"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult _newGeometry(long plotid,string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string refrencePoint = "")
         {
@@ -155,7 +246,19 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(result != null);
         }
 
-
+        /// <summary>
+        /// update a exisiting subplot information
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="color"></param>
+        /// <param name="geometryId"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult _updateGeometry(string plotid, string coordinate, string geometrytype, string coordinatetype, string color, long geometryId, string name, string description, string refrencePoint = "")
         {
@@ -163,6 +266,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(result != null);
         }
 
+        /// <summary>
+        /// change status of a existing subplot to archive
+        /// </summary>
+        /// <param name="geometryid"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult _archiveGeometry(long geometryid)
         {
@@ -170,6 +278,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(true);
         }
 
+        /// <summary>
+        /// change status of a existing subplot to delete
+        /// </summary>
+        /// <param name="geometryid"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult _deleteGeometry(long geometryid)
         {
@@ -177,11 +290,21 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return Json(true);
         }
 
+        /// <summary>
+        /// load the view to import plot and subplots
+        /// </summary>
+        /// <returns></returns>
         public ActionResult ImportInformation()
         {
             return View();
         }
 
+        /// <summary>
+        /// import the data from a file to the system
+        /// </summary>
+        /// <param name="attachments"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         [HttpPost]
         public ActionResult ImportInformation(IEnumerable<HttpPostedFileBase> attachments, String type)
         {
@@ -218,6 +341,10 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View();
         }
 
+        /// <summary>
+        /// export plots to a CSV file
+        /// </summary>
+        /// <returns>CSV file</returns>
         public ActionResult ExportAllPlots()
         {
             ImportExport importExport = new ImportExport();
@@ -225,6 +352,10 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return File(Encoding.ASCII.GetBytes(importExport.ExportAllPlots()), "text/csv", "PlotList.csv");
         }
 
+        /// <summary>
+        /// export all subplots to a CSV file
+        /// </summary>
+        /// <returns>CSV file</returns>
         public ActionResult ExportAllGeometries()
         {
             ImportExport importExport = new ImportExport();
@@ -232,6 +363,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return File(Encoding.ASCII.GetBytes(importExport.ExportAllGeometries()), "text/csv", "SubplotList.csv");
         }
 
+        /// <summary>
+        /// export subplots of a plot to a CSV file
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>CSV file</returns>
         public ActionResult ExportPlot(long id)
         {
             ImportExport importExport = new ImportExport();

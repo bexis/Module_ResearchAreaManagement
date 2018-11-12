@@ -17,6 +17,17 @@ namespace BExIS.Pmm.Model
 {
     public class Plotchart
     {
+        /// <summary>
+        /// add a new plot
+        /// </summary>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="name"></param>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns>new plot</returns>
         public Plot AddPlot(string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
         {
             if (!checkGeometry(geometrytype, coordinatetype, coordinate))
@@ -33,6 +44,18 @@ namespace BExIS.Pmm.Model
             return plot;
         }
 
+        /// <summary>
+        /// update a existing plot
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="name"></param>
+        /// <param name="latitude"></param>
+        /// <param name="longitude"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns>updated plot</returns>
         public Plot UpdatePlot(long plotid, string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
         {
             PlotManager pManager = new PlotManager();
@@ -73,6 +96,11 @@ namespace BExIS.Pmm.Model
             return plot;
         }
 
+        /// <summary>
+        /// change the status of a plot to delete
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <returns>updated plot</returns>
         public Plot DeletePlot(long plotid)
         {
             PlotManager pManager = new PlotManager();
@@ -85,6 +113,11 @@ namespace BExIS.Pmm.Model
             return plot;
         }
 
+        /// <summary>
+        /// change the status of a plot to archived
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <returns>updated plot</returns>
         public Plot ArchivePlot(long plotid)
         {
             PlotManager pManager = new PlotManager();
@@ -97,6 +130,13 @@ namespace BExIS.Pmm.Model
             return plot;
         }
 
+        /// <summary>
+        /// check plot name for duplicatation
+        /// </summary>
+        /// <param name="action"></param>
+        /// <param name="name"></param>
+        /// <param name="plotId"></param>
+        /// <returns>Message for validity of the name</returns>
         public String CheckDuplicatePlotName(String action, String name, long plotId)
         {
             String message = "valid";
@@ -113,6 +153,18 @@ namespace BExIS.Pmm.Model
             return message;
         }
 
+        /// <summary>
+        /// add a new subplot
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="color"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns>new subplot</returns>
         public GeometryInformation AddGeometry(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string refrencePoint = "")
         {
             Plot plot = GetPlot(plotid);
@@ -131,6 +183,18 @@ namespace BExIS.Pmm.Model
             return geometry;
         }
 
+        /// <summary>
+        /// update a existing subplot
+        /// </summary>
+        /// <param name="geometryId"></param>
+        /// <param name="coordinate"></param>
+        /// <param name="geometrytype"></param>
+        /// <param name="coordinatetype"></param>
+        /// <param name="color"></param>
+        /// <param name="name"></param>
+        /// <param name="description"></param>
+        /// <param name="refrencePoint"></param>
+        /// <returns>updated subplot</returns>
         public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string refrencePoint = "")
         {
             GeometryManager gManager = new GeometryManager();
@@ -157,6 +221,11 @@ namespace BExIS.Pmm.Model
             return geometry;
         }
 
+        /// <summary>
+        /// change the status of a subplot to archived
+        /// </summary>
+        /// <param name="geometryId"></param>
+        /// <returns>updated subplot</returns>
         public GeometryInformation ArchiveGeometry(long geometryId)
         {
             GeometryManager gManager = new GeometryManager();
@@ -169,6 +238,11 @@ namespace BExIS.Pmm.Model
             return geometry;
         }
 
+        /// <summary>
+        /// change the status of a subplot to deleted
+        /// </summary>
+        /// <param name="geometryId"></param>
+        /// <returns>updated subplot</returns>
         public GeometryInformation DeleteGeometry(long geometryId)
         {
             GeometryManager gManager = new GeometryManager();
@@ -182,6 +256,10 @@ namespace BExIS.Pmm.Model
             return geometry;
         }
 
+        /// <summary>
+        /// get list of plots
+        /// </summary>
+        /// <returns>plots list</returns>
         public IList<Plot> GetPlots()
         {
             PlotManager pcManager = new PlotManager();
@@ -190,6 +268,11 @@ namespace BExIS.Pmm.Model
             return plots;
         }
 
+        /// <summary>
+        /// get a plot by the plot name
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <returns>plot</returns>
         public Plot GetPlot(string plotid)
         {
             PlotManager pcManager = new PlotManager();
@@ -197,6 +280,11 @@ namespace BExIS.Pmm.Model
             return plot;
         }
 
+        /// <summary>
+        /// get a plot by plot id
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <returns>plot</returns>
         public Plot GetPlot(long plotid)
         {
             PlotManager pcManager = new PlotManager();
@@ -204,6 +292,13 @@ namespace BExIS.Pmm.Model
             return plot;
         }
 
+        /// <summary>
+        /// get a plot
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <returns></returns>
         public Plot GetPlot(long plotid, Boolean deactivePlot, Boolean beyondPlot)
         {
             PlotManager pcManager = new PlotManager();
@@ -236,6 +331,15 @@ namespace BExIS.Pmm.Model
             return plot;
         }
 
+        /// <summary>
+        /// produce plot image
+        /// </summary>
+        /// <param name="plot"></param>
+        /// <param name="zoom"></param>
+        /// <param name="deactiveGeometries">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <param name="gridSize"></param>
+        /// <returns>image</returns>
         public String ProducePlot(Plot plot, int zoom = 1, bool deactiveGeometries = true, bool beyondPlot = false, int gridSize = 5)
         {
             SharpMap.Map myMap;
@@ -247,7 +351,6 @@ namespace BExIS.Pmm.Model
             string mimeType = "image/jpg";/* Get mime type somehow (e.g. "image/png") */;
 
             ImageConverter _imageConverter = new ImageConverter();
-            //string base64 = Convert.ToBase64String((byte[])_imageConverter.ConvertTo(mapImage, typeof(byte[])));
             var stream = new MemoryStream();
             if (mapImage == null)
                 return String.Format("data:image/png;base64,{0}", Convert.ToBase64String(stream.ToArray()));
@@ -257,27 +360,27 @@ namespace BExIS.Pmm.Model
             return img;
         }
 
+        /// <summary>
+        /// produce sharpmap map and visualize all the plot's infromation
+        /// </summary>
+        /// <param name="outputsize"></param>
+        /// <param name="plot"></param>
+        /// <param name="zoom"></param>
+        /// <param name="deactiveGeometries">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
         private SharpMap.Map InitializeMap(Size outputsize, Plot plot, int zoom = 1, bool deactiveGeometries = true, bool beyondPlot = false, int gridSize = 5)
         {
             //Initialize a new map of size 'imagesize'
             SharpMap.Map map = new SharpMap.Map(outputsize);
             map.SRID = 54004;
             map.BackColor = Color.White;
-            //Plot plot = this.GetPlot(plotid);
             ProjNet.CoordinateSystems.CoordinateSystemFactory csFact = new ProjNet.CoordinateSystems.CoordinateSystemFactory();
-
-            //string wkt_gk = "PROJCS[\"World_Mercator\", GEOGCS[\"GCS_WGS_1984\", DATUM[\"WGS_1984\", SPHEROID[\"WGS_1984\", 6378137, 298.257223563]], PRIMEM[\"Greenwich\", 0], UNIT[\"Degree\", 0.017453292519943295]], PROJECTION[\"Mercator_1SP\"], PARAMETER[\"False_Easting\", 0], PARAMETER[\"False_Northing\", 0], PARAMETER[\"Central_Meridian\", 0], PARAMETER[\"Standard_Parallel_1\", 0], UNIT[\"Meter\", 1], AUTHORITY[\"EPSG\", \"54004\"]]";
-            //string wkt_gk = "PROJCS[\"Popular Visualisation CRS / Mercator\",    GEOGCS[\"Popular Visualisation CRS\",        DATUM[\"Popular_Visualisation_Datum\",            SPHEROID[\"Popular Visualisation Sphere\",6378137,0,                AUTHORITY[\"EPSG\",\"7059\"]],            TOWGS84[0,0,0,0,0,0,0],            AUTHORITY[\"EPSG\",\"6055\"]],        PRIMEM[\"Greenwich\",0,            AUTHORITY[\"EPSG\",\"8901\"]],        UNIT[\"degree\",0.01745329251994328,            AUTHORITY[\"EPSG\",\"9122\"]],        AUTHORITY[\"EPSG\",\"4055\"]],    UNIT[\"metre\",1,        AUTHORITY[\"EPSG\",\"9001\"]],    PROJECTION[\"Mercator_1SP\"],    PARAMETER[\"central_meridian\",0],    PARAMETER[\"scale_factor\",1],    PARAMETER[\"false_easting\",0],    PARAMETER[\"false_northing\",0],    AUTHORITY[\"EPSG\",\"3785\"],    AXIS[\"X\",EAST],    AXIS[\"Y\",NORTH]]";
-            //string wkt_4326 = "PROJCS[\"WGS 84 / Plate Carree (deprecated)\",GEOGCS[\"WGS 84\",DATUM[\"WGS_1984\",SPHEROID[\"WGS 84\",6378137,298.257223563,AUTHORITY[\"EPSG\",\"7030\"]],AUTHORITY[\"EPSG\",\"6326\"]],PRIMEM[\"Greenwich\",0,AUTHORITY[\"EPSG\",\"8901\"]],UNIT[\"degree\",0.01745329251994328,AUTHORITY[\"EPSG\",\"9122\"]],AUTHORITY[\"EPSG\",\"4326\"]],UNIT[\"metre\",1,AUTHORITY[\"EPSG\",\"9001\"]],PROJECTION[\"Equirectangular\"],PARAMETER[\"latitude_of_origin\",0],PARAMETER[\"central_meridian\",0],PARAMETER[\"false_easting\",0],PARAMETER[\"false_northing\",0],AUTHORITY[\"EPSG\",\"32662\"],AXIS[\"X\",EAST],AXIS[\"Y\",NORTH]]";
-            //GeoAPI.CoordinateSystems.ICoordinateSystem World_Mercator = csFact.CreateFromWkt(wkt_gk);
-
-            //GeoAPI.CoordinateSystems.ICoordinateSystem WGS_4326 = csFact.CreateFromWkt(wkt_4326);
-            //GeoAPI.CoordinateSystems.ICoordinateSystem WGS_4326 = ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84;
             GeoAPI.CoordinateSystems.ICoordinateSystem webmercator = ProjNet.CoordinateSystems.ProjectedCoordinateSystem.WebMercator;
 
             ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory ctFact = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory();
-            //ICoordinateTransformation transform = ctFact.CreateFromCoordinateSystems(webmercator, WGS_4326);
-
+            
             SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("Border");
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
             IGeometry area = plot.Geometry;
@@ -303,26 +406,18 @@ namespace BExIS.Pmm.Model
                 double disss = geometry.Geometry.Envelope.Distance(plot.Geometry.Envelope);
 
                 List<IGeometry> geometries = new List<IGeometry>();
-                //geometry.Geometry = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(geometry.GeometryText);
                 geometries.Add(geometry.Geometry);
-                //plotLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(geometries);
-                //new SharpMap.Data.Providers.GeometryProvider()
                 var dd = new SharpMap.Data.FeatureDataTable();
                 dd.Columns.Add("Label");
                 SharpMap.Data.FeatureDataRow newRow = dd.NewRow();
                 newRow.Geometry = geometry.Geometry;
-                //newRow["Label"] = (plot.Latitude) + "\t \n";
-                //dd.Rows.Add(new object[] { geometry.Geometry, "Salam"}); dd.AcceptChanges();
-                //dd.Rows.Add(newRow);
+
                 plotLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(geometries);
                 
-                //plotLayer.SRID = 3752;
-
                 newRow["Label"] = Math.Round((plotLayer.Envelope.MaxX - (Convert.ToDouble(plot.Longitude))) * 67000) + "," + Math.Round((plotLayer.Envelope.MaxY - (Convert.ToDouble(plot.Latitude))) * 108800) + "\t \n";
                 plotLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
                 plotLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
                 
-
                 dd.Rows.Clear(); dd.Rows.Add(newRow); plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
 
                 SharpMap.Layers.LabelLayer layLabel = new SharpMap.Layers.LabelLayer("Country labels")
@@ -337,17 +432,11 @@ namespace BExIS.Pmm.Model
 
                     Style = new SharpMap.Styles.LabelStyle()
                     {
-                        //ForeColor = System.Drawing.Color.Green,
                         Font = new Font(FontFamily.GenericSerif, 40),
-                        //BackColor = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)),
                         HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Right,
                         VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
                         CollisionDetection = true,
                         Enabled = true,
-
-
-                        //MaxVisible = 90,
-                        //MinVisible = 30
                     }
                 };
 
@@ -356,14 +445,7 @@ namespace BExIS.Pmm.Model
                 layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
 
                 layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
-                //layLabel.Style.Offset = map.WorldToImage(new Coordinate((double)layLabel.Style.Offset.X, (double)layLabel.Style.Offset.Y), false);
-                //var centroid = map.WorldToImage(layLabel.Envelope.Centre.CoordinateValue);
-                //layLabel.Style.Offset = new PointF(layLabel.Style.Offset.X - centroid.X, layLabel.Style.Offset.Y - centroid.Y);
 
-
-                //layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
-
-                //Set the polygons to have a black outline
                 String borderColor = "#000000";
                 if (geometry.GeometryType.ToLower() == "linestring")
                     borderColor = geometry.Color;
@@ -381,48 +463,17 @@ namespace BExIS.Pmm.Model
                 int argb = Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber);
                 Color clr = Color.FromArgb(argb);
                 plotLayer.Style.Fill = new SolidBrush(clr);
-                //pen.Width = geometry.LineWidth;
                 plotLayer.Style.Outline = pen;
                 plotLayer.Style.EnableOutline = true;
 
                 if (!beyondPlot && beyondBorderCheck(borderLayer, plotLayer))
                     continue;
 
-                //Add the layers to the map object.
-                //The order we add them in are the order they are drawn, so we add the rivers last to put them on top
-                //plotLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
-                //plotLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
-                //plotLayer.CoordinateTransformation = transform;
-                //plotLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, WGS_4326);
-
                 map.Layers.Add(plotLayer);
                 map.Layers.Add(layLabel);
             }
 
-
             
-
-
-            ////////////////////////////////////////
-            /////////////////////////////////////
-
-
-            //zoom = zoom == 0 ? 1 : zoom;
-
-            //map.ZoomToExtents();
-            //map.Zoom /= zoom;
-
-            /*for (int i = 9; i < map.Layers.Count ; i++)
-            {
-                if (i % 2 == 1)
-                    continue;
-                SharpMap.Layers.LabelLayer layer = map.Layers.ElementAt(i) as SharpMap.Layers.LabelLayer;
-                layer.Style.Offset = map.WorldToImage(new Coordinate((double)layer.Style.Offset.X, (double)layer.Style.Offset.Y), false);
-                var centroid = map.WorldToImage(layer.Envelope.Centre.CoordinateValue);
-                layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X, layer.Style.Offset.Y - centroid.Y);
-                map.Layers[i] = layer; map.Layers.ResetItem(i);
-            }*/
-
             map.ZoomToExtents();
 
             if (beyondPlot)
@@ -454,7 +505,6 @@ namespace BExIS.Pmm.Model
             else
             {
 
-                //////////////
                 for (int i = 0; i < gridSize * 2 * 2; i++)
                 {
                     if (i % 2 == 1)
@@ -466,9 +516,6 @@ namespace BExIS.Pmm.Model
                         map.Layers[i] = layer; map.Layers.ResetItem(i);
                     }
                 }
-
-
-                /////////////
 
                 for (int i = gridSize * 2 * 2 - 1; i < map.Layers.Count; i++)
                 {
@@ -486,6 +533,11 @@ namespace BExIS.Pmm.Model
             return map;
         }
 
+        /// <summary>
+        /// convert rgb colors to Argb
+        /// </summary>
+        /// <param name="color"></param>
+        /// <returns>Argb color</returns>
         private String RGBAToArgb(String color)
         {
             if (color.Length == 9)
@@ -493,6 +545,16 @@ namespace BExIS.Pmm.Model
             return color;
         }
 
+        /// <summary>
+        /// Generate a plot section to store in a PDF file
+        /// </summary>
+        /// <param name="plot"></param>
+        /// <param name="zoom"></param>
+        /// <param name="deactiveGeometries"></param>
+        /// <param name="beyondPlot"></param>
+        /// <param name="gridSize"></param>
+        /// <param name="legend"></param>
+        /// <returns></returns>
         private String generatePlotDiv(Plot plot, int zoom = 1, bool deactiveGeometries = true, bool beyondPlot = false, int gridSize = 5, Boolean legend = false)
         {
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
@@ -513,7 +575,6 @@ namespace BExIS.Pmm.Model
                     continue;
                 if (!beyondPlot)
                 {
-                    //IGeometry geom2 = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(geometry.GeometryText);
                     if (!area.Envelope.Contains(geometry.Geometry))
                         continue;
                 }
@@ -524,6 +585,16 @@ namespace BExIS.Pmm.Model
             return Div;
         }
 
+        /// <summary>
+        /// Generate PDF to export a list of plots
+        /// </summary>
+        /// <param name="plotList"></param>
+        /// <param name="zoom"></param>
+        /// <param name="deactiveGeometries"></param>
+        /// <param name="beyondPlot"></param>
+        /// <param name="gridSize"></param>
+        /// <param name="legend"></param>
+        /// <returns>PDF file</returns>
         public Byte[] generatePDF(List<Plot> plotList, int zoom = 1, bool deactiveGeometries = true, bool beyondPlot = false, int gridSize = 5, Boolean legend = false)
         {
             String Html = "<html><head><style>tr:nth-child(odd) {  background-color: #afafaf;} tr:nth-child(even) {  background-color: #f1f1f1;}</style></head><body >";
@@ -539,6 +610,12 @@ namespace BExIS.Pmm.Model
             return pdfBytes;
         }
 
+        /// <summary>
+        /// chech if a subplot is in a plot border or not
+        /// </summary>
+        /// <param name="borderLayer"></param>
+        /// <param name="plotLayer"></param>
+        /// <returns>true or false</returns>
         private Boolean beyondBorderCheck(SharpMap.Layers.VectorLayer borderLayer, SharpMap.Layers.VectorLayer plotLayer)
         {
             Boolean returnValue = true;
@@ -560,15 +637,20 @@ namespace BExIS.Pmm.Model
             {
                 Console.WriteLine("PlotChart: Can not generate the from the plotchart information");
             }
-            //string imgID = SharpMap.Web.Caching.InsertIntoCache(1, img);
-            //imgMap.ImageUrl = "getmap.aspx?ID=" + HttpUtility.UrlEncode(imgID);
             return img;
         }
 
+        /// <summary>
+        /// Add grid to the map
+        /// </summary>
+        /// <param name="map"></param>
+        /// <param name="plot"></param>
+        /// <param name="zoom"></param>
+        /// <param name="beyondPlot"></param>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
         private SharpMap.Map AddGridToMap(SharpMap.Map map, Plot plot, int zoom, bool beyondPlot = false, int gridSize = 5)
         {
-            //////////////////////////
-            //////////////////////////
             GeoAPI.CoordinateSystems.ICoordinateSystem webmercator = ProjNet.CoordinateSystems.ProjectedCoordinateSystem.WebMercator;
 
             ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory ctFact = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory();
@@ -576,8 +658,6 @@ namespace BExIS.Pmm.Model
 
             SharpMap.Layers.VectorLayer areaLayer = new SharpMap.Layers.VectorLayer("area");
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
-
-            
 
             float X1 = (float)Math.Round(((plot.Geometry.EnvelopeInternal.MinX - bb[0]) * 108800)); //plot.Area.X1 * 1.2f;
             X1 = Convert.ToInt32(X1) / gridSize * gridSize;
@@ -587,7 +667,6 @@ namespace BExIS.Pmm.Model
             float Y2 = X2; //plot.Area.Y3 * 1.2f;
             if (beyondPlot)
             {
-                //map.ZoomToExtents();
                 X1 = (float)Math.Round(-((float)(map.Envelope.Width) / 2)); X2 = (float)Math.Round(((float)(map.Envelope.Width) / 2));
                 Y1 = (float)Math.Round(-((float)(map.Envelope.Height) / 2)); Y2 = (float)Math.Round(((float)(map.Envelope.Height) / 2));
 
@@ -602,8 +681,6 @@ namespace BExIS.Pmm.Model
             areaLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
             areaLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-
-            ////////////////////////////////////////
             var dd = new SharpMap.Data.FeatureDataTable();
             dd.Columns.Add("Label");
             SharpMap.Data.FeatureDataRow newRow = dd.NewRow();
@@ -622,17 +699,11 @@ namespace BExIS.Pmm.Model
 
                 Style = new SharpMap.Styles.LabelStyle()
                 {
-                    //ForeColor = System.Drawing.Color.Green,
                     Font = new Font(FontFamily.GenericSerif, 50, FontStyle.Bold),
-                    //BackColor = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)),
                     HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
                     VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
                     CollisionDetection = true,
                     Enabled = true,
-
-
-                    //MaxVisible = 90,
-                    //MinVisible = 30
                 }
             };
 
@@ -641,14 +712,7 @@ namespace BExIS.Pmm.Model
             layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
 
             layLabel.Style.Offset = (new PointF((float)areaLayer.Envelope.Centre.X, (float)areaLayer.Envelope.MaxY));
-
-
-
-
-
-
-            ///////////////////////////////////////
-
+            
 
             areaLayer.Style.Fill = new SolidBrush(Color.FromArgb(0, ColorTranslator.FromHtml("#000000")));
             areaLayer.Style.Outline = Pens.Black;
@@ -657,8 +721,6 @@ namespace BExIS.Pmm.Model
             map.Layers.Add(layLabel);
 
             map.ZoomToExtents();
-
-
 
             float XI = (X2 - (X1)) / gridSize;
             float YI = (Y2 - (Y1)) / gridSize;
@@ -676,7 +738,6 @@ namespace BExIS.Pmm.Model
             borderLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
             borderLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-            ////////////////////////////////////////
             var borderFdt = new SharpMap.Data.FeatureDataTable();
             borderFdt.Columns.Add("Label");
             SharpMap.Data.FeatureDataRow newRowBorder = borderFdt.NewRow();
@@ -695,17 +756,12 @@ namespace BExIS.Pmm.Model
 
                 Style = new SharpMap.Styles.LabelStyle()
                 {
-                    //ForeColor = System.Drawing.Color.Green,
                     Font = new Font(FontFamily.GenericSerif, 60, FontStyle.Bold),
-                    //BackColor = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)),
                     HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
                     VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
                     CollisionDetection = true,
                     Enabled = true,
 
-
-                    //MaxVisible = 90,
-                    //MinVisible = 30
                 }
             };
 
@@ -715,17 +771,9 @@ namespace BExIS.Pmm.Model
 
             layLabelBorder.Style.Offset = (new PointF((float)borderLayer.Envelope.Centre.X, (float)borderLayer.Envelope.MaxY));
 
-
-
-
-
-
-            ///////////////////////////////////////
             map.Layers.Add(borderLayer);
             map.Layers.Add(layLabelBorder);
-
-
-
+            
             for (int i = 0; i < gridSize - 1; i++)
             {
                 XS -= XI;
@@ -742,13 +790,11 @@ namespace BExIS.Pmm.Model
 
                 gridxLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(gridXgeometries);
                 gridxLayer.Style.Fill = new SolidBrush(Color.FromArgb(50, ColorTranslator.FromHtml("#101010")));
-                //pen.Width = geometry.LineWidth;
                 gridxLayer.Style.Outline = new Pen((Color.FromArgb(50, ColorTranslator.FromHtml("#101010")))); ;
                 gridxLayer.Style.EnableOutline = true;
                 gridxLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
                 gridxLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-                ////////////////////////////////////////
                 var fdtX = new SharpMap.Data.FeatureDataTable();
                 fdtX.Columns.Add("Label");
                 SharpMap.Data.FeatureDataRow newFdtXRow = fdtX.NewRow();
@@ -767,17 +813,11 @@ namespace BExIS.Pmm.Model
 
                     Style = new SharpMap.Styles.LabelStyle()
                     {
-                        //ForeColor = System.Drawing.Color.Green,
                         Font = new Font(FontFamily.GenericSerif, 50, FontStyle.Bold),
-                        //BackColor = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)),
                         HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
                         VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
                         CollisionDetection = true,
                         Enabled = true,
-
-
-                        //MaxVisible = 90,
-                        //MinVisible = 30
                     }
                 };
 
@@ -787,24 +827,16 @@ namespace BExIS.Pmm.Model
 
                 layerLabelX.Style.Offset = (new PointF((float)gridxLayer.Envelope.MinX, (float)gridxLayer.Envelope.Centre.Y));
 
-
-
-
-
-
-                ///////////////////////////////////////
                 map.Layers.Add(gridxLayer);
                 map.Layers.Add(layerLabelX);
 
                 gridyLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(gridYgeometries);
                 gridyLayer.Style.Fill = new SolidBrush(Color.FromArgb(50, ColorTranslator.FromHtml("#101010")));
-                //pen.Width = geometry.LineWidth;
                 gridyLayer.Style.Outline = new Pen((Color.FromArgb(50, ColorTranslator.FromHtml("#101010"))));
                 gridyLayer.Style.EnableOutline = true;
                 gridyLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
                 gridyLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-                ////////////////////////////////////////
                 var fdtY = new SharpMap.Data.FeatureDataTable();
                 fdtY.Columns.Add("Label");
                 SharpMap.Data.FeatureDataRow newFdtYRow = fdtY.NewRow();
@@ -823,17 +855,11 @@ namespace BExIS.Pmm.Model
 
                     Style = new SharpMap.Styles.LabelStyle()
                     {
-                        //ForeColor = System.Drawing.Color.Green,
                         Font = new Font(FontFamily.GenericSerif, 50, FontStyle.Bold),
-                        //BackColor = new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(128, 255, 0, 0)),
                         HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
                         VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
                         CollisionDetection = true,
                         Enabled = true,
-
-
-                        //MaxVisible = 90,
-                        //MinVisible = 30
                     }
                 };
 
@@ -843,24 +869,21 @@ namespace BExIS.Pmm.Model
 
                 layerLabelY.Style.Offset = (new PointF((float)gridyLayer.Envelope.MinX, (float)gridyLayer.Envelope.MinY));
 
-
-
-
-
-
-                ///////////////////////////////////////
                 map.Layers.Add(gridyLayer);
                 map.Layers.Add(layerLabelY);
             }
 
-            //zoom = zoom == 0 ? 1 : zoom;
             map.ZoomToExtents();
-            //map.ZoomToExtents();
-            //map.Zoom /= zoom;
-
             return map;
         }
 
+        /// <summary>
+        /// check the validity of the coordinate to define a plot or a subplot
+        /// </summary>
+        /// <param name="geometryType"></param>
+        /// <param name="coordType"></param>
+        /// <param name="geometry"></param>
+        /// <returns>true or false</returns>
         public bool checkGeometry(String geometryType, String coordType, String geometry)
         {
             //Holds regular expression
@@ -931,7 +954,15 @@ namespace BExIS.Pmm.Model
             return false;
         }
 
-
+        /// <summary>
+        /// produce WKT(well knows text) to visualize a plot or subplot geometry
+        /// </summary>
+        /// <param name="geomType"></param>
+        /// <param name="coord"></param>
+        /// <param name="aa"></param>
+        /// <param name="coordType"></param>
+        /// <param name="refPoint">it have to be filled when the coordType is polar</param>
+        /// <returns></returns>
         public static string calCoordd(string geomType, string coord, double[] aa, string coordType = "xy", string refPoint = "")
         {
             double[,] toReturn = null;

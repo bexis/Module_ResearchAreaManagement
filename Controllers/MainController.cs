@@ -24,6 +24,10 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             helper = new BExIS.Pmm.Model.Plotchart();
         }
 
+        /// <summary>
+        /// load plot view form normal users
+        /// </summary>
+        /// <returns>plot view</returns>
         public ActionResult Index()
         {
 
@@ -32,6 +36,10 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(plotviewmodel);
         }
 
+        /// <summary>
+        /// load plots' list for a grid
+        /// </summary>
+        /// <returns>grid model</returns>
         [GridAction]
         public ActionResult _AjaxBindingPlots()
         {
@@ -50,6 +58,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(new GridModel<Plot> { Data = plots.ToList() });
         }
 
+        /// <summary>
+        /// load subplot view for noram users
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <returns>subplot view</returns>
         // GET: PlotChart
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
@@ -64,11 +77,27 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(plotviewmodel);
         }
 
+        /// <summary>
+        /// load plotchart infromation
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <param name="gridSize"></param>
+        /// <returns></returns>
         public ActionResult _getPlotChart(long id, Boolean deactivePlot = false, Boolean beyondPlot = false, int gridSize = 5)
         {
             return Json(helper.ProducePlot(helper.GetPlot(id), 1, deactivePlot, beyondPlot, gridSize));
         }
 
+        /// <summary>
+        /// export a plot to PDF
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <param name="gridSize"></param>
+        /// <returns>PDF file</returns>
         public ActionResult GetPDF(long id, Boolean deactivePlot = false, Boolean beyondPlot = false, int gridSize = 5)
         {
             List<Plot> plotList = new List<Plot>();
@@ -76,6 +105,13 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return File(helper.generatePDF(plotList, 1, deactivePlot, beyondPlot, gridSize), "application/pdf", "filename.pdf");
         }
 
+        /// <summary>
+        /// load subplots' list for a grid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="deactivePlot">load deactive subplots</param>
+        /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
+        /// <returns>grid model</returns>
         [GridAction]
         public virtual ActionResult _AjaxBinding(long id, Boolean deactivePlot, Boolean beyondPlot)
         {
@@ -90,7 +126,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View(new GridModel<GeometryInformation> { Data = plot.Geometries.ToList() });
         }
 
-        public ActionResult ImportInformation()
+        /*public ActionResult ImportInformation()
         {
             return View();
         }
@@ -129,8 +165,12 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
             // Redirect to a view showing the result of the form submission.
             return View();
-        }
+        }*/
 
+        /// <summary>
+        /// export plots to a CSV file
+        /// </summary>
+        /// <returns>CSV file</returns>
         public ActionResult ExportAllPlots()
         {
             ImportExport importExport = new ImportExport();
@@ -138,6 +178,10 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return File(Encoding.ASCII.GetBytes(importExport.ExportAllPlots()), "text/csv", "PlotList.csv");
         }
 
+        /// <summary>
+        /// export all subplots to a CSV file
+        /// </summary>
+        /// <returns>CSV file</returns>
         public ActionResult ExportAllGeometries()
         {
             ImportExport importExport = new ImportExport();
@@ -145,6 +189,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return File(Encoding.ASCII.GetBytes(importExport.ExportAllGeometries()), "text/csv", "SubplotList.csv");
         }
 
+        /// <summary>
+        /// export subplots of a plot to a CSV file
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>CSV file</returns>
         public ActionResult ExportPlot(long id)
         {
             ImportExport importExport = new ImportExport();
