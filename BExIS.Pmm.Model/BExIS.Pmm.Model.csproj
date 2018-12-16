@@ -86,6 +86,9 @@
       <HintPath>..\..\..\..\..\packages\ProjNET4GeoAPI.1.3.0.3\lib\net403-client\ProjNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="ServiceStack.Text, Version=3.9.71.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\packages\ServiceStack.Text.3.9.71\lib\net35\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="SharpMap, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\..\..\packages\SharpMap.1.1.0\lib\net40-client\SharpMap.dll</HintPath>
       <Private>True</Private>
@@ -107,6 +110,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="Terradue.GeoJson, Version=1.4.0.18920, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\..\..\packages\Terradue.GeoJson.1.4.0\lib\net40\Terradue.GeoJson.dll</HintPath>
+    </Reference>
     <Reference Include="Vaiona.Entities">
       <HintPath>..\..\..\..\..\Libraries\Vaiona\Vaiona.Entities.dll</HintPath>
     </Reference>
@@ -124,7 +130,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BExIS.Pmm.Entities\BExIS.Pmm.Entities.csproj">
-      <Project>{B35CB78F-639A-4C14-97F6-0E699FBCDE81}</Project>
+      <Project>{29f7ddae-22f0-4a3e-a5e3-a25869ebf3eb}</Project>
       <Name>BExIS.Pmm.Entities</Name>
     </ProjectReference>
     <ProjectReference Include="..\BExIS.Pmm.Services\BExIS.Pmm.Services.csproj">
