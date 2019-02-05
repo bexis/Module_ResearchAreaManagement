@@ -15,7 +15,7 @@
     <!--add proper menu items-->
 	
     <Export tag="menubar" id="pmmMenu" order="10"
-            title="PMM" description="PMM desc" icon=""
+            title="PlotChart" description="PMM desc" icon=""
             controller="main" action="index"
             extends="./menubarRoot" />
     
