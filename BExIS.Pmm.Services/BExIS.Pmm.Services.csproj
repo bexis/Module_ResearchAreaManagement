@@ -54,7 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BExIS.Pmm.Entities\BExIS.Pmm.Entities.csproj">
-      <Project>{B35CB78F-639A-4C14-97F6-0E699FBCDE81}</Project>
+      <Project>{29f7ddae-22f0-4a3e-a5e3-a25869ebf3eb}</Project>
       <Name>BExIS.Pmm.Entities</Name>
     </ProjectReference>
   </ItemGroup>

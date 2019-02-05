@@ -12,6 +12,10 @@ using System.Text.RegularExpressions;
 using System.Web;
 using BExIS.Dlm.Services;
 using System.Text;
+using Terradue.GeoJson.Geometry;
+using Terradue.GeoJson.Feature;
+using ServiceStack.Text;
+using Newtonsoft.Json.Linq;
 
 namespace BExIS.Pmm.Model
 {
@@ -160,6 +164,34 @@ namespace BExIS.Pmm.Model
                 String line = geometry.Id + ";" + geometry.Name + ";" + geometry.GeometryType + ";" + geometry.Coordinate + ";" + geometry.CoordinateType + ";" + geometry.LineWidth + ";" + geometry.Color + ";" + geometry.Description + ";" + geometry.Status + ";" + geometry.Plot.Id + "\n";
                 output += line;
             }
+            return output;
+        }
+
+        public String ExportToGeoJSON(long id)
+        {
+            String output = "";
+            Plotchart plotChart = new Plotchart();
+            Plot plot = plotChart.GetPlot(id);
+            JArray featureArray = new JArray();
+            foreach (var geometry in plot.Geometries)
+            {
+                try
+                {
+                    var test = geometry.Geometry.ToString();
+                    var feature = GeometryFactory.WktToFeature(test);
+                    var fc = new FeatureCollection(new Terradue.GeoJson.Feature.Feature[] { feature }.ToList());
+                    output = JsonSerializer.SerializeToString(fc);
+                    output = output.Replace("{\"features\":[", "").Replace("],\"type\":\"FeatureCollection\"}", "");
+                    JObject jobject = JObject.Parse(output);
+                    if(!jobject.ToString().Equals("{}"))
+                        featureArray.Add(jobject);
+                }
+                catch(Exception e) { continue; }
+            }
+            JObject geoJson = new JObject();
+            geoJson.Add("type", "FeatureCollection");
+            geoJson.Add("features", featureArray);
+            output = geoJson.ToString();
             return output;
         }
 
