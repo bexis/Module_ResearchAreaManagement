@@ -26,18 +26,22 @@ namespace BExIS.Modules.Pmm.UI.Helper
 
                 List<Feature> features = featureManager.FeatureRepository.Get().ToList();
 
-                Feature ResearchAreas = features.FirstOrDefault(f => f.Name.Equals("Research Areas"));
-                if (ResearchAreas == null)
-                    ResearchAreas = featureManager.Create("Research Areas", "Research Areas");
-
-                Feature ResearchAreasAdmin = features.FirstOrDefault(f => f.Name.Equals("Research Areas Admin"));
-                if (ResearchAreasAdmin == null)
-                    ResearchAreasAdmin = featureManager.Create("Research Areas Admin", "Research Areas Admin");
+                Feature rootResearchAreaFeature = featureManager.FeatureRepository.Get().FirstOrDefault(f => f.Name.Equals("Research Area Management"));
+                if (rootResearchAreaFeature == null) rootResearchAreaFeature = featureManager.Create("Research Area Management", "Research Area Management");
 
 
-                operationManager.Create("PMM", "Main", "*", ResearchAreas);
+                Feature researchAreasFeature = features.FirstOrDefault(f => f.Name.Equals("Research Areas"));
+                if (researchAreasFeature == null)
+                    researchAreasFeature = featureManager.Create("Research Areas", "Research Areas", rootResearchAreaFeature);
 
-                operationManager.Create("PMM", "MainAdmin", "*", ResearchAreasAdmin);
+                Feature researchAreasAdminFeature = features.FirstOrDefault(f => f.Name.Equals("Research Areas Admin"));
+                if (researchAreasAdminFeature == null)
+                    researchAreasAdminFeature = featureManager.Create("Research Areas Admin", "Research Areas Admin", rootResearchAreaFeature);
+
+
+                operationManager.Create("PMM", "Main", "*", researchAreasFeature);
+
+                operationManager.Create("PMM", "MainAdmin", "*", researchAreasAdminFeature);
 
             }
             catch (Exception ex)
