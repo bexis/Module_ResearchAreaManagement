@@ -42,7 +42,9 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Mappings\Default\PlotChart\GeometryInformation.hbm.xml" />
+    <Content Include="Mappings\Default\PlotChart\GeometryInformationHistory.hbm.xml" />
     <Content Include="Mappings\Default\PlotChart\Plot.hbm.xml" />
+    <Content Include="Mappings\Default\PlotChart\PlotHistory.hbm.xml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Mappings\DB2Dialect\" />
