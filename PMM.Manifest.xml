@@ -16,7 +16,7 @@
 	
     <Export tag="menubar" id="pmmMenu" order="10"
             title="PlotChart" description="PMM desc" icon=""
-            controller="main" action="index"
+            controller="mainAdmin" action="SubPlots"
             extends="./menubarRoot" />
     
 	<!-- Settings Example-->
