@@ -1,5 +1,5 @@
 ﻿<hibernate-mapping xmlns="urn:nhibernate-mapping-2.2" assembly="BExIS.Pmm.Entities" namespace="BExIS.Pmm.Entities">
-  <class xmlns="urn:nhibernate-mapping-2.2" name="PlotHistory" table="PlotHistory" dynamic-update="true">
+  <class xmlns="urn:nhibernate-mapping-2.2" name="PlotHistory" table="PMM_PlotHistory" dynamic-update="true">
     <!-- Mapping BaseEntity properties -->
 
     <id name="Id" type="Int64">
