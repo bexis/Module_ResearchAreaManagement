@@ -4,7 +4,7 @@ using System.Diagnostics.Contracts;
 using Vaiona.Persistence.Api;
 using PlotChartX = BExIS.Pmm.Entities.Plot;
 
-namespace BExIS.Dlm.Services
+namespace BExIS.Pmm.Services
 {
     public sealed class PlotManager
     {
