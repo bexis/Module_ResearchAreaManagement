@@ -88,7 +88,6 @@
                     "<input disabled='disabled' type='text' value='<#= Color #>' style='width:100px;background-color:<#= Color #>;color:<#= Color #>;'/>"
                     ).Title("Color").HtmlAttributes("style='background-color:pink;'");
                 columns.Bound(c => c.Description);
-                columns.Bound(c => c.PlotId);
                 columns.Template(@<text></text>).ClientTemplate(
                 "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= RefrencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
                 columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick='archiveGeometry(<#= Id #>)'><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
