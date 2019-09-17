@@ -28,7 +28,7 @@ namespace BExIS.Pmm.Services
         #endregion
         
         #region Methods
-        public GeometryX Create(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string geometrytext, string name, string description, long logedId, String action, DateTime dateTime, string refrencePoint = "")
+        public GeometryX Create(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string geometrytext, string name, string description, long logedId, String action, DateTime dateTime, string referencePoint = "")
         {
             //Contract.Requires(!string.IsNullOrWhiteSpace(plotId));
             //Contract.Requires(!string.IsNullOrWhiteSpace(plotType) != null);
@@ -59,7 +59,7 @@ namespace BExIS.Pmm.Services
                 LogedId = logedId,
                 LogTime = dateTime,
                 Action = action,
-                RefrencePoint = refrencePoint
+                ReferencePoint = referencePoint
             };
             //entity.History.Add(initialStatus);
 

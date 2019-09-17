@@ -105,8 +105,8 @@
       <column name="Description" />
     </property>
 
-    <property name="RefrencePoint" type="string">
-      <column name="RefrencePoint" />
+    <property name="ReferencePoint" type="string">
+      <column name="ReferencePoint" />
     </property>
 
     <many-to-one class="BExIS.Pmm.Entities.Plot" name="Plot" column="PlotId" cascade="all" />

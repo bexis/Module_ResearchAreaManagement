@@ -40,6 +40,6 @@ namespace BExIS.Pmm.Entities
         public virtual string Name { set; get; }
         public virtual string Description { set; get; }
         public virtual long PlotId { set; get; }
-        public virtual string RefrencePoint { set; get; }
+        public virtual string ReferencePoint { set; get; }
     }
 }

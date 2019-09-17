@@ -44,16 +44,16 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// <param name="name"></param>
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns>if the action was successful or not</returns>
         [HttpPost]
-        public ActionResult _newPlot(string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
+        public ActionResult _newPlot(string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string referencePoint = "")
         {
             String message = "valid";
             message = helper.CheckDuplicatePlotName("create", name, 0);
             if (message != "valid")
                 return Json(message);
-            Plot result = helper.AddPlot(coordinate, geometrytype, coordinatetype, name, latitude, longitude, refrencePoint);
+            Plot result = helper.AddPlot(coordinate, geometrytype, coordinatetype, name, latitude, longitude, referencePoint);
             return Json(message);
         }
 
@@ -67,16 +67,16 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// <param name="name"></param>
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns>if the action was successful or not</returns>
         [HttpPost]
-        public ActionResult _updatePlot(int plotid, string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
+        public ActionResult _updatePlot(int plotid, string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string referencePoint = "")
         {
             String message = "valid";
             message = helper.CheckDuplicatePlotName("update", name, plotid);
             if (message != "valid")
                 return Json(message);
-            Plot result = helper.UpdatePlot(plotid, coordinate, geometrytype, coordinatetype, name, latitude, longitude, refrencePoint);
+            Plot result = helper.UpdatePlot(plotid, coordinate, geometrytype, coordinatetype, name, latitude, longitude, referencePoint);
             return Json(message);
         }
 
@@ -237,12 +237,12 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// <param name="color"></param>
         /// <param name="name"></param>
         /// <param name="description"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult _newGeometry(long plotid,string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string refrencePoint = "")
+        public ActionResult _newGeometry(long plotid,string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string referencePoint = "")
         {
-            GeometryInformation result = helper.AddGeometry(plotid, coordinate, geometrytype, coordinatetype, color, name, description, refrencePoint);
+            GeometryInformation result = helper.AddGeometry(plotid, coordinate, geometrytype, coordinatetype, color, name, description, referencePoint);
             return Json(result != null);
         }
 
@@ -257,12 +257,12 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// <param name="geometryId"></param>
         /// <param name="name"></param>
         /// <param name="description"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult _updateGeometry(string plotid, string coordinate, string geometrytype, string coordinatetype, string color, long geometryId, string name, string description, string refrencePoint = "")
+        public ActionResult _updateGeometry(string plotid, string coordinate, string geometrytype, string coordinatetype, string color, long geometryId, string name, string description, string referencePoint = "")
         {
-            GeometryInformation result = helper.UpdateGeometry(geometryId, coordinate, geometrytype, coordinatetype, color, name, description, refrencePoint);
+            GeometryInformation result = helper.UpdateGeometry(geometryId, coordinate, geometrytype, coordinatetype, color, name, description, referencePoint);
             return Json(result != null);
         }
 

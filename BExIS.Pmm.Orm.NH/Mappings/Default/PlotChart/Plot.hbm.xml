@@ -54,8 +54,8 @@
       <column name="Status" />
     </property>
 
-    <property name="RefrencePoint" type="string">
-      <column name="RefrencePoint" />
+    <property name="ReferencePoint" type="string">
+      <column name="ReferencePoint" />
     </property>
 
     <set name="Geometries" lazy="false" cascade="all">

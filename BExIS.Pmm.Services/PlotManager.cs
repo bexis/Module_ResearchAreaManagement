@@ -25,7 +25,7 @@ namespace BExIS.Pmm.Services
         #endregion
         
         #region Methods
-        public PlotChartX Create(string plotId, string plotType, string latitude, string longitude, List<GeometryInformation> geometries, string coordinate, string coordinateType, string geometryType, string geometryText, string refrencePoint = "")
+        public PlotChartX Create(string plotId, string plotType, string latitude, string longitude, List<GeometryInformation> geometries, string coordinate, string coordinateType, string geometryType, string geometryText, string referencePoint = "")
         {
             Contract.Requires(!string.IsNullOrWhiteSpace(plotId));
             Contract.Requires(!string.IsNullOrWhiteSpace(plotType) != null);
@@ -52,7 +52,7 @@ namespace BExIS.Pmm.Services
                 VersionNo = 1,
                 Extra = null,
                 PlotType = "",
-                RefrencePoint = refrencePoint
+                ReferencePoint = referencePoint
                 //Area = null
             };
             //entity.History.Add(initialStatus);
