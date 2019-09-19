@@ -39,6 +39,8 @@
                 <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" />include former subplots
                 <br />
                 <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" />draw beyond plot borders
+                <br />
+                <input type="checkbox" id="Legend" />PDF without legend
             </td>
             <td>
                 Grid Size:
@@ -345,7 +347,8 @@
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
-        var params = "id=" + plotId + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize;
+        var legend = $('#Legend').is(':checked');
+        var params = "id=" + plotId + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize + "&legend=" + legend;
         window.open("/PMM/MainAdmin/getpdf?" + params, "_blank");
     }
 
