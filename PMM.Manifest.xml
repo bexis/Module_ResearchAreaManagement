@@ -14,12 +14,43 @@
   <Exports>
     <!--add proper menu items-->
 	
-    <Export tag="menubar" id="pmmMenu" order="10"
-            title="PlotChart" description="PMM desc" icon=""
-            controller="mainAdmin" action="SubPlots"
-            extends="./menubarRoot" />
     
-	<!-- Settings Example-->
+    
+    <Export tag="menubar" id="pmmMenu" order="6"
+            title="Plot Information" description="PMM desc" icon=""
+            controller="main" action="SubPlots"
+            extends="./menubarRoot" />
+
+    <Export tag="menubar" id="pmmMenu_plotChart" order="10"
+            title="Plot Chart" description="PMM desc" icon=""
+            controller="main" action="SubPlots"
+            extends="./menubarRoot/pmmMenu" />
+
+    <Export tag="menubar" id="pmmMenu_plotChart" order="10"
+           title="Download Plot Chart" description="PMM desc" icon=""
+           controller="main" action="DownloadPlotChart"
+           extends="./menubarRoot/pmmMenu" />
+
+    <Export tag="menubar" id="pmmMenu_plotChart" order="10"
+           title="EP Information" description="PMM desc" icon=""
+           controller="main" action="ExploInfo"
+           extends="./menubarRoot/pmmMenu" />
+
+    <!--admin area-->
+
+    <Export tag="settings" id="adminPlotChart" order="16"
+        title="Manage Plot Charts" description="manage plot charts" icon=""
+        controller="mainAdmin" action="SubPlots"
+        extends="./settingsRoot" />
+
+    <Export tag="settings" id="adminPlots" order="17"
+        title="Manage Plots" description="manage plots" icon=""
+        controller="mainAdmin" action="Index"
+        extends="./settingsRoot" />
+
+
+
+    <!-- Settings Example-->
     <!--<Export tag="settings" id="manageMetadata" order="1"
             title="Manage Metadata Structure" description="Edit or Importa new Metadata Structure" icon=""
             controller="ManageMetadataStructure" action="Index" argument=""
