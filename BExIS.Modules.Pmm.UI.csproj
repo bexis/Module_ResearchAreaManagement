@@ -190,6 +190,8 @@
     <Content Include="Stylesheets\**" />
     <Content Include="Views\**" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="Views\Main\Temp_DownloadPlotChart.cshtml" />
+    <Content Include="Views\Main\Temp_EPInformtion.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
