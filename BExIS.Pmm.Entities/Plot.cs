@@ -32,6 +32,6 @@ namespace BExIS.Pmm.Entities
         public virtual string Coordinate { set; get; }
         public virtual string CoordinateType { set; get; }
         public virtual byte Status { set; get; }
-        public virtual string RefrencePoint { set; get; }
+        public virtual string ReferencePoint { set; get; }
     }
 }

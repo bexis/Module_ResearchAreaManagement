@@ -80,7 +80,7 @@
             columns.Bound(c => c.Latitude);
             columns.Bound(c => c.Longitude);
 
-            columns.Template(@<text></text>).ClientTemplate("<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updatePlot(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= PlotId #>', '<#= Latitude #>', '<#= Longitude #>', '<#= RefrencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
+            columns.Template(@<text></text>).ClientTemplate("<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updatePlot(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= PlotId #>', '<#= Latitude #>', '<#= Longitude #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
             columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick=\"archivePlot(<#= Id #>, '<#= PlotId #>')\"><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
             columns.Template(@<text></text>).ClientTemplate("<a title='download' href='#'" + "class='btn btn-sm' onclick='exportPlot(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/download.png' width='16'></a>").Title("Export").Width(60);
             columns.Template(@<text></text>).ClientTemplate("<a title='pdf' href='#'" + "class='btn btn-sm' onclick='exportPlotPdf(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/pdf.png' width='16'></a>").Title("Pdf").Width(60);
@@ -110,9 +110,9 @@
             <td>
                 <input type="text" style="height:28px;border-width:2px;" name="Latitude" id="Latitude" />
             </td>
-            <td>RefrencePoint:</td>
+            <td>Reference Point:</td>
             <td>
-                <input type="text" style="height:28px;border-width:2px;" name="RefrencePoint" id="RefrencePoint" />
+                <input type="text" style="height:28px;border-width:2px;" name="ReferencePoint" id="ReferencePoint" />
             </td>
             </tr>
         <tr>
@@ -314,7 +314,7 @@
         window.open("/PMM/MainAdmin/ExportAllPlots", "_blank");
     }
 
-    function updatePlot(id, geometryType, coordinate, coordinateType, name, latitude, longitude, refrencePoint) {
+    function updatePlot(id, geometryType, coordinate, coordinateType, name, latitude, longitude, referencePoint) {
         removeErrors();
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
         
@@ -326,7 +326,7 @@
         $('#Name').val(name);
         $('#Latitude').val(latitude);
         $('#Longitude').val(longitude);
-        $('#RefrencePoint').val(refrencePoint);
+        $('#ReferencePoint').val(referencePoint);
         $('#cancelUpdate').css('visibility', 'visible');
         $("#newPlot").attr('value', 'Update');
         $("#edit-" + id).attr("src", "../../Areas/PMM/Images/editactive.png");
@@ -340,7 +340,7 @@
         $('#Name').val("");
         $('#Latitude').val("");
         $('#Longitude').val("");
-        $('#RefrencePoint').val("");
+        $('#ReferencePoint').val("");
         $('#cancelUpdate').css('visibility', 'hidden');
         $("#newPlot").attr('value', 'New');
         removeErrors();
@@ -540,7 +540,7 @@
         var Longitude = $('#Longitude').val();
         var name = $('#Name').val();
         var id = $('#PlotIdHolder').val();
-        var RefrencePoint = $('#RefrencePoint').val();
+        var ReferencePoint = $('#ReferencePoint').val();
         
         if (!checkGeometry(GeometryType, CoordinateType, Coordinate)) 
             addErrors("Coordinate data format is not correct.", "#Coordinate")
@@ -564,7 +564,7 @@
                 name: name,
                 latitude: Latitude,
                 longitude: Longitude,
-                refrencePoint: RefrencePoint
+                referencePoint: ReferencePoint
             }
         } else {
             var data = {
@@ -574,7 +574,7 @@
                 name: name,
                 latitude: Latitude,
                 longitude: Longitude,
-                refrencePoint: RefrencePoint
+                referencePoint: ReferencePoint
             }
         }
 

@@ -39,6 +39,8 @@
                 <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" />include former subplots
                 <br />
                 <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" />draw beyond plot borders
+                <br />
+                <input type="checkbox" id="Legend" />PDF without legend
             </td>
             <td>
                 Grid Size:
@@ -89,7 +91,7 @@
                     ).Title("Color").HtmlAttributes("style='background-color:pink;'");
                 columns.Bound(c => c.Description);
                 columns.Template(@<text></text>).ClientTemplate(
-                "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= RefrencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
+                "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
                 columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick='archiveGeometry(<#= Id #>)'><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
                 columns.Template(@<text></text>).ClientTemplate("<a title='delete' href='#'" + "class='btn btn-sm' onclick='deleteGeometry(<#= Id #>)'><img id='delete-<#= Id #>' src='../../Areas/PMM/Images/delete.png' width='16'></a>").Title("Delete").Width(60);
             }))
@@ -116,9 +118,9 @@
             <td>
                 <input type="text" style="height:28px;border-width:2px;" name="Description" id="Description" />
             </td>
-            <td>RefrencePoint:</td>
+            <td>Reference Point:</td>
             <td>
-                <input type="text" style="height:28px;border-width:2px;" name="RefrencePoint" id="RefrencePoint" />
+                <input type="text" style="height:28px;border-width:2px;" name="ReferencePoint" id="ReferencePoint" />
             </td>
         </tr>
         <tr>
@@ -345,7 +347,8 @@
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
-        var params = "id=" + plotId + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize;
+        var legend = $('#Legend').is(':checked');
+        var params = "id=" + plotId + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize + "&legend=" + legend;
         window.open("/PMM/MainAdmin/getpdf?" + params, "_blank");
     }
 
@@ -461,7 +464,7 @@
         window.open("/PMM/MainAdmin/ExportPlot?id=" + plotId, "_blank");
     }
 
-    function updateGeometry(id, geometryType, coordinate, coordinateType, color, name, description, refrencePoint) {
+    function updateGeometry(id, geometryType, coordinate, coordinateType, color, name, description, referencePoint) {
         cancelUpdate();
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
         var opacity = parseInt(color.substring(7, 9), 16) / 255;
@@ -476,7 +479,7 @@
         $('#GeometryIdHolder').val(id);
         $('#Name').val(name);
         $('#Description').val(description);
-        $('#RefrencePoint').val(refrencePoint);
+        $('#ReferencePoint').val(referencePoint);
         $('#cancelUpdate').css('visibility', 'visible');
         $("#newGeometry").attr('value', 'Update');
         $("#edit-" + id).attr("src", "../../Areas/PMM/Images/editactive.png");
@@ -614,7 +617,7 @@
         var plotid = $('#PlotChartList').data('tDropDownList').value();
         var name = $('#Name').val();
         var description = $('#Description').val();
-        var RefrencePoint = $('#RefrencePoint').val();
+        var ReferencePoint = $('#ReferencePoint').val();
 
         $('#Coordinate').css("border-color", "#000000");
         if (!checkGeometry(GeometryType, CoordinateType, Coordinate)) {
@@ -637,7 +640,7 @@
                 geometryId: geometryid,
                 name: name,
                 description: description,
-                refrencePoint: RefrencePoint
+                referencePoint: ReferencePoint
             }
         } else {
             var data = {
@@ -648,7 +651,7 @@
                 color: Color,
                 name: name,
                 description: description,
-                refrencePoint: RefrencePoint
+                referencePoint: ReferencePoint
             }
         }
 

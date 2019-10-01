@@ -26,15 +26,15 @@ namespace BExIS.Pmm.Model
         /// <param name="name"></param>
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns>new plot</returns>
-        public Plot AddPlot(string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
+        public Plot AddPlot(string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string referencePoint = "")
         {
             if (!checkGeometry(geometrytype, coordinatetype, coordinate))
                 return null;
 
             double[] bb = { Convert.ToDouble(longitude), Convert.ToDouble(latitude) };
-            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, refrencePoint);
+            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
             PlotManager pManager = new PlotManager();
             Plot plot = pManager.Create(name, "", latitude, longitude, new List<GeometryInformation>(), coordinate, coordinatetype, geometrytype, geometryText);
@@ -54,9 +54,9 @@ namespace BExIS.Pmm.Model
         /// <param name="name"></param>
         /// <param name="latitude"></param>
         /// <param name="longitude"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns>updated plot</returns>
-        public Plot UpdatePlot(long plotid, string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string refrencePoint = "")
+        public Plot UpdatePlot(long plotid, string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string referencePoint = "")
         {
             PlotManager pManager = new PlotManager();
             Plot plot = pManager.Repo.Get(x => x.Id == plotid).First();
@@ -66,7 +66,7 @@ namespace BExIS.Pmm.Model
                 return null;
 
             double[] bb = { Convert.ToDouble(longitude), Convert.ToDouble(latitude) };
-            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, refrencePoint);
+            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
             if(plot.Latitude != latitude || plot.Longitude != longitude)
                 locationChanged = true;
@@ -86,7 +86,7 @@ namespace BExIS.Pmm.Model
                 GeometryManager gManager = new GeometryManager();
                 foreach (var geom in Plot.Geometries)
                 {
-                    geom.GeometryText = calCoordd(geom.GeometryType, geom.Coordinate, bb, geom.CoordinateType, geom.RefrencePoint);
+                    geom.GeometryText = calCoordd(geom.GeometryType, geom.Coordinate, bb, geom.CoordinateType, geom.ReferencePoint);
                     gManager.Update(geom);
                 }
             }
@@ -163,9 +163,9 @@ namespace BExIS.Pmm.Model
         /// <param name="color"></param>
         /// <param name="name"></param>
         /// <param name="description"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns>new subplot</returns>
-        public GeometryInformation AddGeometry(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string refrencePoint = "")
+        public GeometryInformation AddGeometry(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string referencePoint = "")
         {
             Plot plot = GetPlot(plotid);
 
@@ -173,7 +173,7 @@ namespace BExIS.Pmm.Model
                 return null;
 
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
-            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, refrencePoint);
+            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
             GeometryManager gManager = new GeometryManager();
             GeometryInformation geometry = gManager.Create(plot.Id, coordinate, geometrytype, coordinatetype, color, geometryText, plot, name, description);
@@ -193,9 +193,9 @@ namespace BExIS.Pmm.Model
         /// <param name="color"></param>
         /// <param name="name"></param>
         /// <param name="description"></param>
-        /// <param name="refrencePoint"></param>
+        /// <param name="referencePoint"></param>
         /// <returns>updated subplot</returns>
-        public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string refrencePoint = "")
+        public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string referencePoint = "")
         {
             GeometryManager gManager = new GeometryManager();
             GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
@@ -204,7 +204,7 @@ namespace BExIS.Pmm.Model
                 return null;
 
             double[] bb = { Convert.ToDouble(geom.Plot.Longitude), Convert.ToDouble(geom.Plot.Latitude) };
-            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, refrencePoint);
+            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
             geom.GeometryText = geometryText;
             geom.Coordinate = coordinate;
