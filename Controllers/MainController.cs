@@ -30,11 +30,6 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             return View("Temp_EPInformtion");
         }
 
-        public ActionResult DownloadPlotChart()
-        {
-            return View("Temp_DownloadPlotChart");
-        }
-
         /// <summary>
         /// load plot view form normal users
         /// </summary>

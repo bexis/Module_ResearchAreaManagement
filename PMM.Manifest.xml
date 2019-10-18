@@ -27,11 +27,6 @@
             extends="./menubarRoot/pmmMenu" />
 
     <Export tag="menubar" id="pmmMenu_plotChart" order="10"
-           title="Download Plot Chart" description="PMM desc" icon=""
-           controller="main" action="DownloadPlotChart"
-           extends="./menubarRoot/pmmMenu" />
-
-    <Export tag="menubar" id="pmmMenu_plotChart" order="10"
            title="EP Information" description="PMM desc" icon=""
            controller="main" action="ExploInfo"
            extends="./menubarRoot/pmmMenu" />
