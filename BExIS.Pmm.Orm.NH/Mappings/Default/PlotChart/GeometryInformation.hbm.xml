@@ -109,7 +109,7 @@
       <column name="ReferencePoint" />
     </property>
 
-    <many-to-one class="BExIS.Pmm.Entities.Plot" name="Plot" column="PlotId" cascade="all" />
+    <many-to-one class="BExIS.Pmm.Entities.Plot" name="Plot" column="PlotId" cascade="all" index="idx_GeometryInformation_PlotId"/>
 
 
 
