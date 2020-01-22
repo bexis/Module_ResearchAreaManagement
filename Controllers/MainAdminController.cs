@@ -178,11 +178,14 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// <param name="beyondPlot">load subplots which are outside of the plot border</param>
         /// <param name="gridSize"></param>
         /// <returns>PDF file</returns>
-        public ActionResult GetPDF(long id, Boolean deactivePlot = false, Boolean beyondPlot = false, int gridSize = 5)
+        public ActionResult GetPDF(long id, Boolean deactivePlot = false, Boolean beyondPlot = false, int gridSize = 5, Boolean legend = false)
         {
             List<Plot> plotList = new List<Plot>();
             plotList.Add(helper.GetPlot(id));
-            return File(helper.generatePDF(plotList, 1, deactivePlot, beyondPlot, gridSize), "application/pdf", "filename.pdf");
+            DateTime date = DateTime.Now;
+            legend = !legend;
+
+            return File(helper.generatePDF(plotList, 1, deactivePlot, beyondPlot, gridSize, legend), "application/pdf", plotList[0].PlotId + "_" + date.ToString("dd_mm_yyyy") + ".pdf");
         }
 
         /// <summary>

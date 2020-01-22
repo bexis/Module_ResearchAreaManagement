@@ -561,27 +561,30 @@ namespace BExIS.Pmm.Model
             IGeometry area = plot.Geometry;//SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("rectangle", (plot.Area.X1) + "," + (plot.Area.Y1) + "," + (plot.Area.X3) + "," + (plot.Area.Y3), bb));
             String image = ProducePlot(plot, zoom, deactiveGeometries, beyondPlot, gridSize);
             String Div = "<div><center><image width='900px' height='900px' src='" + image + "'>";
-            if (legend)
+            if (!legend)
             {
                 Div += "</center></div>";
                 return Div;
             }
-            Div += "<table style='font-size:small;border:1px solid black;'><tr><td>Name</td><td>Geometry Type</td><td>Coordinate</td><td>Coordinate Type</td><td>Color</td><td>Description</td></tr>";
-            foreach (var geometry in plot.Geometries)
+            else
             {
-                if (geometry.Color.Length < 9)
-                    geometry.Color += "AA";
-                if (!deactiveGeometries && geometry.Status != 1)
-                    continue;
-                if (!beyondPlot)
+                Div += "<table style='font-size:small;border:1px solid black;'><tr><td>Name</td><td>Geometry Type</td><td>Coordinate</td><td>Coordinate Type</td><td>Color</td><td>Description</td></tr>";
+                foreach (var geometry in plot.Geometries)
                 {
-                    if (!area.Envelope.Contains(geometry.Geometry))
+                    if (geometry.Color.Length < 9)
+                        geometry.Color += "AA";
+                    if (!deactiveGeometries && geometry.Status != 1)
                         continue;
+                    if (!beyondPlot)
+                    {
+                        if (!area.Envelope.Contains(geometry.Geometry))
+                            continue;
+                    }
+                    var color = Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber));
+                    Div += "<tr><td>" + geometry.Name + "</td><td>" + geometry.GeometryType + "</td><td>" + geometry.Coordinate + "</td><td>" + geometry.CoordinateType + "</td><td style='width:100px;background-color:rgba(" + color.R + "," + color.G + "," + color.B + "," + color.A + ")'></td><td>" + geometry.Description + "</td></tr>";
                 }
-                var color = Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber));
-                Div += "<tr><td>" + geometry.Name + "</td><td>" + geometry.GeometryType + "</td><td>" + geometry.Coordinate + "</td><td>" + geometry.CoordinateType + "</td><td style='width:100px;background-color:rgba(" + color.R + "," + color.G + "," + color.B + "," + color.A + ")'></td><td>" + geometry.Description + "</td></tr>";
+                Div += "</table></center></div>";
             }
-            Div += "</table></center></div>";
             return Div;
         }
 
@@ -799,7 +802,7 @@ namespace BExIS.Pmm.Model
                 fdtX.Columns.Add("Label");
                 SharpMap.Data.FeatureDataRow newFdtXRow = fdtX.NewRow();
                 newFdtXRow.Geometry = xline;
-                newFdtXRow["Label"] = Math.Round( XS) + "\t \n";
+                newFdtXRow["Label"] = Math.Round(XS, 2) + "\t \n";
                 fdtX.Rows.Clear(); fdtX.Rows.Add(newFdtXRow); gridxLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(fdtX);
                 SharpMap.Layers.LabelLayer layerLabelX = new SharpMap.Layers.LabelLayer("Country labels")
                 {
@@ -841,7 +844,7 @@ namespace BExIS.Pmm.Model
                 fdtY.Columns.Add("Label");
                 SharpMap.Data.FeatureDataRow newFdtYRow = fdtY.NewRow();
                 newFdtYRow.Geometry = yline;
-                newFdtYRow["Label"] = Math.Round(YS) + "\t \n"; ;
+                newFdtYRow["Label"] = Math.Round(YS, 2) + "\t \n"; ;
                 fdtY.Rows.Clear(); fdtY.Rows.Add(newFdtYRow); gridyLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(fdtY);
                 SharpMap.Layers.LabelLayer layerLabelY = new SharpMap.Layers.LabelLayer("Country labels")
                 {
