@@ -33,14 +33,14 @@
        .Name("PlotChartList")
        .BindTo(new SelectList(Model.plotList, "Id", "PlotId"))
        .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)))
+       .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)).HtmlAttributes(new { style = "width:100px" }))
             </td>
             <td>
-                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" />include former subplots
+                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()"/> include former subplots
                 <br />
-                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" />draw beyond plot borders
+                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()"/> draw beyond plot borders
                 <br />
-                <input type="checkbox" id="Legend" />PDF without legend
+                <input type="checkbox" id="Legend"/> PDF without legend
             </td>
             <td>
                 Grid Resolution:
@@ -50,7 +50,7 @@
        .Name("Gridsize")
        .BindTo(new SelectList(Model.gridsize))
        .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(0))
+       .SelectedIndex(0).HtmlAttributes(new { style = "width:100px" }))
             </td>
 
             <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
@@ -91,7 +91,7 @@
                     ).Title("Color").HtmlAttributes("style='background-color:pink;'");
                 columns.Bound(c => c.Description);
                 columns.Template(@<text></text>).ClientTemplate(
-                "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
+                "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(this, <#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
                 columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick='archiveGeometry(<#= Id #>)'><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
                 columns.Template(@<text></text>).ClientTemplate("<a title='delete' href='#'" + "class='btn btn-sm' onclick='deleteGeometry(<#= Id #>)'><img id='delete-<#= Id #>' src='../../Areas/PMM/Images/delete.png' width='16'></a>").Title("Delete").Width(60);
             }))
@@ -493,15 +493,18 @@
         window.open("/PMM/MainAdmin/ExportPlot?id=" + plotId, "_blank");
     }
 
-    function updateGeometry(id, geometryType, coordinate, coordinateType, color, name, description, referencePoint) {
+    function updateGeometry(elem, id, geometryType, coordinate, coordinateType, color, name, description, referencePoint) {
         cancelUpdate();
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
         var opacity = parseInt(color.substring(7, 9), 16) / 255;
         $('#Color').val(color.substring(0, 7)).keyup();
         var ColorOpacity = $('#Color').attr("data-opacity", opacity);
 
-        if ($('#GeometryIdHolder').val() != id && $('#PlotIdHolder').val() != "")
+        if ($('#GeometryIdHolder').val() != id && $('#PlotIdHolder').val() != "") {
             $("#edit-" + $('#GeometryIdHolder').val()).attr("src", "../../Areas/PMM/Images/edit.png");
+            $(elem).parent().parent().addClass("edit");
+        }
+           
 
         $('#CoordinateType').data('tDropDownList').value(coordinateType);
         $('#Coordinate').val(coordinate);
@@ -522,6 +525,7 @@
         $("#newGeometry").attr('value', 'New');
         $('#Coordinate').css("border-color", "#000000");
         $('#errorPlaceHolder').html("");
+        $(".edit").removeClass("edit");
     }
 
     function archiveGeometry(id) {
@@ -708,3 +712,8 @@
         });
     }
 </script>
+<style>
+    .edit {
+        background-color: yellow;
+    }
+</style>
