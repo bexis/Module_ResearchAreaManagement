@@ -23,19 +23,19 @@
             <td>
                 Plotchart:
             </td>
-            <td>
+            <td style="width:20px">
                 @(Html.Telerik().DropDownList()
        .Name("PlotChartList")
        .BindTo(new SelectList(Model.plotList, "Id", "PlotId"))
        .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)))
+       .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)).HtmlAttributes(new { style = "width:100px" }))
             </td>
             <td>
-                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" />include former subplots
+                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()"/> include former subplots
                 <br />
-                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" />draw beyond plot borders
+                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()"/> draw beyond plot borders
                 <br />
-                <input type="checkbox" id="Legend" />PDF without legend
+                <input type="checkbox" id="Legend"/> PDF without legend
             </td>
             <td>
                 Grid Resolution:
@@ -45,7 +45,7 @@
        .Name("Gridsize")
        .BindTo(new SelectList(Model.gridsize))
        .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(0))
+       .SelectedIndex(0).HtmlAttributes(new { style = "width:60px" }))
             </td>
 
             <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
@@ -54,6 +54,10 @@
 
     </table>
 </div>
+<div style="width:65%;float:left;">
+    <img id="plotChartPicture" src="@Model.ImageSource" width="800" height="800" />
+</div>
+
 <div>
     @(Html.Telerik().Grid<GeometryInformation>()
             .Name("plotchart_geometries")
@@ -63,33 +67,25 @@
                    //The action method which will return JSON and its arguments
                    .Select("_AjaxBinding", "Main", new { id = Model.selectedPlot != null ? Model.selectedPlot.PlotId : "0", beyondborder = false, deactiveplot = false, area = "PMM" })
             )
-            .Pageable(paging =>
-                paging
-                        .Style(pagerStyles).Enabled(true)
-                        .PageSize(10)
-                    .Position(GridPagerPosition.Both)
-                        .PageTo(1)
-                    )
+
             .Sortable().ClientEvents(x => x.OnDataBound("UpdateGridColors"))
             .Filterable()
             .ClientEvents(x => x.OnDataBinding("Grid_onDataBinding"))
             .Columns(columns =>
             {
-                columns.Bound(c => c.Name);
+                columns.Bound(c => c.Name).Width("20%");
                 columns.Bound(c => c.GeometryType).EditorViewData(new { geometryType = Model.geometryType });
-                columns.Bound(c => c.Coordinate);
-                columns.Bound(c => c.CoordinateType);
-                columns.Bound(c => c.LineWidth);
+                columns.Bound(c => c.Coordinate).Filterable(false);
+                columns.Bound(c => c.CoordinateType).Title("Type").Width("5%").Filterable(false).Width("80px"); ;
+                // columns.Bound(c => c.LineWidth).Width("2%");
 
                 columns.Template(c => c.Color).ClientTemplate(
-                    "<input disabled='disabled' type='text' value='<#= Color #>' style='width:100px;background-color:<#= Color #>;color:<#= Color #>;'/>"
-                    ).Title("Color").HtmlAttributes("style='background-color:pink;'");
-                columns.Bound(c => c.Description);
-                        }))
+                    "<input disabled='disabled' type='text' value='<#= Color #>' style='width:50px;background-color:<#= Color #>;color:<#= Color #>;'/>"
+                    ).Title("Color").HtmlAttributes("style='background-color:pink;'").Width("80px");
+                columns.Bound(c => c.Description).Width("40%");
+            }))
 </div>
-<div style="width:65%;float:left;">
-    <img id="plotChartPicture" src="@Model.ImageSource" width="800" height="800" />
-</div>
+
 <script type="text/javascript">
 
     $(document).ready(function () {
