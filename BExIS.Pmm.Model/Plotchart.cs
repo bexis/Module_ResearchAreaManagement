@@ -395,7 +395,7 @@ namespace BExIS.Pmm.Model
             
             SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("Border");
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
-            IGeometry area = plot.Geometry.Buffer(0.0001); // Add buffer to given plot area to avoid border is not shown, if it is outside of the standard plot area
+            IGeometry area = plot.Geometry.Buffer(0.00005); // Add buffer to given plot area to avoid border is not shown, if it is outside of the standard plot area
             List<IGeometry> borderGeometries = new List<IGeometry>();
             borderGeometries.Add(area);
             borderLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(borderGeometries);
