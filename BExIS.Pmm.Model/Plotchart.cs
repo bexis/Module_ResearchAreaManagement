@@ -108,7 +108,10 @@ namespace BExIS.Pmm.Model
             plot.Status = (byte)(plot.Status == 3 ? 1 : 3);
             Plot Plot = pManager.Update(plot);
             PlotHistoryManager pHManager = new PlotHistoryManager();
-            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, "Delete", DateTime.Now);
+            string action = "";
+            if (plot.Status == 1) action = "Undelete";
+            if (plot.Status == 3) action = "Delete";
+            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, action, DateTime.Now);
 
             return plot;
         }
@@ -125,7 +128,10 @@ namespace BExIS.Pmm.Model
             plot.Status = (byte)(plot.Status == 2 ? 1 : 2);
             Plot Plot = pManager.Update(plot);
             PlotHistoryManager pHManager = new PlotHistoryManager();
-            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, "Update", DateTime.Now);
+            string action = "";
+            if (plot.Status == 1) action = "Unarchive";
+            if (plot.Status == 2) action = "Archive";
+            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, action, DateTime.Now);
 
             return plot;
         }
@@ -233,7 +239,10 @@ namespace BExIS.Pmm.Model
             geom.Status = (byte)(geom.Status == 2 ? 1 : 2);
             GeometryInformation geometry = gManager.Update(geom);
             GeometryHistoryManager gHManager = new GeometryHistoryManager();
-            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);
+            string action = "";
+            if (geom.Status == 1) action = "Unarchive";
+            if (geom.Status == 2) action = "Archive";
+            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
 
             return geometry;
         }
@@ -251,7 +260,10 @@ namespace BExIS.Pmm.Model
 
             GeometryInformation geometry = gManager.Update(geom);
             GeometryHistoryManager gHManager = new GeometryHistoryManager();
-            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Delete", DateTime.Now);
+            string action = "";
+            if (geom.Status == 1) action = "Undelete";
+            if (geom.Status == 3) action = "Delete";
+            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
 
             return geometry;
         }
@@ -383,7 +395,7 @@ namespace BExIS.Pmm.Model
             
             SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("Border");
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
-            IGeometry area = plot.Geometry;
+            IGeometry area = plot.Geometry.Buffer(0.0001); // Add buffer to given plot area to avoid border is not shown, if it is outside of the standard plot area
             List<IGeometry> borderGeometries = new List<IGeometry>();
             borderGeometries.Add(area);
             borderLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(borderGeometries);
@@ -614,7 +626,7 @@ namespace BExIS.Pmm.Model
         }
 
         /// <summary>
-        /// chech if a subplot is in a plot border or not
+        /// check if a subplot is in a plot border or not
         /// </summary>
         /// <param name="borderLayer"></param>
         /// <param name="plotLayer"></param>
@@ -745,7 +757,7 @@ namespace BExIS.Pmm.Model
             borderFdt.Columns.Add("Label");
             SharpMap.Data.FeatureDataRow newRowBorder = borderFdt.NewRow();
             newRowBorder.Geometry = test;
-            newRowBorder["Label"] = "Basistemplate " + plot.PlotId + "\t \n";
+            newRowBorder["Label"] = "Plot " + plot.PlotId + "\t \n";
             borderFdt.Rows.Clear(); borderFdt.Rows.Add(newRowBorder); borderLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(borderFdt);
             SharpMap.Layers.LabelLayer layLabelBorder = new SharpMap.Layers.LabelLayer("Country labels")
             {
