@@ -26,7 +26,7 @@
             <td style="width:20px">
                 @(Html.Telerik().DropDownList()
        .Name("PlotChartList")
-       .BindTo(new SelectList(Model.plotList, "Id", "PlotId"))
+       .BindTo(new SelectList(Model.plotlist, "Id", "PlotId"))
        .ClientEvents(events => events.OnChange("ComboBox_onChange"))
        .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)).HtmlAttributes(new { style = "width:100px" }))
             </td>
@@ -91,7 +91,7 @@
     $(document).ready(function () {
 
         var data = {
-            id: "1",
+            id: "249", // default id
             deactivePlot: false,
             beyondPlot: false,
             gridsize: "2"

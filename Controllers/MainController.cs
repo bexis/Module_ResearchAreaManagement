@@ -13,6 +13,7 @@ using BExIS.Pmm.Entities;
 using System.Web;
 using BExIS.Pmm.Model;
 using System.Text;
+using BExIS.Modules.PMM.UI.Helper;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -74,6 +75,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         {
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             plotviewmodel.plotList = helper.GetPlots();
+            plotviewmodel.plotlist = plotviewmodel.plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
             plotviewmodel.selectedPlot = null;
             if (plotid != null && plotviewmodel.plotList.Count > 0 && plotviewmodel.plotList.First(x => x.Id == plotid) != null)
                 plotviewmodel.selectedPlot = plotid != null ? plotviewmodel.plotList.First(x => x.Id == plotid) : plotviewmodel.plotList.First();
