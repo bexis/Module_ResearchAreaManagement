@@ -35,13 +35,13 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// load plot view form normal users
         /// </summary>
         /// <returns>plot view</returns>
-        public ActionResult Index()
+     /*   public ActionResult Index()
         {
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             plotviewmodel.plotList = helper.GetPlots();
             return View(plotviewmodel);
-        }
+        }*/
 
         /// <summary>
         /// load plots' list for a grid
@@ -74,13 +74,17 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
-            plotviewmodel.plotList = helper.GetPlots();
-            plotviewmodel.plotlist = plotviewmodel.plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
-            plotviewmodel.selectedPlot = null;
-            if (plotid != null && plotviewmodel.plotList.Count > 0 && plotviewmodel.plotList.First(x => x.Id == plotid) != null)
-                plotviewmodel.selectedPlot = plotid != null ? plotviewmodel.plotList.First(x => x.Id == plotid) : plotviewmodel.plotList.First();
-            plotviewmodel.ImageSource = helper.ProducePlot(plotviewmodel.selectedPlot, 1, false);
+            var plotList = helper.GetPlotsOld();
+            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
 
+            var plotListNew = helper.GetPlotsNew();
+            plotviewmodel.plotlistNew = plotListNew.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
+
+            plotviewmodel.selectedPlot = null;
+            var list_plotlist = plotviewmodel.plotlist.ToList();
+            if (plotid != null && list_plotlist.Count > 0 && list_plotlist.First(x => x.Id == plotid) != null)
+                plotviewmodel.selectedPlot = plotid != null ? list_plotlist.First(x => x.Id == plotid) : list_plotlist.First();
+            plotviewmodel.ImageSource = helper.ProducePlot(plotviewmodel.selectedPlot, 1, false);
 
             return View(plotviewmodel);
         }

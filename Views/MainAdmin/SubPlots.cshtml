@@ -26,31 +26,31 @@
     <table style="width:800px;">
         <tr>
             <td>
-                Plotchart:
+                Plot maps:
+                </br>
+                Experiment maps:
+            </td>
+            <td style="width:20px">
+                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                </br>
+                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlistNew, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
             </td>
             <td>
-                @(Html.Telerik().DropDownList()
-       .Name("PlotChartList")
-       .BindTo(new SelectList(Model.plotlist, "Id", "PlotId"))
-       .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)).HtmlAttributes(new { style = "width:100px" }))
-            </td>
-            <td>
-                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()"/> include former subplots
+                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" /> include former subplots
                 <br />
-                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()"/> draw beyond plot borders
+                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" /> draw beyond plot borders
                 <br />
-                <input type="checkbox" id="Legend"/> PDF without legend
+                <input type="checkbox" id="Legend" /> PDF without legend
             </td>
             <td>
                 Grid Resolution:
             </td>
             <td>
                 @(Html.Telerik().DropDownList()
-       .Name("Gridsize")
-       .BindTo(new SelectList(Model.gridsize))
-       .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(0).HtmlAttributes(new { style = "width:100px" }))
+               .Name("Gridsize")
+               .BindTo(new SelectList(Model.gridsize))
+               .ClientEvents(events => events.OnChange("ComboBox_onChange"))
+               .SelectedIndex(0).HtmlAttributes(new { style = "width:100px" }))
             </td>
 
             <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
@@ -300,12 +300,15 @@
 
     $(document).ready(function () {
 
+        $(".plotids").eq(0).val("249");
+
         var data = {
-            id: "249", // default id 
+            id: "249", // default id
             deactivePlot: false,
             beyondPlot: false,
             gridsize: "2"
         }
+
 
 
         $.ajax({
@@ -365,14 +368,16 @@
     });
 
     function ComboBox_onChange(e) {
+        var didntChange = $(".plotids").not(e);
+        didntChange.val("");
         LoadPackageAndBindGrid();
         UpdatePlotChart();
     }
 
+
     function DownloadPdf() {
-        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -382,9 +387,8 @@
     }
 
     function LoadPackageAndBindGrid() {
-        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -404,9 +408,8 @@
     }
 
     function Grid_onDataBinding(e) {
-        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -450,9 +453,8 @@
     }
 
     function UpdatePlotChart() {
-        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -488,8 +490,7 @@
     }
 
     function exportPlot() {
-        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         window.open("/PMM/MainAdmin/ExportPlot?id=" + plotId, "_blank");
     }
 
@@ -529,7 +530,7 @@
     }
 
     function archiveGeometry(id) {
-        var plotid = $('#PlotChartList').data('tDropDownList').value();
+        var plotid = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var data = {
             geometryid: id
         }
@@ -611,7 +612,7 @@
     }
 
     function deleteGeometry(id) {
-        var plotid = $('#PlotChartList').data('tDropDownList').value();
+        var plotid = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var data = {
             geometryid: id
         }
@@ -647,7 +648,7 @@
         Color += ColorOpacity;
         var CoordinateType = $('#CoordinateType').data('tDropDownList').value();
         var Coordinate = $('#Coordinate').val();
-        var plotid = $('#PlotChartList').data('tDropDownList').value();
+        var plotid = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var name = $('#Name').val();
         var description = $('#Description').val();
         var ReferencePoint = $('#ReferencePoint').val();

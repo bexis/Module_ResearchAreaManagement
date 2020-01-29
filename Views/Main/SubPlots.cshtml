@@ -16,40 +16,41 @@
     Model.colorList = new List<String>(new String[] { "#00ff00", "#ff0000", "#ffa07a", "#000000", "#bebebe", "#ffffff", "#ee82ee", "#add8e6", "#4682b4", "#00ffff", "#d8bfd8", "#0000ff", "#a020f0", "#2e8b57", "#b03060", "#f5deb3", "#d2691e", "ffa500", "#90ee90", "#ebebeb", "#ffff00", "#a52a2a", "#ffeeee", "#c71585" });
     Model.coordinateType = new List<String>(new String[] { "xy", "polar" });
 
+
 }
 <div>
     <table style="width:800px;">
         <tr>
             <td>
-                Plotchart:
+                Plot maps:
+                </br>
+                Experiment maps: 
             </td>
             <td style="width:20px">
-                @(Html.Telerik().DropDownList()
-       .Name("PlotChartList")
-       .BindTo(new SelectList(Model.plotlist, "Id", "PlotId"))
-       .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(Model.selectedPlot == null ? 0 : Model.plotList.IndexOf(Model.selectedPlot)).HtmlAttributes(new { style = "width:100px" }))
+                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                </br>
+                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlistNew, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
             </td>
             <td>
-                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()"/> include former subplots
+                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" /> include former subplots
                 <br />
-                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()"/> draw beyond plot borders
+                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" /> draw beyond plot borders
                 <br />
-                <input type="checkbox" id="Legend"/> PDF without legend
+                <input type="checkbox" id="Legend" /> PDF without legend
             </td>
             <td>
                 Grid Resolution:
             </td>
             <td>
                 @(Html.Telerik().DropDownList()
-       .Name("Gridsize")
-       .BindTo(new SelectList(Model.gridsize))
-       .ClientEvents(events => events.OnChange("ComboBox_onChange"))
-       .SelectedIndex(0).HtmlAttributes(new { style = "width:60px" }))
+               .Name("Gridsize")
+               .BindTo(new SelectList(Model.gridsize))
+               .ClientEvents(events => events.OnChange("ComboBox_onChange"))
+               .SelectedIndex(0).HtmlAttributes(new { style = "width:60px" }))
             </td>
 
             <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
-          <!-- <td valign="bottom"><a href="#" title="Export CSV" onclick="exportPlot()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>-->
+            <!-- <td valign="bottom"><a href="#" title="Export CSV" onclick="exportPlot()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>-->
         </tr>
 
     </table>
@@ -89,6 +90,8 @@
 <script type="text/javascript">
 
     $(document).ready(function () {
+
+        $(".plotids").eq(0).val("249");
 
         var data = {
             id: "249", // default id
@@ -156,14 +159,17 @@
     });
 
     function ComboBox_onChange(e) {
+        var didntChange = $(".plotids").not(e);
+        didntChange.val("");
         LoadPackageAndBindGrid();
         UpdatePlotChart();
     }
 
+  
+
     function DownloadPdf() {
-        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -173,9 +179,9 @@
     }
 
     function LoadPackageAndBindGrid() {
-        var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
+      
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -198,7 +204,7 @@
     function Grid_onDataBinding(e) {
         var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -216,7 +222,7 @@
     function UpdatePlotChart() {
         var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = comboboxPlotChart.value();
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();

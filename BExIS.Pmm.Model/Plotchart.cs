@@ -280,6 +280,31 @@ namespace BExIS.Pmm.Model
             return plots;
         }
 
+
+        /// <summary>
+        /// get list of plots
+        /// </summary>
+        /// <returns>plots list</returns>
+        public IList<Plot> GetPlotsOld()
+        {
+            PlotManager pcManager = new PlotManager();
+            IList<Plot> plots = pcManager.Repo.Get(x => !x.PlotId.Contains("-"));
+
+            return plots;
+        }
+
+        /// <summary>
+        /// get list of plots
+        /// </summary>
+        /// <returns>plots list</returns>
+        public IList<Plot> GetPlotsNew()
+        {
+            PlotManager pcManager = new PlotManager();
+            IList<Plot> plots = pcManager.Repo.Get(x => x.PlotId.Contains("-"));
+
+            return plots;
+        }
+
         /// <summary>
         /// get a plot by the plot name
         /// </summary>
