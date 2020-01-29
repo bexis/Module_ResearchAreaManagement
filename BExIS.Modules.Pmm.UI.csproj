@@ -165,6 +165,7 @@
   <ItemGroup>
     <Compile Include="Controllers\MainController.cs" />
     <Compile Include="Controllers\MainAdminController.cs" />
+    <Compile Include="Helper\NaturalSorter.cs" />
     <Compile Include="Helper\PmmSeedDataGenerator.cs" />
     <Compile Include="PMMModule.cs" />
     <Compile Include="Models\PlotChartViewModel.cs" />
