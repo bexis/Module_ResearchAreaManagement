@@ -157,7 +157,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             var list_plotlist = plotviewmodel.plotlist.ToList();
             if (plotid != null && list_plotlist.Count > 0 && list_plotlist.First(x => x.Id == plotid) != null)
                 plotviewmodel.selectedPlot = plotid != null ? list_plotlist.First(x => x.Id == plotid) : list_plotlist.First();
-            plotviewmodel.ImageSource = helper.ProducePlot(plotviewmodel.selectedPlot, 1, false);
+            plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
 
             return View(plotviewmodel);
         }

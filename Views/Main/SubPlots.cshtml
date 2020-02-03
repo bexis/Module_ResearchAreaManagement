@@ -45,7 +45,7 @@
                 @(Html.Telerik().DropDownList()
                .Name("Gridsize")
                .BindTo(new SelectList(Model.gridsize))
-               .ClientEvents(events => events.OnChange("ComboBox_onChange"))
+               .ClientEvents(events => events.OnChange("Gridsize_ComboBox_onChange"))
                .SelectedIndex(0).HtmlAttributes(new { style = "width:60px" }))
             </td>
 
@@ -91,10 +91,10 @@
 
     $(document).ready(function () {
 
-        $(".plotids").eq(0).val("249");
+        $(".plotids").eq(0).val("937");
 
         var data = {
-            id: "249", // default id
+            id: "937", // default id
             deactivePlot: false,
             beyondPlot: false,
             gridsize: "2"
@@ -161,11 +161,13 @@
     function ComboBox_onChange(e) {
         var didntChange = $(".plotids").not(e);
         didntChange.val("");
-        LoadPackageAndBindGrid();
+        //LoadPackageAndBindGrid();
         UpdatePlotChart();
     }
 
-  
+    function Gridsize_ComboBox_onChange(e){
+        UpdatePlotChart();
+    }
 
     function DownloadPdf() {
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');

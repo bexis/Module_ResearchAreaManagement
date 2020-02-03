@@ -1,4 +1,5 @@
 ﻿using BExIS.Pmm.Entities;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using Vaiona.Persistence.Api;
@@ -6,24 +7,47 @@ using PlotChartX = BExIS.Pmm.Entities.Plot;
 
 namespace BExIS.Pmm.Services
 {
-    public sealed class PlotManager
-    {
+      public class PlotManager : IDisposable
+      { 
+
         #region Attributes
-        
+
         public IReadOnlyRepository<PlotChartX> Repo { get; private set; }
 
         #endregion
 
-        #region Ctors
-        
+        private IUnitOfWork guow = null;
         public PlotManager()
         {
-            IUnitOfWork uow = this.GetUnitOfWork();
-            this.Repo = uow.GetReadOnlyRepository<PlotChartX>();
+            guow = this.GetIsolatedUnitOfWork();
+            this.Repo = guow.GetReadOnlyRepository<PlotChartX>();
+
+        }
+        private bool isDisposed = false;
+        ~PlotManager()
+        {
+            Dispose(true);
         }
 
-        #endregion
-        
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed)
+            {
+                if (disposing)
+                {
+                    if (guow != null)
+                        guow.Dispose();
+                    isDisposed = true;
+                }
+            }
+        }
+
+
         #region Methods
         public PlotChartX Create(string plotId, string plotType, string latitude, string longitude, List<GeometryInformation> geometries, string coordinate, string coordinateType, string geometryType, string geometryText, string referencePoint = "")
         {

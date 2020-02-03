@@ -49,7 +49,7 @@
                 @(Html.Telerik().DropDownList()
                .Name("Gridsize")
                .BindTo(new SelectList(Model.gridsize))
-               .ClientEvents(events => events.OnChange("ComboBox_onChange"))
+               .ClientEvents(events => events.OnChange("Gridsize_ComboBox_onChange"))
                .SelectedIndex(0).HtmlAttributes(new { style = "width:100px" }))
             </td>
 
@@ -370,7 +370,11 @@
     function ComboBox_onChange(e) {
         var didntChange = $(".plotids").not(e);
         didntChange.val("");
-        LoadPackageAndBindGrid();
+        
+        UpdatePlotChart();
+    }
+
+    function Gridsize_ComboBox_onChange(e){
         UpdatePlotChart();
     }
 

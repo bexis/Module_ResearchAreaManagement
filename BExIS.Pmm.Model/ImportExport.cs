@@ -129,15 +129,17 @@ namespace BExIS.Pmm.Model
         public String ExportAllPlots()
         {
             String output = "";
-            PlotManager pManager = new PlotManager();
-            List<Plot> plotList = new List<Plot>();
-            plotList = pManager.Repo.Get().ToList();
-            foreach (var plot in plotList)
+            using (PlotManager pManager = new PlotManager())
             {
-                String Line = plot.Id + ";" + plot.PlotId + ";" + plot.GeometryType + ";" + plot.Coordinate + ";" + plot.CoordinateType + ";" + plot.Latitude + ";" + plot.Longitude + ";" + plot.Status + "\n";
-                output += Line;
+                List<Plot> plotList = new List<Plot>();
+                plotList = pManager.Repo.Get().ToList();
+                foreach (var plot in plotList)
+                {
+                    String Line = plot.Id + ";" + plot.PlotId + ";" + plot.GeometryType + ";" + plot.Coordinate + ";" + plot.CoordinateType + ";" + plot.Latitude + ";" + plot.Longitude + ";" + plot.Status + "\n";
+                    output += Line;
+                }
+                return output;
             }
-            return output;
         }
 
         public String ExportAllGeometries()

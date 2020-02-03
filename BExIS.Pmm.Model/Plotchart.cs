@@ -36,12 +36,15 @@ namespace BExIS.Pmm.Model
             double[] bb = { Convert.ToDouble(longitude), Convert.ToDouble(latitude) };
             String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
-            PlotManager pManager = new PlotManager();
-            Plot plot = pManager.Create(name, "", latitude, longitude, new List<GeometryInformation>(), coordinate, coordinatetype, geometrytype, geometryText);
-            PlotHistoryManager pHManager = new PlotHistoryManager();
-            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, "Create", DateTime.Now);
-            
-            return plot;
+            using (PlotManager pManager = new PlotManager())
+            {
+
+                Plot plot = pManager.Create(name, "", latitude, longitude, new List<GeometryInformation>(), coordinate, coordinatetype, geometrytype, geometryText);
+                PlotHistoryManager pHManager = new PlotHistoryManager();
+                pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, "Create", DateTime.Now);
+
+                return plot;
+            }
         }
 
         /// <summary>
@@ -58,42 +61,45 @@ namespace BExIS.Pmm.Model
         /// <returns>updated plot</returns>
         public Plot UpdatePlot(long plotid, string coordinate, string geometrytype, string coordinatetype, string name, String latitude, String longitude, string referencePoint = "")
         {
-            PlotManager pManager = new PlotManager();
-            Plot plot = pManager.Repo.Get(x => x.Id == plotid).First();
-            bool locationChanged = false;
-
-            if (!checkGeometry(geometrytype, coordinatetype, coordinate))
-                return null;
-
-            double[] bb = { Convert.ToDouble(longitude), Convert.ToDouble(latitude) };
-            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
-
-            if(plot.Latitude != latitude || plot.Longitude != longitude)
-                locationChanged = true;
-            
-            plot.Coordinate = coordinate;
-            plot.CoordinateType = coordinatetype;
-            plot.GeometryText = geometryText;
-            plot.GeometryType = geometrytype;
-            plot.Latitude = latitude;
-            plot.Longitude = longitude;
-            plot.PlotId = name;
-            plot.PlotType = "";
-
-            Plot Plot = pManager.Update(plot);
-            if (locationChanged)
+            using (PlotManager pManager = new PlotManager())
+            using (PlotHistoryManager pHManager = new PlotHistoryManager())
+            using (GeometryManager gManager = new GeometryManager())
             {
-                GeometryManager gManager = new GeometryManager();
-                foreach (var geom in Plot.Geometries)
-                {
-                    geom.GeometryText = calCoordd(geom.GeometryType, geom.Coordinate, bb, geom.CoordinateType, geom.ReferencePoint);
-                    gManager.Update(geom);
-                }
-            }
-            PlotHistoryManager pHManager = new PlotHistoryManager();
-            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, "Update", DateTime.Now);
+                Plot plot = pManager.Repo.Get(x => x.Id == plotid).First();
+                bool locationChanged = false;
 
-            return plot;
+                if (!checkGeometry(geometrytype, coordinatetype, coordinate))
+                    return null;
+
+                double[] bb = { Convert.ToDouble(longitude), Convert.ToDouble(latitude) };
+                String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
+
+                if (plot.Latitude != latitude || plot.Longitude != longitude)
+                    locationChanged = true;
+
+                plot.Coordinate = coordinate;
+                plot.CoordinateType = coordinatetype;
+                plot.GeometryText = geometryText;
+                plot.GeometryType = geometrytype;
+                plot.Latitude = latitude;
+                plot.Longitude = longitude;
+                plot.PlotId = name;
+                plot.PlotType = "";
+
+                Plot Plot = pManager.Update(plot);
+                if (locationChanged)
+                {
+                    foreach (var geom in Plot.Geometries)
+                    {
+                        geom.GeometryText = calCoordd(geom.GeometryType, geom.Coordinate, bb, geom.CoordinateType, geom.ReferencePoint);
+                        gManager.Update(geom);
+                    }
+                }
+
+                pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, "Update", DateTime.Now);
+
+                return plot;
+            }
         }
 
         /// <summary>
@@ -103,17 +109,20 @@ namespace BExIS.Pmm.Model
         /// <returns>updated plot</returns>
         public Plot DeletePlot(long plotid)
         {
-            PlotManager pManager = new PlotManager();
-            Plot plot = pManager.Repo.Get(x => x.Id == plotid).First();
-            plot.Status = (byte)(plot.Status == 3 ? 1 : 3);
-            Plot Plot = pManager.Update(plot);
-            PlotHistoryManager pHManager = new PlotHistoryManager();
-            string action = "";
-            if (plot.Status == 1) action = "Undelete";
-            if (plot.Status == 3) action = "Delete";
-            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, action, DateTime.Now);
+            using (PlotManager pManager = new PlotManager())
+            using (PlotHistoryManager pHManager = new PlotHistoryManager())
+            {
+                Plot plot = pManager.Repo.Get(x => x.Id == plotid).First();
+                plot.Status = (byte)(plot.Status == 3 ? 1 : 3);
+                Plot Plot = pManager.Update(plot);
 
-            return plot;
+                string action = "";
+                if (plot.Status == 1) action = "Undelete";
+                if (plot.Status == 3) action = "Delete";
+                pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, action, DateTime.Now);
+
+                return plot;
+            }
         }
 
         /// <summary>
@@ -123,17 +132,20 @@ namespace BExIS.Pmm.Model
         /// <returns>updated plot</returns>
         public Plot ArchivePlot(long plotid)
         {
-            PlotManager pManager = new PlotManager();
-            Plot plot = pManager.Repo.Get(x => x.Id == plotid).First();
-            plot.Status = (byte)(plot.Status == 2 ? 1 : 2);
-            Plot Plot = pManager.Update(plot);
-            PlotHistoryManager pHManager = new PlotHistoryManager();
-            string action = "";
-            if (plot.Status == 1) action = "Unarchive";
-            if (plot.Status == 2) action = "Archive";
-            pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, action, DateTime.Now);
+            using (PlotManager pManager = new PlotManager())
+            using (PlotHistoryManager pHManager = new PlotHistoryManager())
+            {
+                Plot plot = pManager.Repo.Get(x => x.Id == plotid).First();
+                plot.Status = (byte)(plot.Status == 2 ? 1 : 2);
+                Plot Plot = pManager.Update(plot);
 
-            return plot;
+                string action = "";
+                if (plot.Status == 1) action = "Unarchive";
+                if (plot.Status == 2) action = "Archive";
+                pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, action, DateTime.Now);
+
+                return plot;
+            }
         }
 
         /// <summary>
@@ -146,17 +158,19 @@ namespace BExIS.Pmm.Model
         public String CheckDuplicatePlotName(String action, String name, long plotId)
         {
             String message = "valid";
-            PlotManager pManager = new PlotManager();
-            if (action == "create")
-            { 
-                if (pManager.Repo.Get(x => x.PlotId == name && x.Status == 1).Count() != 0)
-                    message = "Active Plot with a same name already exist";
-            }
-            else if(action == "update")
-                if (pManager.Repo.Get(x => x.PlotId == name && x.Status == 1 && x.Id != plotId).Count() != 0)
-                    message = "Active Plot with a same name already exist";
+            using (PlotManager pManager = new PlotManager())
+            {
+                if (action == "create")
+                {
+                    if (pManager.Repo.Get(x => x.PlotId == name && x.Status == 1).Count() != 0)
+                        message = "Active Plot with a same name already exist";
+                }
+                else if (action == "update")
+                    if (pManager.Repo.Get(x => x.PlotId == name && x.Status == 1 && x.Id != plotId).Count() != 0)
+                        message = "Active Plot with a same name already exist";
 
-            return message;
+                return message;
+            }
         }
 
         /// <summary>
@@ -181,12 +195,14 @@ namespace BExIS.Pmm.Model
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
             String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
-            GeometryManager gManager = new GeometryManager();
-            GeometryInformation geometry = gManager.Create(plot.Id, coordinate, geometrytype, coordinatetype, color, geometryText, plot, name, description);
-            GeometryHistoryManager gHManager = new GeometryHistoryManager();
-            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Create", DateTime.Now);
+            using (GeometryManager gManager = new GeometryManager())
+            using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
+            {
+                GeometryInformation geometry = gManager.Create(plot.Id, coordinate, geometrytype, coordinatetype, color, geometryText, plot, name, description);
+                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Create", DateTime.Now);
 
-            return geometry;
+                return geometry;
+            }
         }
 
         /// <summary>
@@ -203,28 +219,30 @@ namespace BExIS.Pmm.Model
         /// <returns>updated subplot</returns>
         public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string referencePoint = "")
         {
-            GeometryManager gManager = new GeometryManager();
-            GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
+            using (GeometryManager gManager = new GeometryManager())
+            using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
+            {
+                GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
 
-            if (!checkGeometry(geometrytype, coordinatetype, coordinate))
-                return null;
+                if (!checkGeometry(geometrytype, coordinatetype, coordinate))
+                    return null;
 
-            double[] bb = { Convert.ToDouble(geom.Plot.Longitude), Convert.ToDouble(geom.Plot.Latitude) };
-            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
+                double[] bb = { Convert.ToDouble(geom.Plot.Longitude), Convert.ToDouble(geom.Plot.Latitude) };
+                String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
-            geom.GeometryText = geometryText;
-            geom.Coordinate = coordinate;
-            geom.GeometryType = geometrytype;
-            geom.CoordinateType = coordinatetype;
-            geom.Color = color;
-            geom.Name = name;
-            geom.Description = description;
+                geom.GeometryText = geometryText;
+                geom.Coordinate = coordinate;
+                geom.GeometryType = geometrytype;
+                geom.CoordinateType = coordinatetype;
+                geom.Color = color;
+                geom.Name = name;
+                geom.Description = description;
 
-            GeometryInformation geometry = gManager.Update(geom);
-            GeometryHistoryManager gHManager = new GeometryHistoryManager();
-            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);
+                GeometryInformation geometry = gManager.Update(geom);
+                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);
 
-            return geometry;
+                return geometry;
+            }
         }
 
         /// <summary>
@@ -234,17 +252,21 @@ namespace BExIS.Pmm.Model
         /// <returns>updated subplot</returns>
         public GeometryInformation ArchiveGeometry(long geometryId)
         {
-            GeometryManager gManager = new GeometryManager();
-            GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
-            geom.Status = (byte)(geom.Status == 2 ? 1 : 2);
-            GeometryInformation geometry = gManager.Update(geom);
-            GeometryHistoryManager gHManager = new GeometryHistoryManager();
-            string action = "";
-            if (geom.Status == 1) action = "Unarchive";
-            if (geom.Status == 2) action = "Archive";
-            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
+            using (GeometryManager gManager = new GeometryManager())
+            using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
+            {
+                GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
+                geom.Status = (byte)(geom.Status == 2 ? 1 : 2);
 
-            return geometry;
+                GeometryInformation geometry = gManager.Update(geom);
+
+                string action = "";
+                if (geom.Status == 1) action = "Unarchive";
+                if (geom.Status == 2) action = "Archive";
+                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
+
+                return geometry;
+            }
         }
 
         /// <summary>
@@ -254,18 +276,21 @@ namespace BExIS.Pmm.Model
         /// <returns>updated subplot</returns>
         public GeometryInformation DeleteGeometry(long geometryId)
         {
-            GeometryManager gManager = new GeometryManager();
-            GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
-            geom.Status = (byte)(geom.Status == 3 ? 1 : 3);
+            using (GeometryManager gManager = new GeometryManager())
+            using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
+            {
+                GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
+                geom.Status = (byte)(geom.Status == 3 ? 1 : 3);
 
-            GeometryInformation geometry = gManager.Update(geom);
-            GeometryHistoryManager gHManager = new GeometryHistoryManager();
-            string action = "";
-            if (geom.Status == 1) action = "Undelete";
-            if (geom.Status == 3) action = "Delete";
-            gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
+                GeometryInformation geometry = gManager.Update(geom);
 
-            return geometry;
+                string action = "";
+                if (geom.Status == 1) action = "Undelete";
+                if (geom.Status == 3) action = "Delete";
+                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
+
+                return geometry;
+            }
         }
 
         /// <summary>
@@ -274,10 +299,12 @@ namespace BExIS.Pmm.Model
         /// <returns>plots list</returns>
         public IList<Plot> GetPlots()
         {
-            PlotManager pcManager = new PlotManager();
-            IList<Plot> plots = pcManager.Repo.Get();
-            
-            return plots;
+            using (PlotManager pcManager = new PlotManager())
+            {
+                IList<Plot> plots = pcManager.Repo.Get();
+
+                return plots;
+            }
         }
 
 
@@ -287,11 +314,12 @@ namespace BExIS.Pmm.Model
         /// <returns>plots list</returns>
         public IList<Plot> GetPlotsOld()
         {
-            PlotManager pcManager = new PlotManager();
-            IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-")).ToList();
+            using (PlotManager pcManager = new PlotManager())
+            {
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-")).ToList(); // get all plot names without a "-" -> "old" plots
 
-
-            return plots;
+                return plots;
+            }
         }
 
         /// <summary>
@@ -300,9 +328,11 @@ namespace BExIS.Pmm.Model
         /// <returns>plots list</returns>
         public IList<Plot> GetPlotsNew()
         {
-            PlotManager pcManager = new PlotManager();
-            IList<Plot> plots = pcManager.Repo.Query().Where(x => x.PlotId.Contains("-")).ToList();
-            return plots;
+            using (PlotManager pcManager = new PlotManager())
+            {
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => x.PlotId.Contains("-")).ToList(); // get all plot names with a "-" -> new experiments
+                return plots;
+            }
         }
 
         /// <summary>
@@ -312,9 +342,15 @@ namespace BExIS.Pmm.Model
         /// <returns>plot</returns>
         public Plot GetPlot(string plotid)
         {
-            PlotManager pcManager = new PlotManager();
-            Plot plot = pcManager.Repo.Get(x => x.PlotId == plotid).ElementAtOrDefault(0);
-            return plot;
+            using (PlotManager pcManager = new PlotManager())
+            {
+                Plot plot = pcManager.Repo.Get(x => x.PlotId == plotid).ElementAtOrDefault(0);
+                if (plot != null)
+                {
+                    pcManager.Repo.LoadIfNot(plot.Geometries); // Load Geoemetries
+                }
+                return plot;
+            }
         }
 
         /// <summary>
@@ -324,9 +360,22 @@ namespace BExIS.Pmm.Model
         /// <returns>plot</returns>
         public Plot GetPlot(long plotid)
         {
-            PlotManager pcManager = new PlotManager();
-            Plot plot = pcManager.Repo.Get(x => x.Id == plotid).ElementAtOrDefault(0);
-            return plot;
+            Plot returnPlot = new Plot(); // workaround helping var to force geometries are loaded
+            using (PlotManager pcManager = new PlotManager())
+            {
+                Plot plot = pcManager.Repo.Get(x => x.Id == plotid).ElementAtOrDefault(0);
+                if (plot != null)
+                {
+                    pcManager.Repo.LoadIfNot(plot.Geometries); // Load Geoemetries
+                }
+
+                // Workaround to force Geoemtries are loaded
+                returnPlot = plot;
+                if (plot.Geometries != null && plot.Geometries.Count() >0)
+                    returnPlot.Geometries = plot.Geometries;
+
+                return returnPlot;
+            }
         }
 
         /// <summary>
@@ -338,34 +387,45 @@ namespace BExIS.Pmm.Model
         /// <returns></returns>
         public Plot GetPlot(long plotid, Boolean deactivePlot, Boolean beyondPlot)
         {
-            PlotManager pcManager = new PlotManager();
-            Plot plot = pcManager.Repo.Get(x => x.Id == plotid).ElementAtOrDefault(0);
-            if (plot == null)
+            using (PlotManager pcManager = new PlotManager())
             {
-                plot = new Plot();
-                plot.Geometries = new List<GeometryInformation>();
+                Plot plot = pcManager.Repo.Get(x => x.Id == plotid).ElementAtOrDefault(0);
+                if (plot == null)
+                {
+                    plot = new Plot();
+                    //plot.Geometries = new List<GeometryInformation>();
+                    //if (plot != null)
+                    //{
+                    //    pcManager.Repo.LoadIfNot(plot.Geometries); // Load Geoemetries
+                    //}
+                    return plot;
+                }
+                if (plot != null)
+                {
+                    pcManager.Repo.LoadIfNot(plot.Geometries); // Load Geoemetries
+                }
+
+                double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
+                IGeometry area = plot.Geometry;
+                List<GeometryInformation> removeList = new List<GeometryInformation>();
+                foreach (var geom in plot.Geometries)
+                {
+                    if (!deactivePlot && geom.Status != 1)
+                    {
+                        removeList.Add(geom);
+                        continue;
+                    }
+                    if (!beyondPlot)
+                    {
+                        if (!area.Envelope.Contains(geom.Geometry.Envelope))
+                            removeList.Add(geom);
+                    }
+                }
+                foreach (var geom in removeList)
+                    plot.Geometries.Remove(geom);
+
                 return plot;
             }
-            double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
-            IGeometry area = plot.Geometry;
-            List<GeometryInformation> removeList = new List<GeometryInformation>();
-            foreach (var geom in plot.Geometries)
-            {
-                if (!deactivePlot && geom.Status != 1)
-                {
-                    removeList.Add(geom);
-                    continue;
-                }
-                if(!beyondPlot)
-                {
-                    if (!area.Envelope.Contains(geom.Geometry.Envelope))
-                        removeList.Add(geom);
-                }
-            }
-           foreach (var geom in removeList)
-                plot.Geometries.Remove(geom);
-
-            return plot;
         }
 
         /// <summary>
@@ -380,7 +440,6 @@ namespace BExIS.Pmm.Model
         public String ProducePlot(Plot plot, int zoom = 1, bool deactiveGeometries = true, bool beyondPlot = false, int gridSize = 5)
         {
             SharpMap.Map myMap;
-
 
             myMap = plot != null ? InitializeMap(new Size(3000, 3000), plot, zoom, deactiveGeometries, beyondPlot, gridSize) : null;
 
@@ -432,6 +491,7 @@ namespace BExIS.Pmm.Model
                 map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
             
             
+
             foreach (var geometry in plot.Geometries)
             {
                 //check to ignore deactive geometries
@@ -640,7 +700,7 @@ namespace BExIS.Pmm.Model
             String Html = "<html><head><style>tr:nth-child(odd) {  background-color: #afafaf;} tr:nth-child(even) {  background-color: #f1f1f1;}</style></head><body >";
             foreach(var plot in plotList)
             {
-                Html += generatePlotDiv(plot, zoom, deactiveGeometries, beyondPlot, gridSize, legend);
+                Html += generatePlotDiv(GetPlot(plot.Id), zoom, deactiveGeometries, beyondPlot, gridSize, legend);
                 Html += "<div style='page-break-after:always'></div>";
             }
             Html += "</body></html>";

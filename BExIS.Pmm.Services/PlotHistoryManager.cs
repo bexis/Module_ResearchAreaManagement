@@ -9,7 +9,7 @@ using PlotChartX = BExIS.Pmm.Entities.PlotHistory;
 
 namespace BExIS.Dlm.Services
 {
-    public sealed class PlotHistoryManager
+    public class PlotHistoryManager : IDisposable
     {
         #region Attributes
         
@@ -18,15 +18,43 @@ namespace BExIS.Dlm.Services
         #endregion
 
         #region Ctors
-        
+
+        private IUnitOfWork guow = null;
         public PlotHistoryManager()
         {
-            IUnitOfWork uow = this.GetUnitOfWork();
-            this.Repo = uow.GetReadOnlyRepository<PlotChartX>();
+            guow = this.GetIsolatedUnitOfWork();
+            this.Repo = guow.GetReadOnlyRepository<PlotChartX>();
         }
 
+        private bool isDisposed = false;
+        ~PlotHistoryManager()
+        {
+            Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed)
+            {
+                if (disposing)
+                {
+                    if (guow != null)
+                        guow.Dispose();
+                    isDisposed = true;
+                }
+            }
+        }
+
+
+
+
         #endregion
-        
+
         #region Methods
         public PlotChartX Create(string plotId, string plotType, string latitude, string longitude, string coordinate, string coordinateType, string geometryType, string geometryText, long logedId, String action, DateTime dateTime, string referencePoint = "")
         {

@@ -2,14 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
-using System.Text;
 using Vaiona.Persistence.Api;
 using GeometryX = BExIS.Pmm.Entities.GeometryInformationHistory;
 
 namespace BExIS.Pmm.Services
 {
-    public sealed class GeometryHistoryManager
+    public class GeometryHistoryManager :IDisposable
     {
         #region Attributes
         
@@ -18,15 +16,42 @@ namespace BExIS.Pmm.Services
         #endregion
 
         #region Ctors
-        
+
+        private IUnitOfWork guow = null;
         public GeometryHistoryManager()
         {
-            IUnitOfWork uow = this.GetUnitOfWork();
-            this.Repo = uow.GetReadOnlyRepository<GeometryX>();
+            guow = this.GetIsolatedUnitOfWork();
+            this.Repo = guow.GetReadOnlyRepository<GeometryX>();
         }
 
+        private bool isDisposed = false;
+        ~GeometryHistoryManager()
+        {
+            Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!isDisposed)
+            {
+                if (disposing)
+                {
+                    if (guow != null)
+                        guow.Dispose();
+                    isDisposed = true;
+                }
+            }
+        }
+
+
+
         #endregion
-        
+
         #region Methods
         public GeometryX Create(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string geometrytext, string name, string description, long logedId, String action, DateTime dateTime, string referencePoint = "")
         {
