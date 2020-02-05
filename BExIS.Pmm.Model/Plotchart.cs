@@ -873,11 +873,12 @@ namespace BExIS.Pmm.Model
 
             map.Layers.Add(borderLayer);
             map.Layers.Add(layLabelBorder);
-            
-            for (int i = 0; i < gridSize - 1; i++)
+
+            var max = (int)((X2 - (X1)) / gridSize);
+            for (int i = 0; i < max - 1; i++)
             {
-                XS -= XI;
-                YS -= YI;
+                XS -= gridSize;
+                YS -= gridSize;
                 SharpMap.Layers.VectorLayer gridxLayer = new SharpMap.Layers.VectorLayer("gridx" + i);
                 SharpMap.Layers.VectorLayer gridyLayer = new SharpMap.Layers.VectorLayer("gridy" + i);
                 IGeometry xline = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("linestring", "(" + X2 + "," + X1 + "),(" + YS + "," + YS+ ")", bb));

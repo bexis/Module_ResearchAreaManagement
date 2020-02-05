@@ -11,7 +11,7 @@
     pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
     pagerStyles |= GridPagerStyles.Numeric;
 
-    Model.gridsize = new List<int>(new int[] {2, 5, 10, 12, 14, 16, 18, 20, 22, 23 });
+    Model.gridsize = new List<int>(new int[] {1, 2, 5, 10, 15 });
     Model.geometryType = new List<String>(new String[] { "rectangle", "linestring", "circle", "polygon" });
     Model.colorList = new List<String>(new String[] { "#00ff00", "#ff0000", "#ffa07a", "#000000", "#bebebe", "#ffffff", "#ee82ee", "#add8e6", "#4682b4", "#00ffff", "#d8bfd8", "#0000ff", "#a020f0", "#2e8b57", "#b03060", "#f5deb3", "#d2691e", "ffa500", "#90ee90", "#ebebeb", "#ffff00", "#a52a2a", "#ffeeee", "#c71585" });
     Model.coordinateType = new List<String>(new String[] { "xy", "polar" });
@@ -39,7 +39,7 @@
                 <input type="checkbox" id="Legend" /> PDF without legend
             </td>
             <td>
-                Grid Resolution:
+                Grid Size:
             </td>
             <td>
                 @(Html.Telerik().DropDownList()
@@ -97,7 +97,7 @@
             id: "937", // default id
             deactivePlot: false,
             beyondPlot: false,
-            gridsize: "2"
+            gridsize: "1"
         }
 
 
