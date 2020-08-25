@@ -145,15 +145,17 @@ namespace BExIS.Pmm.Model
         public String ExportAllGeometries()
         {
             String output = "";
-            GeometryManager gManager = new GeometryManager();
-            List<GeometryInformation> geometryList = new List<GeometryInformation>();
-            geometryList = gManager.Repo.Get().ToList();
-            foreach (var geometry in geometryList)
+            using (GeometryManager gManager = new GeometryManager())
             {
-                String line = geometry.Id + ";" + geometry.Name + ";" + geometry.GeometryType + ";" + geometry.Coordinate + ";" + geometry.CoordinateType + ";" + geometry.LineWidth + ";" + geometry.Color + ";" + geometry.Description + ";" + geometry.Status + ";" + geometry.Plot.Id + "\n";
-                output += line;
+                List<GeometryInformation> geometryList = new List<GeometryInformation>();
+                geometryList = gManager.Repo.Get().ToList();
+                foreach (var geometry in geometryList)
+                {
+                    String line = geometry.Id + ";" + geometry.Name + ";" + geometry.GeometryType + ";" + geometry.Coordinate + ";" + geometry.CoordinateType + ";" + geometry.LineWidth + ";" + geometry.Color + ";" + geometry.Description + ";" + geometry.Status + ";" + geometry.Plot.Id + "\n";
+                    output += line;
+                }
+                return output;
             }
-            return output;
         }
 
         public String ExportPlotGeometries(long id)

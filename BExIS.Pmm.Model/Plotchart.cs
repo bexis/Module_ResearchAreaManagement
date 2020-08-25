@@ -37,10 +37,9 @@ namespace BExIS.Pmm.Model
             String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
 
             using (PlotManager pManager = new PlotManager())
+            using (PlotHistoryManager pHManager = new PlotHistoryManager())
             {
-
                 Plot plot = pManager.Create(name, "", latitude, longitude, new List<GeometryInformation>(), coordinate, coordinatetype, geometrytype, geometryText);
-                PlotHistoryManager pHManager = new PlotHistoryManager();
                 pHManager.Create(plot.PlotId, plot.PlotType, plot.Latitude, plot.Longitude, plot.Coordinate, plot.CoordinateType, plot.GeometryType, plot.GeometryText, plot.Id, "Create", DateTime.Now);
 
                 return plot;
@@ -440,20 +439,24 @@ namespace BExIS.Pmm.Model
         public String ProducePlot(Plot plot, int zoom = 1, bool deactiveGeometries = true, bool beyondPlot = false, int gridSize = 5)
         {
             SharpMap.Map myMap;
+            using (var stream = new MemoryStream())
+            {
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+                myMap = plot != null ? InitializeMap(new Size(3000, 3000), plot, zoom, deactiveGeometries, beyondPlot, gridSize) : null;
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
 
-            myMap = plot != null ? InitializeMap(new Size(3000, 3000), plot, zoom, deactiveGeometries, beyondPlot, gridSize) : null;
+                Image mapImage = CreateMap(myMap); //mapImage.Save("file.png", ImageFormat.Png);
+                string mimeType = "image/jpg";/* Get mime type somehow (e.g. "image/png") */;
 
-            Image mapImage = CreateMap(myMap); //mapImage.Save("file.png", ImageFormat.Png);
-            string mimeType = "image/jpg";/* Get mime type somehow (e.g. "image/png") */;
+                ImageConverter _imageConverter = new ImageConverter();
 
-            ImageConverter _imageConverter = new ImageConverter();
-            var stream = new MemoryStream();
-            if (mapImage == null)
-                return String.Format("data:image/png;base64,{0}", Convert.ToBase64String(stream.ToArray()));
-            mapImage.Save(stream, ImageFormat.Png);
-            stream.Position = 0;
-            var img = String.Format("data:image/png;base64,{0}", Convert.ToBase64String(stream.ToArray()));
-            return img;
+                if (mapImage == null)
+                    return String.Format("data:image/png;base64,{0}", Convert.ToBase64String(stream.ToArray()));
+                mapImage.Save(stream, ImageFormat.Png);
+                stream.Position = 0;
+                var img = String.Format("data:image/png;base64,{0}", Convert.ToBase64String(stream.ToArray()));
+                return img;
+            }
         }
 
         /// <summary>
@@ -476,158 +479,165 @@ namespace BExIS.Pmm.Model
             GeoAPI.CoordinateSystems.ICoordinateSystem webmercator = ProjNet.CoordinateSystems.ProjectedCoordinateSystem.WebMercator;
 
             ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory ctFact = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory();
-            
-            SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("Border");
-            double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
-            IGeometry area = plot.Geometry.Buffer(0.00005); // Add buffer to given plot area to avoid border is not shown, if it is outside of the standard plot area
-            List<IGeometry> borderGeometries = new List<IGeometry>();
-            borderGeometries.Add(area);
-            borderLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(borderGeometries);
-            borderLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
-            borderLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-
-            if (!beyondPlot)
-                map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
-            
-            
-
-            foreach (var geometry in plot.Geometries)
+            using (SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("Border"))
             {
-                //check to ignore deactive geometries
-                if (!deactiveGeometries && geometry.Status == 2)
-                    continue;
+                double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
+                IGeometry area = plot.Geometry.Buffer(0.00005); // Add buffer to given plot area to avoid border is not shown, if it is outside of the standard plot area
+                List<IGeometry> borderGeometries = new List<IGeometry>();
+                borderGeometries.Add(area);
+                borderLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(borderGeometries);
+                borderLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
+                borderLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-                SharpMap.Layers.VectorLayer plotLayer = new SharpMap.Layers.VectorLayer(geometry.Id.ToString());
 
-                double disss = geometry.Geometry.Envelope.Distance(plot.Geometry.Envelope);
+                if (!beyondPlot)
+                    map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
 
-                List<IGeometry> geometries = new List<IGeometry>();
-                geometries.Add(geometry.Geometry);
-                var dd = new SharpMap.Data.FeatureDataTable();
-                dd.Columns.Add("Label");
-                SharpMap.Data.FeatureDataRow newRow = dd.NewRow();
-                newRow.Geometry = geometry.Geometry;
 
-                plotLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(geometries);
-                
-                newRow["Label"] = Math.Round((plotLayer.Envelope.MaxX - (Convert.ToDouble(plot.Longitude))) * 67000) + "," + Math.Round((plotLayer.Envelope.MaxY - (Convert.ToDouble(plot.Latitude))) * 108800) + "\t \n";
-                plotLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
-                plotLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
-                
-                dd.Rows.Clear(); dd.Rows.Add(newRow); plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
 
-                SharpMap.Layers.LabelLayer layLabel = new SharpMap.Layers.LabelLayer("Country labels")
+                foreach (var geometry in plot.Geometries)
                 {
-                    DataSource = plotLayer.DataSource,
-                    Enabled = true,
-                    LabelColumn = "Label",
-                    MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
-                    LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
-                    CoordinateTransformation = plotLayer.CoordinateTransformation,
-                    PriorityColumn = "Label",
-
-                    Style = new SharpMap.Styles.LabelStyle()
-                    {
-                        Font = new Font(FontFamily.GenericSerif, 40),
-                        HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Right,
-                        VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
-                        CollisionDetection = true,
-                        Enabled = true,
-                    }
-                };
-
-                layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
-                layLabel.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
-                layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
-
-                layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
-
-                String borderColor = "#000000";
-                if (geometry.GeometryType.ToLower() == "linestring")
-                    borderColor = geometry.Color;
-                Pen pen = new Pen(ColorTranslator.FromHtml(RGBAToArgb(borderColor)), geometry.LineWidth);
-                pen.Width = geometry.LineWidth > 1 ? geometry.LineWidth * 3 : geometry.LineWidth;
-                float[] dashValues = { 8, 8 };
-                int transparency = 150;
-                if (geometry.Status == 2)
-                {
-                    pen.DashPattern = dashValues;
-                    transparency = 0;
-                    plotLayer.Style.Fill = new SolidBrush(Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber)));
-                }
-
-                int argb = Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber);
-                Color clr = Color.FromArgb(argb);
-                plotLayer.Style.Fill = new SolidBrush(clr);
-                plotLayer.Style.Outline = pen;
-                plotLayer.Style.EnableOutline = true;
-
-                if (!beyondPlot && beyondBorderCheck(borderLayer, plotLayer))
-                    continue;
-
-                map.Layers.Add(plotLayer);
-                map.Layers.Add(layLabel);
-            }
-
-            
-            map.ZoomToExtents();
-
-            if (beyondPlot)
-            {
-                map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
-                for (int i = 0; i < map.Layers.Count - (gridSize * 2 * 2 - 1); i++)
-                {
-                    if (i % 2 == 0)
+                    //check to ignore deactive geometries
+                    if (!deactiveGeometries && geometry.Status == 2)
                         continue;
-                    SharpMap.Layers.LabelLayer layer = map.Layers.ElementAt(i) as SharpMap.Layers.LabelLayer;
-                    layer.Style.Offset = map.WorldToImage(new Coordinate((double)layer.Style.Offset.X, (double)layer.Style.Offset.Y), false);
-                    var centroid = map.WorldToImage(layer.Envelope.Centre.CoordinateValue);
-                    layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X, layer.Style.Offset.Y - centroid.Y);
-                    map.Layers[i] = layer; map.Layers.ResetItem(i);
-                }
-                for (int i = map.Layers.Count - (gridSize * 2 * 2 - 1); i < map.Layers.Count; i++)
-                {
-                    if (i % 2 == 1)
+
+                    using (SharpMap.Layers.VectorLayer plotLayer = new SharpMap.Layers.VectorLayer(geometry.Id.ToString()))
+                     using (var dd = new SharpMap.Data.FeatureDataTable())
                     {
+
+                        double disss = geometry.Geometry.Envelope.Distance(plot.Geometry.Envelope);
+
+                        List<IGeometry> geometries = new List<IGeometry>();
+                        geometries.Add(geometry.Geometry);
+                       
+                        dd.Columns.Add("Label");
+                        SharpMap.Data.FeatureDataRow newRow = dd.NewRow();
+                        newRow.Geometry = geometry.Geometry;
+
+                        plotLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(geometries);
+
+                        newRow["Label"] = Math.Round((plotLayer.Envelope.MaxX - (Convert.ToDouble(plot.Longitude))) * 67000) + "," + Math.Round((plotLayer.Envelope.MaxY - (Convert.ToDouble(plot.Latitude))) * 108800) + "\t \n";
+                        plotLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
+                        plotLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
+
+                        dd.Rows.Clear(); dd.Rows.Add(newRow); plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
+
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+                        SharpMap.Layers.LabelLayer layLabel = new SharpMap.Layers.LabelLayer("Country labels")
+                        {
+                            DataSource = plotLayer.DataSource,
+                            Enabled = true,
+                            LabelColumn = "Label",
+                            MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
+                            LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
+                            CoordinateTransformation = plotLayer.CoordinateTransformation,
+                            PriorityColumn = "Label",
+
+                            Style = new SharpMap.Styles.LabelStyle()
+                            {
+                                Font = new Font(FontFamily.GenericSerif, 40),
+                                HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Right,
+                                VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
+                                CollisionDetection = true,
+                                Enabled = true,
+                            }
+                        };
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+
+                        layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
+                        layLabel.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
+                        layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+
+                        layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
+
+                        String borderColor = "#000000";
+                        if (geometry.GeometryType.ToLower() == "linestring")
+                            borderColor = geometry.Color;
+                        Pen pen = new Pen(ColorTranslator.FromHtml(RGBAToArgb(borderColor)), geometry.LineWidth);
+                        pen.Width = geometry.LineWidth > 1 ? geometry.LineWidth * 3 : geometry.LineWidth;
+                        float[] dashValues = { 8, 8 };
+                        int transparency = 150;
+                        if (geometry.Status == 2)
+                        {
+                            pen.DashPattern = dashValues;
+                            transparency = 0;
+                            plotLayer.Style.Fill = new SolidBrush(Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber)));
+                        }
+
+                        int argb = Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber);
+                        Color clr = Color.FromArgb(argb);
+                        plotLayer.Style.Fill = new SolidBrush(clr);
+                        plotLayer.Style.Outline = pen;
+                        plotLayer.Style.EnableOutline = true;
+
+                        if (!beyondPlot && beyondBorderCheck(borderLayer, plotLayer))
+                            continue;
+
+                        map.Layers.Add(plotLayer);
+                        map.Layers.Add(layLabel);
+                    }
+                }
+
+
+                map.ZoomToExtents();
+
+                if (beyondPlot)
+                {
+                    map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
+                    for (int i = 0; i < map.Layers.Count - (gridSize * 2 * 2 - 1); i++)
+                    {
+                        if (i % 2 == 0)
+                            continue;
                         SharpMap.Layers.LabelLayer layer = map.Layers.ElementAt(i) as SharpMap.Layers.LabelLayer;
                         layer.Style.Offset = map.WorldToImage(new Coordinate((double)layer.Style.Offset.X, (double)layer.Style.Offset.Y), false);
                         var centroid = map.WorldToImage(layer.Envelope.Centre.CoordinateValue);
                         layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X, layer.Style.Offset.Y - centroid.Y);
                         map.Layers[i] = layer; map.Layers.ResetItem(i);
+                    }
+                    for (int i = map.Layers.Count - (gridSize * 2 * 2 - 1); i < map.Layers.Count; i++)
+                    {
+                        if (i % 2 == 1)
+                        {
+                            SharpMap.Layers.LabelLayer layer = map.Layers.ElementAt(i) as SharpMap.Layers.LabelLayer;
+                            layer.Style.Offset = map.WorldToImage(new Coordinate((double)layer.Style.Offset.X, (double)layer.Style.Offset.Y), false);
+                            var centroid = map.WorldToImage(layer.Envelope.Centre.CoordinateValue);
+                            layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X, layer.Style.Offset.Y - centroid.Y);
+                            map.Layers[i] = layer; map.Layers.ResetItem(i);
 
+                        }
                     }
                 }
-            }
-            else
-            {
-
-                for (int i = 0; i < gridSize * 2 * 2; i++)
+                else
                 {
-                    if (i % 2 == 1)
+
+                    for (int i = 0; i < gridSize * 2 * 2; i++)
                     {
+                        if (i % 2 == 1)
+                        {
+                            SharpMap.Layers.LabelLayer layer = map.Layers.ElementAt(i) as SharpMap.Layers.LabelLayer;
+                            layer.Style.Offset = map.WorldToImage(new Coordinate((double)layer.Style.Offset.X, (double)layer.Style.Offset.Y), false);
+                            var centroid = map.WorldToImage(layer.Envelope.Centre.CoordinateValue);
+                            layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X - 30, layer.Style.Offset.Y - centroid.Y + 100);
+                            map.Layers[i] = layer; map.Layers.ResetItem(i);
+                        }
+                    }
+
+                    for (int i = gridSize * 2 * 2 - 1; i < map.Layers.Count; i++)
+                    {
+                        if (i % 2 == 0)
+                            continue;
                         SharpMap.Layers.LabelLayer layer = map.Layers.ElementAt(i) as SharpMap.Layers.LabelLayer;
                         layer.Style.Offset = map.WorldToImage(new Coordinate((double)layer.Style.Offset.X, (double)layer.Style.Offset.Y), false);
                         var centroid = map.WorldToImage(layer.Envelope.Centre.CoordinateValue);
-                        layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X - 30, layer.Style.Offset.Y - centroid.Y + 100);
+                        layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X, layer.Style.Offset.Y - centroid.Y);
                         map.Layers[i] = layer; map.Layers.ResetItem(i);
                     }
                 }
+                map.ZoomToExtents();
 
-                for (int i = gridSize * 2 * 2 - 1; i < map.Layers.Count; i++)
-                {
-                    if (i % 2 == 0)
-                        continue;
-                    SharpMap.Layers.LabelLayer layer = map.Layers.ElementAt(i) as SharpMap.Layers.LabelLayer;
-                    layer.Style.Offset = map.WorldToImage(new Coordinate((double)layer.Style.Offset.X, (double)layer.Style.Offset.Y), false);
-                    var centroid = map.WorldToImage(layer.Envelope.Centre.CoordinateValue);
-                    layer.Style.Offset = new PointF(layer.Style.Offset.X - centroid.X, layer.Style.Offset.Y - centroid.Y);
-                    map.Layers[i] = layer; map.Layers.ResetItem(i);
-                }
+                return map;
             }
-            map.ZoomToExtents();
-
-            return map;
         }
 
         /// <summary>
@@ -781,135 +791,25 @@ namespace BExIS.Pmm.Model
             areaLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
             areaLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-            var dd = new SharpMap.Data.FeatureDataTable();
-            dd.Columns.Add("Label");
-            SharpMap.Data.FeatureDataRow newRow = dd.NewRow();
-            newRow.Geometry = area;
-            newRow["Label"] = "";
-            dd.Rows.Clear(); dd.Rows.Add(newRow); areaLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
-            SharpMap.Layers.LabelLayer layLabel = new SharpMap.Layers.LabelLayer("Country labels")
+            using (var dd = new SharpMap.Data.FeatureDataTable())
+            using (var borderFdt = new SharpMap.Data.FeatureDataTable())
+            using (var fdtX = new SharpMap.Data.FeatureDataTable())
+            using (var fdtY = new SharpMap.Data.FeatureDataTable())
             {
-                DataSource = areaLayer.DataSource,
-                Enabled = true,
-                LabelColumn = "Label",
-                MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
-                LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
-                CoordinateTransformation = areaLayer.CoordinateTransformation,
-                PriorityColumn = "Label",
 
-                Style = new SharpMap.Styles.LabelStyle()
+                dd.Columns.Add("Label");
+                SharpMap.Data.FeatureDataRow newRow = dd.NewRow();
+                newRow.Geometry = area;
+                newRow["Label"] = "";
+                dd.Rows.Clear(); dd.Rows.Add(newRow); areaLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
+                SharpMap.Layers.LabelLayer layLabel = new SharpMap.Layers.LabelLayer("Country labels")
                 {
-                    Font = new Font(FontFamily.GenericSerif, 50, FontStyle.Bold),
-                    HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
-                    VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
-                    CollisionDetection = true,
-                    Enabled = true,
-                }
-            };
-
-            layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
-            layLabel.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center;
-            layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
-
-            layLabel.Style.Offset = (new PointF((float)areaLayer.Envelope.Centre.X, (float)areaLayer.Envelope.MaxY));
-            
-
-            areaLayer.Style.Fill = new SolidBrush(Color.FromArgb(0, ColorTranslator.FromHtml("#000000")));
-            areaLayer.Style.Outline = Pens.Black;
-            areaLayer.Style.EnableOutline = true;
-            map.Layers.Add(areaLayer);
-            map.Layers.Add(layLabel);
-
-            map.ZoomToExtents();
-
-            float XI = (X2 - (X1)) / gridSize;
-            float YI = (Y2 - (Y1)) / gridSize;
-            float XS = X1 > X2 ? X1 : X2;// Math.Abs(X1);
-            float YS = Y1 > Y2 ? Y1 : Y2;// Math.Abs(Y1);
-
-            SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("area");
-            List<IGeometry> frameGeometry = new List<IGeometry>();
-            IGeometry test = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("rectangle", (X1 * 1.1) + "," + (Y1 * 1.1) + "," + (X2 * 1.1) + "," + (Y2 * 1.1), bb));
-            frameGeometry.Add(test);
-            borderLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(frameGeometry);
-            borderLayer.Style.Fill = Brushes.Transparent;
-            borderLayer.Style.Outline = Pens.Transparent;
-            borderLayer.Style.EnableOutline = false;
-            borderLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
-            borderLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
-
-            var borderFdt = new SharpMap.Data.FeatureDataTable();
-            borderFdt.Columns.Add("Label");
-            SharpMap.Data.FeatureDataRow newRowBorder = borderFdt.NewRow();
-            newRowBorder.Geometry = test;
-            newRowBorder["Label"] = "Plot " + plot.PlotId + "\t \n";
-            borderFdt.Rows.Clear(); borderFdt.Rows.Add(newRowBorder); borderLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(borderFdt);
-            SharpMap.Layers.LabelLayer layLabelBorder = new SharpMap.Layers.LabelLayer("Country labels")
-            {
-                DataSource = borderLayer.DataSource,
-                Enabled = true,
-                LabelColumn = "Label",
-                MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
-                LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
-                CoordinateTransformation = borderLayer.CoordinateTransformation,
-                PriorityColumn = "Label",
-
-                Style = new SharpMap.Styles.LabelStyle()
-                {
-                    Font = new Font(FontFamily.GenericSerif, 60, FontStyle.Bold),
-                    HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
-                    VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
-                    CollisionDetection = true,
-                    Enabled = true,
-
-                }
-            };
-
-            layLabelBorder.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
-            layLabelBorder.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center;
-            layLabelBorder.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
-
-            layLabelBorder.Style.Offset = (new PointF((float)borderLayer.Envelope.Centre.X, (float)borderLayer.Envelope.MaxY));
-
-            map.Layers.Add(borderLayer);
-            map.Layers.Add(layLabelBorder);
-
-            var max = (int)((X2 - (X1)) / gridSize);
-            for (int i = 0; i < max - 1; i++)
-            {
-                XS -= gridSize;
-                YS -= gridSize;
-                SharpMap.Layers.VectorLayer gridxLayer = new SharpMap.Layers.VectorLayer("gridx" + i);
-                SharpMap.Layers.VectorLayer gridyLayer = new SharpMap.Layers.VectorLayer("gridy" + i);
-                IGeometry xline = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("linestring", "(" + X2 + "," + X1 + "),(" + YS + "," + YS+ ")", bb));
-                IGeometry yline = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("linestring", "(" + XS + "," + XS + "),(" + Y2 + "," + Y1+ ")", bb));
-
-                List<IGeometry> gridXgeometries = new List<IGeometry>();
-                gridXgeometries.Add(xline);
-                List<IGeometry> gridYgeometries = new List<IGeometry>();
-                gridYgeometries.Add(yline);
-
-                gridxLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(gridXgeometries);
-                gridxLayer.Style.Fill = new SolidBrush(Color.FromArgb(50, ColorTranslator.FromHtml("#101010")));
-                gridxLayer.Style.Outline = new Pen((Color.FromArgb(50, ColorTranslator.FromHtml("#101010")))); ;
-                gridxLayer.Style.EnableOutline = true;
-                gridxLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
-                gridxLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
-
-                var fdtX = new SharpMap.Data.FeatureDataTable();
-                fdtX.Columns.Add("Label");
-                SharpMap.Data.FeatureDataRow newFdtXRow = fdtX.NewRow();
-                newFdtXRow.Geometry = xline;
-                newFdtXRow["Label"] = Math.Round(XS, 2) + "\t \n";
-                fdtX.Rows.Clear(); fdtX.Rows.Add(newFdtXRow); gridxLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(fdtX);
-                SharpMap.Layers.LabelLayer layerLabelX = new SharpMap.Layers.LabelLayer("Country labels")
-                {
-                    DataSource = gridxLayer.DataSource,
+                    DataSource = areaLayer.DataSource,
                     Enabled = true,
                     LabelColumn = "Label",
                     MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
                     LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
-                    CoordinateTransformation = gridxLayer.CoordinateTransformation,
+                    CoordinateTransformation = areaLayer.CoordinateTransformation,
                     PriorityColumn = "Label",
 
                     Style = new SharpMap.Styles.LabelStyle()
@@ -922,60 +822,173 @@ namespace BExIS.Pmm.Model
                     }
                 };
 
-                layerLabelX.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Middle;
-                layerLabelX.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
-                layerLabelX.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+                layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
+                layLabel.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center;
+                layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
 
-                layerLabelX.Style.Offset = (new PointF((float)gridxLayer.Envelope.MinX, (float)gridxLayer.Envelope.Centre.Y));
+                layLabel.Style.Offset = (new PointF((float)areaLayer.Envelope.Centre.X, (float)areaLayer.Envelope.MaxY));
 
-                map.Layers.Add(gridxLayer);
-                map.Layers.Add(layerLabelX);
 
-                gridyLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(gridYgeometries);
-                gridyLayer.Style.Fill = new SolidBrush(Color.FromArgb(50, ColorTranslator.FromHtml("#101010")));
-                gridyLayer.Style.Outline = new Pen((Color.FromArgb(50, ColorTranslator.FromHtml("#101010"))));
-                gridyLayer.Style.EnableOutline = true;
-                gridyLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
-                gridyLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
+                areaLayer.Style.Fill = new SolidBrush(Color.FromArgb(0, ColorTranslator.FromHtml("#000000")));
+                areaLayer.Style.Outline = Pens.Black;
+                areaLayer.Style.EnableOutline = true;
+                map.Layers.Add(areaLayer);
+                map.Layers.Add(layLabel);
 
-                var fdtY = new SharpMap.Data.FeatureDataTable();
-                fdtY.Columns.Add("Label");
-                SharpMap.Data.FeatureDataRow newFdtYRow = fdtY.NewRow();
-                newFdtYRow.Geometry = yline;
-                newFdtYRow["Label"] = Math.Round(YS, 2) + "\t \n"; ;
-                fdtY.Rows.Clear(); fdtY.Rows.Add(newFdtYRow); gridyLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(fdtY);
-                SharpMap.Layers.LabelLayer layerLabelY = new SharpMap.Layers.LabelLayer("Country labels")
+                map.ZoomToExtents();
+
+                float XI = (X2 - (X1)) / gridSize;
+                float YI = (Y2 - (Y1)) / gridSize;
+                float XS = X1 > X2 ? X1 : X2;// Math.Abs(X1);
+                float YS = Y1 > Y2 ? Y1 : Y2;// Math.Abs(Y1);
+
+                SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("area");
+                List<IGeometry> frameGeometry = new List<IGeometry>();
+                IGeometry test = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("rectangle", (X1 * 1.1) + "," + (Y1 * 1.1) + "," + (X2 * 1.1) + "," + (Y2 * 1.1), bb));
+                frameGeometry.Add(test);
+                borderLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(frameGeometry);
+                borderLayer.Style.Fill = Brushes.Transparent;
+                borderLayer.Style.Outline = Pens.Transparent;
+                borderLayer.Style.EnableOutline = false;
+                borderLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
+                borderLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
+
+                borderFdt.Columns.Add("Label");
+                SharpMap.Data.FeatureDataRow newRowBorder = borderFdt.NewRow();
+                newRowBorder.Geometry = test;
+                newRowBorder["Label"] = "Plot " + plot.PlotId + "\t \n";
+                borderFdt.Rows.Clear(); borderFdt.Rows.Add(newRowBorder); borderLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(borderFdt);
+                SharpMap.Layers.LabelLayer layLabelBorder = new SharpMap.Layers.LabelLayer("Country labels")
                 {
-                    DataSource = gridyLayer.DataSource,
+                    DataSource = borderLayer.DataSource,
                     Enabled = true,
                     LabelColumn = "Label",
                     MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
                     LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
-                    CoordinateTransformation = gridyLayer.CoordinateTransformation,
+                    CoordinateTransformation = borderLayer.CoordinateTransformation,
                     PriorityColumn = "Label",
 
                     Style = new SharpMap.Styles.LabelStyle()
                     {
-                        Font = new Font(FontFamily.GenericSerif, 50, FontStyle.Bold),
+                        Font = new Font(FontFamily.GenericSerif, 60, FontStyle.Bold),
                         HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
                         VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
                         CollisionDetection = true,
                         Enabled = true,
+
                     }
                 };
 
-                layerLabelY.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Bottom;
-                layerLabelY.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Right;
-                layerLabelY.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+                layLabelBorder.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
+                layLabelBorder.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center;
+                layLabelBorder.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
 
-                layerLabelY.Style.Offset = (new PointF((float)gridyLayer.Envelope.MinX, (float)gridyLayer.Envelope.MinY));
+                layLabelBorder.Style.Offset = (new PointF((float)borderLayer.Envelope.Centre.X, (float)borderLayer.Envelope.MaxY));
 
-                map.Layers.Add(gridyLayer);
-                map.Layers.Add(layerLabelY);
+                map.Layers.Add(borderLayer);
+                map.Layers.Add(layLabelBorder);
+
+                var max = (int)((X2 - (X1)) / gridSize);
+                for (int i = 0; i < max - 1; i++)
+                {
+                    XS -= gridSize;
+                    YS -= gridSize;
+                    SharpMap.Layers.VectorLayer gridxLayer = new SharpMap.Layers.VectorLayer("gridx" + i);
+                    SharpMap.Layers.VectorLayer gridyLayer = new SharpMap.Layers.VectorLayer("gridy" + i);
+                    IGeometry xline = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("linestring", "(" + X2 + "," + X1 + "),(" + YS + "," + YS + ")", bb));
+                    IGeometry yline = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("linestring", "(" + XS + "," + XS + "),(" + Y2 + "," + Y1 + ")", bb));
+
+                    List<IGeometry> gridXgeometries = new List<IGeometry>();
+                    gridXgeometries.Add(xline);
+                    List<IGeometry> gridYgeometries = new List<IGeometry>();
+                    gridYgeometries.Add(yline);
+
+                    gridxLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(gridXgeometries);
+                    gridxLayer.Style.Fill = new SolidBrush(Color.FromArgb(50, ColorTranslator.FromHtml("#101010")));
+                    gridxLayer.Style.Outline = new Pen((Color.FromArgb(50, ColorTranslator.FromHtml("#101010")))); ;
+                    gridxLayer.Style.EnableOutline = true;
+                    gridxLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
+                    gridxLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
+
+                    fdtX.Columns.Add("Label");
+                    SharpMap.Data.FeatureDataRow newFdtXRow = fdtX.NewRow();
+                    newFdtXRow.Geometry = xline;
+                    newFdtXRow["Label"] = Math.Round(XS, 2) + "\t \n";
+                    fdtX.Rows.Clear(); fdtX.Rows.Add(newFdtXRow); gridxLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(fdtX);
+                    SharpMap.Layers.LabelLayer layerLabelX = new SharpMap.Layers.LabelLayer("Country labels")
+                    {
+                        DataSource = gridxLayer.DataSource,
+                        Enabled = true,
+                        LabelColumn = "Label",
+                        MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
+                        LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
+                        CoordinateTransformation = gridxLayer.CoordinateTransformation,
+                        PriorityColumn = "Label",
+
+                        Style = new SharpMap.Styles.LabelStyle()
+                        {
+                            Font = new Font(FontFamily.GenericSerif, 50, FontStyle.Bold),
+                            HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
+                            VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
+                            CollisionDetection = true,
+                            Enabled = true,
+                        }
+                    };
+
+                    layerLabelX.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Middle;
+                    layerLabelX.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
+                    layerLabelX.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+
+                    layerLabelX.Style.Offset = (new PointF((float)gridxLayer.Envelope.MinX, (float)gridxLayer.Envelope.Centre.Y));
+
+                    map.Layers.Add(gridxLayer);
+                    map.Layers.Add(layerLabelX);
+
+                    gridyLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(gridYgeometries);
+                    gridyLayer.Style.Fill = new SolidBrush(Color.FromArgb(50, ColorTranslator.FromHtml("#101010")));
+                    gridyLayer.Style.Outline = new Pen((Color.FromArgb(50, ColorTranslator.FromHtml("#101010"))));
+                    gridyLayer.Style.EnableOutline = true;
+                    gridyLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
+                    gridyLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
+
+                    fdtY.Columns.Add("Label");
+                    SharpMap.Data.FeatureDataRow newFdtYRow = fdtY.NewRow();
+                    newFdtYRow.Geometry = yline;
+                    newFdtYRow["Label"] = Math.Round(YS, 2) + "\t \n"; ;
+                    fdtY.Rows.Clear(); fdtY.Rows.Add(newFdtYRow); gridyLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(fdtY);
+                    SharpMap.Layers.LabelLayer layerLabelY = new SharpMap.Layers.LabelLayer("Country labels")
+                    {
+                        DataSource = gridyLayer.DataSource,
+                        Enabled = true,
+                        LabelColumn = "Label",
+                        MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
+                        LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
+                        CoordinateTransformation = gridyLayer.CoordinateTransformation,
+                        PriorityColumn = "Label",
+
+                        Style = new SharpMap.Styles.LabelStyle()
+                        {
+                            Font = new Font(FontFamily.GenericSerif, 50, FontStyle.Bold),
+                            HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Center,
+                            VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
+                            CollisionDetection = true,
+                            Enabled = true,
+                        }
+                    };
+
+                    layerLabelY.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Bottom;
+                    layerLabelY.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Right;
+                    layerLabelY.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+
+                    layerLabelY.Style.Offset = (new PointF((float)gridyLayer.Envelope.MinX, (float)gridyLayer.Envelope.MinY));
+
+                    map.Layers.Add(gridyLayer);
+                    map.Layers.Add(layerLabelY);
+                }
+
+                map.ZoomToExtents();
+                return map;
             }
-
-            map.ZoomToExtents();
-            return map;
         }
 
         /// <summary>
