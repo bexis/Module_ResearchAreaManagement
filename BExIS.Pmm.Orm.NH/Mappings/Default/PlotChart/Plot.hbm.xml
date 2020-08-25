@@ -58,7 +58,7 @@
       <column name="ReferencePoint" />
     </property>
 
-    <set name="Geometries" lazy="true" cascade="all">
+    <set name="Geometries" lazy="false" >
       <key column="PlotId" />
       <one-to-many class="GeometryInformation" />
     </set>
