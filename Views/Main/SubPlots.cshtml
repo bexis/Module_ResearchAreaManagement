@@ -46,7 +46,7 @@
                .Name("Gridsize")
                .BindTo(new SelectList(Model.gridsize))
                .ClientEvents(events => events.OnChange("Gridsize_ComboBox_onChange"))
-               .SelectedIndex(0).HtmlAttributes(new { style = "width:60px" }))
+               .SelectedIndex(3).HtmlAttributes(new { style = "width:60px" }))
             </td>
 
             <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
@@ -97,7 +97,7 @@
             id: "937", // default id
             deactivePlot: false,
             beyondPlot: false,
-            gridsize: "1"
+            gridsize: "10"
         }
 
 
