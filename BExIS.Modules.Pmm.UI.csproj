@@ -183,7 +183,6 @@
     <Content Include="Images\**" />
     <Content Include="Scripts\girdExtra.js" />
     <Content Include="Scripts\jquery.minicolors.js" />
-    <Content Include="Scripts\lui.js" />
     <Content Include="Stylesheets\**" />
     <Content Include="Views\**" />
     <None Include="packages.config" />
