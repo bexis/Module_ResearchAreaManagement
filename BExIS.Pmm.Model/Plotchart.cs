@@ -478,7 +478,9 @@ namespace BExIS.Pmm.Model
 
             ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory ctFact = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory();
 
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
             SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("Border");
+
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
             IGeometry area = plot.Geometry.Buffer(0.00005); // Add buffer to given plot area to avoid border is not shown, if it is outside of the standard plot area
             List<IGeometry> borderGeometries = new List<IGeometry>();
@@ -630,7 +632,7 @@ namespace BExIS.Pmm.Model
 
             return map;
         }
-
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
         /// <summary>
         /// convert rgb colors to Argb
         /// </summary>
