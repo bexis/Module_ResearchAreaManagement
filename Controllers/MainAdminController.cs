@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using Telerik.Web.Mvc;
 using System.IO;
 using System.Text;
+using BExIS.Pmm.Services;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -157,7 +158,12 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             var list_plotlist = plotviewmodel.plotlist.ToList();
             if (plotid != null && list_plotlist.Count > 0 && list_plotlist.First(x => x.Id == plotid) != null)
                 plotviewmodel.selectedPlot = plotid != null ? list_plotlist.First(x => x.Id == plotid) : list_plotlist.First();
-            plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
+
+
+            if (plotviewmodel.selectedPlot == null)
+                plotviewmodel.selectedPlot = plotList.Last();
+
+                plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
 
             return View(plotviewmodel);
         }
