@@ -147,6 +147,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         // GET: PlotChart
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
+            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
+            ViewData["DefaultPlotID"] = defaultPlotId;
+
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             var plotList = helper.GetPlotsOld();
             plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());

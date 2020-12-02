@@ -170,6 +170,7 @@
     <Compile Include="Controllers\MainAdminController.cs" />
     <Compile Include="Helper\NaturalSorter.cs" />
     <Compile Include="Helper\PmmSeedDataGenerator.cs" />
+    <Compile Include="Helper\Settings.cs" />
     <Compile Include="PMMModule.cs" />
     <Compile Include="Models\PlotChartViewModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
