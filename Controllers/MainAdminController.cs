@@ -164,9 +164,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
 
             if (plotviewmodel.selectedPlot == null)
-                plotviewmodel.selectedPlot = plotList.Last();
+                plotviewmodel.selectedPlot = plotList.Where(a => a.Id == Convert.ToInt64(defaultPlotId)).FirstOrDefault();
 
-                plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
+            plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
 
             return View(plotviewmodel);
         }
