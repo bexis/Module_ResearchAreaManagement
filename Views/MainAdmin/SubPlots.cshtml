@@ -7,6 +7,8 @@
     int PageSize = Convert.ToInt16(ViewData["PageSize"]);
     int CurrentPage = Convert.ToInt16(ViewData["CurrentPage"]);
 
+    string defaultPlotId = ViewData["DefaultPlotID"].ToString();
+
     GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
     pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
     pagerStyles |= GridPagerStyles.Numeric;
@@ -300,10 +302,10 @@
 
     $(document).ready(function () {
 
-        $(".plotids").eq(0).val("249");
+        $(".plotids").eq(0).val(@defaultPlotId);
 
         var data = {
-            id: "937", // default id
+            id: @defaultPlotId, // default 
             deactivePlot: false,
             beyondPlot: false,
             gridsize: "10"

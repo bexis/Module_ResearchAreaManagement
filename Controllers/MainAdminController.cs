@@ -10,6 +10,7 @@ using System.Web.Mvc;
 using Telerik.Web.Mvc;
 using System.IO;
 using System.Text;
+using BExIS.Pmm.Services;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -146,6 +147,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         // GET: PlotChart
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
+            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
+            ViewData["DefaultPlotID"] = defaultPlotId;
+
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             var plotList = helper.GetPlotsOld();
             plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
@@ -157,6 +161,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             var list_plotlist = plotviewmodel.plotlist.ToList();
             if (plotid != null && list_plotlist.Count > 0 && list_plotlist.First(x => x.Id == plotid) != null)
                 plotviewmodel.selectedPlot = plotid != null ? list_plotlist.First(x => x.Id == plotid) : list_plotlist.First();
+
+
+            if (plotviewmodel.selectedPlot == null)
+                plotviewmodel.selectedPlot = plotList.Where(a => a.Id == Convert.ToInt64(defaultPlotId)).FirstOrDefault();
+
             plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
 
             return View(plotviewmodel);
