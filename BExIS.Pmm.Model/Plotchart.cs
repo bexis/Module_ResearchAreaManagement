@@ -414,7 +414,7 @@ namespace BExIS.Pmm.Model
                     }
                     if (!beyondPlot)
                     {
-                        if (!area.Envelope.Contains(geom.Geometry.Envelope))
+                        if (!area.Envelope.Contains(geom.Geometry.Envelope) && plot.PlotId != "AEG42" && plot.PlotId != "HEG31")
                             removeList.Add(geom);
                     }
                 }
@@ -439,6 +439,10 @@ namespace BExIS.Pmm.Model
             SharpMap.Map myMap;
             using (var stream = new MemoryStream())
             {
+                if (plot.PlotId == "AEG42" || plot.PlotId == "HEG31")
+                {
+                    beyondPlot = true;
+                }
 #pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
                 myMap = plot != null ? InitializeMap(new Size(3000, 3000), plot, zoom, deactiveGeometries, beyondPlot, gridSize) : null;
 #pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
