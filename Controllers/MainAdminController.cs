@@ -168,6 +168,8 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
             plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
 
+            ViewBag.Title = "BExIS - Plot Maps";
+
             return View(plotviewmodel);
         }
 
