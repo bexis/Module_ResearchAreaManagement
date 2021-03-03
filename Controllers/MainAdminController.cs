@@ -305,8 +305,8 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         [HttpPost]
         public ActionResult _deleteGeometry(long geometryid)
         {
-            helper.DeleteGeometry(geometryid);
-            return Json(true);
+            bool delete = helper.DeleteGeometry(geometryid);
+            return Json(delete);
         }
 
         /// <summary>

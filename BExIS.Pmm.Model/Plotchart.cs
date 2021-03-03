@@ -271,7 +271,7 @@ namespace BExIS.Pmm.Model
         /// </summary>
         /// <param name="geometryId"></param>
         /// <returns>updated subplot</returns>
-        public GeometryInformation DeleteGeometry(long geometryId)
+        public bool DeleteGeometry(long geometryId)
         {
             using (GeometryManager gManager = new GeometryManager())
             using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
@@ -279,14 +279,14 @@ namespace BExIS.Pmm.Model
                 GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometryId).First();
                 geom.Status = (byte)(geom.Status == 3 ? 1 : 3);
 
-                GeometryInformation geometry = gManager.Update(geom);
+                bool delete = gManager.Delete(geom);
 
                 string action = "";
                 if (geom.Status == 1) action = "Undelete";
                 if (geom.Status == 3) action = "Delete";
-                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
+                gHManager.Create(geom.PlotId, geom.Coordinate, geom.GeometryType, geom.CoordinateType, geom.Color, geom.GeometryText, geom.Name, geom.Description, geom.Id, action, DateTime.Now);
 
-                return geometry;
+                return delete;
             }
         }
 
