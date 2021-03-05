@@ -80,6 +80,8 @@
             .Sortable().ClientEvents(x => x.OnDataBound("UpdateGridColors"))
             .Filterable()
             .ClientEvents(x => x.OnDataBinding("Grid_onDataBinding"))
+              .ClientEvents(clientEvents => clientEvents
+                .OnDataBound("onDataBound"))
             .Columns(columns =>
             {
                 columns.Bound(c => c.Name);
@@ -299,6 +301,11 @@
 
 
 <script type="text/javascript">
+
+    function onDataBound() {
+        resetAllTelerikIconTitles();
+        addTooltips();
+    }
 
     $(document).ready(function () {
 
