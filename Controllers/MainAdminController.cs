@@ -26,15 +26,16 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// Load plot admin view
         /// </summary>
         /// <returns>plot admin view</returns>
-   /*     public ActionResult Index()
+        public ActionResult Index()
         {
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
-            plotviewmodel.plotList = helper.GetPlots();
+            var plotList = helper.GetPlots();
+            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
             plotviewmodel.isAdmin = true;
-            plotviewmodel.allPlots = "," + String.Join(",", plotviewmodel.plotList.Select(x => x.Id.ToString()).ToArray());
+            plotviewmodel.allPlots = "," + String.Join(",", plotviewmodel.plotlist.Select(x => x.Id.ToString()).ToArray());
             return View(plotviewmodel);
-        }*/
+        }
 
         /// <summary>
         /// add new plot

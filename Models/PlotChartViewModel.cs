@@ -10,7 +10,7 @@ namespace BExIS.Web.Shell.Areas.PMM.Models
     {
         public string ImageSource { set; get; }
         public Plot selectedPlot { set; get; }
-        public IOrderedEnumerable<Plot> plotlist { get; internal set; }
+        public IOrderedEnumerable<Plot> plotlist { get; set; }
         public IOrderedEnumerable<Plot> plotlistNew { get; internal set; }
         public List<string> plotlist_new { set; get; }
         public IList<int> gridsize { set; get; }

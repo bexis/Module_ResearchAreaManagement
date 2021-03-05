@@ -34,9 +34,14 @@
     <!--admin area-->
 
     <Export tag="settings" id="adminPlotChart" order="16"
-        title="Manage Plot Charts" description="manage plot charts" icon=""
+        title="Manage Subplots" description="manage subplots" icon=""
         controller="MainAdmin" action="SubPlots"
         extends="./settingsRoot" />
+
+    <Export tag="settings" id="adminPlotChart" order="16"
+       title="Manage Plot Charts" description="manage plot charts" icon=""
+       controller="MainAdmin" action="Index"
+       extends="./settingsRoot" />
 
 
   </Exports>
