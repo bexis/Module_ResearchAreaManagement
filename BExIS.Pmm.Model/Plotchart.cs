@@ -518,11 +518,42 @@ namespace BExIS.Pmm.Model
 
                 plotLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(geometries);
 
-                newRow["Label"] = Math.Round((plotLayer.Envelope.MaxX - (Convert.ToDouble(plot.Longitude))) * 67000) + "," + Math.Round((plotLayer.Envelope.MaxY - (Convert.ToDouble(plot.Latitude))) * 108800) + "\t \n";
+                //newRow["Label"] = Math.Round((plotLayer.Envelope.MaxX - (Convert.ToDouble(plot.Longitude))) * 67000) + "," + Math.Round((plotLayer.Envelope.MaxY - (Convert.ToDouble(plot.Latitude))) * 108800) + "\t \n";
+                if(geometry.GeometryType.Equals("rectangle"))
+                {
+                    string[] xy = geometry.Coordinate.Split(',');
+                    newRow["Label"] = xy[2] + "," + xy[3] + "1";
+                }
+
+                if (geometry.GeometryType.Equals("polygon"))
+                {
+                    string[] tmpXY = geometry.Coordinate.Split(new[] { "),(" }, StringSplitOptions.None);
+                    string[] x = tmpXY[0].Split(',');
+                    string[] y = tmpXY[1].Split(',');
+                    newRow["Label"] = x[2] + "," + y[2] + "1";
+                }
+                if (geometry.GeometryType.Equals("linestring"))
+                {
+                    string[] tmpXY = geometry.Coordinate.Split(new[] { "),(" }, StringSplitOptions.None);
+                    string[] x = tmpXY[0].Split(',');
+                    string[] y = tmpXY[1].Split(',');
+
+                    newRow["Label"] = x[0].Substring(1) + "," + y[0];
+                }
+
+                if (geometry.GeometryType.Equals("circle"))
+                {
+                    string origin = geometry.Coordinate.Substring(0);
+                    origin = origin.TrimEnd(',');
+                    newRow["Label"] = origin;
+                }
+
                 plotLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
                 plotLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-                dd.Rows.Clear(); dd.Rows.Add(newRow); plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
+                dd.Rows.Clear(); 
+                dd.Rows.Add(newRow);
+                plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
 
                 SharpMap.Layers.LabelLayer layLabel = new SharpMap.Layers.LabelLayer("Country labels")
                 {
