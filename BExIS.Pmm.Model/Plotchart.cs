@@ -519,10 +519,11 @@ namespace BExIS.Pmm.Model
                 plotLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(geometries);
 
                 //newRow["Label"] = Math.Round((plotLayer.Envelope.MaxX - (Convert.ToDouble(plot.Longitude))) * 67000) + "," + Math.Round((plotLayer.Envelope.MaxY - (Convert.ToDouble(plot.Latitude))) * 108800) + "\t \n";
+                
                 if(geometry.GeometryType.Equals("rectangle"))
                 {
                     string[] xy = geometry.Coordinate.Split(',');
-                    newRow["Label"] = xy[2] + "," + xy[3] + "1";
+                    newRow["Label"] = xy[2] + "," + xy[3];
                 }
 
                 if (geometry.GeometryType.Equals("polygon"))
@@ -530,7 +531,7 @@ namespace BExIS.Pmm.Model
                     string[] tmpXY = geometry.Coordinate.Split(new[] { "),(" }, StringSplitOptions.None);
                     string[] x = tmpXY[0].Split(',');
                     string[] y = tmpXY[1].Split(',');
-                    newRow["Label"] = x[2] + "," + y[2] + "1";
+                    newRow["Label"] = x[2] + "," + y[2];
                 }
                 if (geometry.GeometryType.Equals("linestring"))
                 {
