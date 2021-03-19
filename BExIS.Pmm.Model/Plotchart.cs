@@ -523,7 +523,7 @@ namespace BExIS.Pmm.Model
                 if(geometry.GeometryType.Equals("rectangle"))
                 {
                     string[] xy = geometry.Coordinate.Split(',');
-                    newRow["Label"] = xy[2] + "," + xy[3];
+                    newRow["Label"] = xy[2] + "," + xy[3] + " _";
                 }
 
                 if (geometry.GeometryType.Equals("polygon"))
@@ -531,7 +531,7 @@ namespace BExIS.Pmm.Model
                     string[] tmpXY = geometry.Coordinate.Split(new[] { "),(" }, StringSplitOptions.None);
                     string[] x = tmpXY[0].Split(',');
                     string[] y = tmpXY[1].Split(',');
-                    newRow["Label"] = x[2] + "," + y[2];
+                    newRow["Label"] = x[2] + "," + y[2] + " _";
                 }
                 if (geometry.GeometryType.Equals("linestring"))
                 {
@@ -539,7 +539,7 @@ namespace BExIS.Pmm.Model
                     string[] x = tmpXY[0].Split(',');
                     string[] y = tmpXY[1].Split(',');
 
-                    newRow["Label"] = x[0].Substring(1) + "," + y[0];
+                    newRow["Label"] = x[0].Substring(1) + "," + y[0] + " _";
                 }
 
                 if (geometry.GeometryType.Equals("circle"))
