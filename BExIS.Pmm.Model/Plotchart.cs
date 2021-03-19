@@ -497,7 +497,7 @@ namespace BExIS.Pmm.Model
             if (!beyondPlot)
                 map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
 
-
+            plot.Geometries = plot.Geometries.OrderByDescending(p => p.Geometry.Length).ToList();
 
             foreach (var geometry in plot.Geometries)
             {
@@ -523,7 +523,7 @@ namespace BExIS.Pmm.Model
                 if(geometry.GeometryType.Equals("rectangle"))
                 {
                     string[] xy = geometry.Coordinate.Split(',');
-                    newRow["Label"] = xy[2] + "," + xy[3] + " _";
+                    newRow["Label"] = xy[2] + "," + xy[3];
                 }
 
                 if (geometry.GeometryType.Equals("polygon"))
@@ -531,7 +531,7 @@ namespace BExIS.Pmm.Model
                     string[] tmpXY = geometry.Coordinate.Split(new[] { "),(" }, StringSplitOptions.None);
                     string[] x = tmpXY[0].Split(',');
                     string[] y = tmpXY[1].Split(',');
-                    newRow["Label"] = x[2] + "," + y[2] + " _";
+                    newRow["Label"] = x[2] + "," + y[2];
                 }
                 if (geometry.GeometryType.Equals("linestring"))
                 {
@@ -539,7 +539,7 @@ namespace BExIS.Pmm.Model
                     string[] x = tmpXY[0].Split(',');
                     string[] y = tmpXY[1].Split(',');
 
-                    newRow["Label"] = x[0].Substring(1) + "," + y[0] + " _";
+                    newRow["Label"] = x[0].Substring(1) + "," + y[0];
                 }
 
                 if (geometry.GeometryType.Equals("circle"))
@@ -798,10 +798,10 @@ namespace BExIS.Pmm.Model
             SharpMap.Layers.VectorLayer areaLayer = new SharpMap.Layers.VectorLayer("area");
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
 
-            float X1 = (float)Math.Round(((plot.Geometry.EnvelopeInternal.MinX - bb[0]) * 108800)); //plot.Area.X1 * 1.2f;
-            X1 = Convert.ToInt32(X1) / gridSize * gridSize;
-            float X2 = (float)Math.Round(((plot.Geometry.EnvelopeInternal.MaxX - bb[0]) * 108800)); //plot.Area.X3 * 1.2f;
-            X2 = Convert.ToInt32(X2) / gridSize * gridSize;
+            float X1 = (float)Math.Round(((plot.Geometry.EnvelopeInternal.MinX - bb[0]) * 100000)); //plot.Area.X1 * 1.2f;
+            X1 = Convert.ToInt32(X1) / 10 * 10;
+            float X2 = (float)Math.Round(((plot.Geometry.EnvelopeInternal.MaxX - bb[0]) * 100000)); //plot.Area.X3 * 1.2f;
+            X2 = Convert.ToInt32(X2) / 10 * 10;
             float Y1 = X1; //plot.Area.Y1 * 1.2f;
             float Y2 = X2; //plot.Area.Y3 * 1.2f;
             if (beyondPlot)
