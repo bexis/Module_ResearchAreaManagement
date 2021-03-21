@@ -743,7 +743,10 @@ namespace BExIS.Pmm.Model
                 Html += "<div style='page-break-after:always'></div>";
             }
             Html += "</body></html>";
-            
+
+            // Remove last empty page
+            Html = Html.Replace("<div style='page-break-after:always'></div></body></html>", "</body></html>");
+
             var htmlToPdf = new NReco.PdfGenerator.HtmlToPdfConverter();
             var pdfBytes = htmlToPdf.GeneratePdf(Html);
             return pdfBytes;
