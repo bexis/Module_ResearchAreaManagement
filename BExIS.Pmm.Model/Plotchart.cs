@@ -662,15 +662,19 @@ namespace BExIS.Pmm.Model
                 if (geometry.Status == 2)
                 {
                     pen.DashPattern = dashValues;
-                    transparency = 0;
-                    plotLayer.Style.Fill = new SolidBrush(Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber)));
+                    pen.Width = 3;
+                    plotLayer.Style.Fill = new SolidBrush(Color.Transparent);
+                    //plotLayer.Style.Fill = new SolidBrush(Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber)));
                 }
-
-                int argb = Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber);
-                Color clr = Color.FromArgb(argb);
-                plotLayer.Style.Fill = new SolidBrush(clr);
+                else
+                {
+                    int argb = Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber);
+                    Color clr = Color.FromArgb(argb);
+                    plotLayer.Style.Fill = new SolidBrush(clr);
+                }
                 plotLayer.Style.Outline = pen;
                 plotLayer.Style.EnableOutline = true;
+               
 
                 if (!beyondPlot && beyondBorderCheck(borderLayer, plotLayer))
                     continue;
