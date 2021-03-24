@@ -145,7 +145,7 @@
             .BindTo(new SelectList(Model.colorList))
             .SelectedIndex(0))</td-->
             <td>
-                <input type="text" id="Color" style="height:28px;border-width:2px;width:180px;" class="demo" data-opacity=".5" data-swatches="#00ff00|#ff0000|#ffa07a|#000000|#bebebe|#ffffff|#ee82ee|#add8e6|#4682b4|#00ffff|#d8bfd8|#0000ff|#a020f0|#2e8b57|#b03060|#f5deb3|#d2691e|ffa500|#90ee90|#ebebeb|#ffff00|#a52a2a|#ffeeee|#c71585" value="#f00">
+                <input type="text" id="Color" style="height:28px;border-width:2px;width:180px;" class="demo" data-opacity="1" value="#f00">
             </td>
             <td>Coordinate Type:</td>
             <td>
@@ -361,23 +361,30 @@
                 keywords: $(this).attr('data-keywords') || '',
                 inline: $(this).attr('data-inline') === 'true',
                 letterCase: $(this).attr('data-letterCase') || 'lowercase',
-                opacity: $(this).attr('data-opacity'),
+                //opacity: $(this).attr('data-opacity'),
                 position: $(this).attr('data-position') || 'bottom left',
-                swatches: $(this).attr('data-swatches') ? $(this).attr('data-swatches').split('|') : [],
-                change: function (hex, opacity) {
-                    var log;
-                    try {
-                        log = hex ? hex : 'transparent';
-                        if (opacity) log += ', ' + opacity;
-                        console.log(log);
-                    } catch (e) { }
-                },
+                //change: function(value, opacity) {
+                //        if (!value) return;
+                //        if (opacity) value += ', ' + opacity;
+                //        if (typeof console === 'object') {
+                //            console.log(value);
+                //        }
+                //    },
                 theme: 'default'
             });
 
         });
 
     });
+
+    //function (hex, opacity) {
+    //    var log;
+    //    try {
+    //        log = hex ? hex : 'transparent';
+    //        if (opacity) log += ', ' + opacity;
+    //        console.log(log);
+    //    } catch (e) { }
+    //},
 
     function ComboBox_onChange(e) {
         var didntChange = $(".plotids").not(e);
