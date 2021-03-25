@@ -72,16 +72,16 @@
                 .OnDataBound("onDataBound"))
             .Columns(columns =>
             {
-                columns.Bound(c => c.Name);
+                columns.Bound(c => c.Name).Width("25%");
                 columns.Bound(c => c.GeometryType).EditorViewData(new { geometryType = Model.geometryType });
-                columns.Bound(c => c.Coordinate);
+                columns.Bound(c => c.Coordinate).Width("20%");
                 columns.Bound(c => c.CoordinateType);
                 columns.Bound(c => c.LineWidth);
 
                 columns.Template(c => c.Color).ClientTemplate(
                     "<input disabled='disabled' type='text' value='<#= Color #>' style='width:100px;background-color:<#= Color #>;color:<#= Color #>;'/>"
                     ).Title("Color").HtmlAttributes("style='background-color:pink;'");
-                columns.Bound(c => c.Description);
+                columns.Bound(c => c.Description).Width("25%");
                 columns.Template(@<text></text>).ClientTemplate(
                 "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(this, <#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
                 columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick='archiveGeometry(<#= Id #>)'><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
@@ -298,6 +298,7 @@
         var dataElement = $("div").find(".t-grid-content");
         jQuery(dataElement).css("overflow-y", "scroll");
 
+        resetAllTelerikIconTitles();
         addTooltips();
     }
 
