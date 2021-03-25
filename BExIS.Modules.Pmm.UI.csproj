@@ -187,6 +187,7 @@
     <Content Include="Stylesheets\**" />
     <Content Include="Views\**" />
     <None Include="packages.config" />
+    <Content Include="Views\MainAdmin\PlotchartImageView.cshtml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>

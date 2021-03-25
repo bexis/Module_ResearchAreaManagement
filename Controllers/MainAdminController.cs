@@ -141,6 +141,35 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         }
 
         /// <summary>
+        /// load subplot image view
+        /// </summary>
+        /// <param name="plotid"></param>
+        /// <returns>subplotview</returns>
+        // GET: PlotChart
+        public ActionResult LoadPlotchartImage(long? plotid)//String plotid, int zoom)
+        {
+            PlotChartViewModel plotviewmodel = new PlotChartViewModel();
+            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
+            ViewData["DefaultPlotID"] = defaultPlotId;
+
+            var plotList = helper.GetPlotsOld();
+            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
+
+            var plotListNew = helper.GetPlotsNew();
+            plotviewmodel.plotlistNew = plotListNew.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
+
+            if (plotviewmodel.selectedPlot == null)
+                plotviewmodel.selectedPlot = plotList.Where(a => a.Id == Convert.ToInt64(defaultPlotId)).FirstOrDefault();
+
+            plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
+
+            ViewBag.Title = "BExIS - Plot Maps";
+
+            return View("PlotchartImageView", plotviewmodel);
+
+        }
+
+        /// <summary>
         /// load subplot view
         /// </summary>
         /// <param name="plotid"></param>

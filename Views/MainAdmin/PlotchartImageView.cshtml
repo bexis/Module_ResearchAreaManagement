@@ -1,0 +1,103 @@
+﻿@using BExIS.Pmm.Entities;
+@using Telerik.Web.Mvc.UI;
+@model BExIS.Web.Shell.Areas.PMM.Models.PlotChartViewModel
+
+@{
+    string defaultPlotId = ViewData["DefaultPlotID"].ToString();
+
+    Model.gridsize = new List<int>(new int[] { 1, 2, 5, 10, 15 });
+    Model.geometryType = new List<String>(new String[] { "rectangle", "linestring", "circle", "polygon" });
+    Model.colorList = new List<String>(new String[] { "#00ff00", "#ff0000", "#ffa07a", "#000000", "#bebebe", "#ffffff", "#ee82ee", "#add8e6", "#4682b4", "#00ffff", "#d8bfd8", "#0000ff", "#a020f0", "#2e8b57", "#b03060", "#f5deb3", "#d2691e", "ffa500", "#90ee90", "#ebebeb", "#ffff00", "#a52a2a", "#ffeeee", "#c71585" });
+    Model.coordinateType = new List<String>(new String[] { "xy", "polar" });
+}
+
+<script src="@Url.Content("~/Areas/PMM/Scripts/girdExtra.js")" type="text/javascript"></script>
+
+<div>
+    <table style="width:800px;">
+        <tr>
+            <td>
+                Plot maps:
+                </br>
+                Experiment maps:
+            </td>
+            <td style="width:20px">
+                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                </br>
+                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlistNew, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+            </td>
+            <td>
+                <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" /> include former subplots
+                <br />
+                <input type="checkbox" id="BeyondBorder" onchange="UpdatePlotChart()" /> draw beyond plot borders
+                <br />
+                <input type="checkbox" id="Legend" /> PDF without legend
+            </td>
+            <td>
+                Grid Size:
+            </td>
+            <td>
+                @(Html.Telerik().DropDownList()
+               .Name("Gridsize")
+               .BindTo(new SelectList(Model.gridsize))
+               .ClientEvents(events => events.OnChange("Gridsize_ComboBox_onChange"))
+               .SelectedIndex(3).HtmlAttributes(new { style = "width:100px" }))
+            </td>
+
+            <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
+        </tr>
+
+    </table>
+</div>
+
+<div style="width:65%;float:left;">
+    <img id="plotChartPicture" src="@Model.ImageSource" width="800" height="800" />
+</div>
+
+<script type="text/javascript">
+
+      $(document).ready(function () {
+
+        $(".plotids").eq(0).val(@defaultPlotId);
+
+        var data = {
+            id: @defaultPlotId, // default
+            deactivePlot: false,
+            beyondPlot: false,
+            gridsize: "10"
+        }
+
+        $.ajax({
+            url: '/PMM/Main/_getPlotChart',
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            error: function (xhr) {
+                alert('Error: ' + xhr.statusText);
+
+            },
+            success: function (result) {
+                if (result) {
+                    $('#plotChartPicture').attr("src", result);
+                } else {
+
+                    alert("Dataset is locked. Please try again later.");
+                }
+            }
+        });
+
+      });
+
+    function DownloadPdf() {
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var gridSize = comboboxGridSize.value();
+        var legend = $('#Legend').is(':checked');
+        var params = "id=" + plotId + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize + "&legend=" + legend;
+        window.open("/PMM/MainAdmin/getpdf?" + params, "_blank");
+    }
+
+</script>
