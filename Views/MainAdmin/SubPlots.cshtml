@@ -4,14 +4,8 @@
 
 @{
 
-    int PageSize = Convert.ToInt16(ViewData["PageSize"]);
-    int CurrentPage = Convert.ToInt16(ViewData["CurrentPage"]);
 
     string defaultPlotId = ViewData["DefaultPlotID"].ToString();
-
-    GridPagerStyles pagerStyles = GridPagerStyles.PageSizeDropDown;
-    pagerStyles |= GridPagerStyles.NextPreviousAndNumeric;
-    pagerStyles |= GridPagerStyles.Numeric;
 
     Model.gridsize = new List<int>(new int[] { 1, 2, 5, 10, 15 });
     Model.geometryType = new List<String>(new String[] { "rectangle", "linestring", "circle", "polygon" });
@@ -61,26 +55,20 @@
 
     </table>
 </div>
-<div>
-    @(Html.Telerik().Grid<GeometryInformation>()
+    <div>
+        @(Html.Telerik().Grid<GeometryInformation>()
             .Name("plotchart_geometries")
+            .Scrollable()
             .DataBinding(dataBinding => dataBinding
              //Ajax binding
              .Ajax()
                    //The action method which will return JSON and its arguments
                    .Select("_AjaxBinding", "Main", new { id = Model.selectedPlot != null ? Model.selectedPlot.PlotId : "0", beyondborder = false, deactiveplot = false, area = "PMM" })
             )
-            .Pageable(paging =>
-                paging
-                        .Style(pagerStyles).Enabled(true)
-                        .PageSize(10)
-                    .Position(GridPagerPosition.Both)
-                        .PageTo(1)
-                    )
             .Sortable().ClientEvents(x => x.OnDataBound("UpdateGridColors"))
             .Filterable()
             .ClientEvents(x => x.OnDataBinding("Grid_onDataBinding"))
-              .ClientEvents(clientEvents => clientEvents
+              .ClientEvents(e => e
                 .OnDataBound("onDataBound"))
             .Columns(columns =>
             {
@@ -99,223 +87,231 @@
                 columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick='archiveGeometry(<#= Id #>)'><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
                 columns.Template(@<text></text>).ClientTemplate("<a title='delete' href='#'" + "class='btn btn-sm' onclick='deleteGeometry(<#= Id #>)'><img id='delete-<#= Id #>' src='../../Areas/PMM/Images/delete.png' width='16'></a>").Title("Delete").Width(60);
             }))
-</div>
-<div>
-    <table style="width:1200px;">
-        <tr>
-            <td colspan="6" id="errorPlaceHolder" style="color:red;"></td>
-        </tr>
-        <tr>
-            <td colspan="6"><b>Add & Update SubPlot</b></td>
-        </tr>
-        <tr>
-            <td>Name:</td>
-            <td>
-                @*<input type="text" style="height:28px;border-width:2px;" name="Name" id="Name" />*@
-                <textarea rows="1" cols="20" name="Name" id="Name"></textarea>
+    </div>
+    <div>
+        <table style="width:1200px;">
+            <tr>
+                <td colspan="6" id="errorPlaceHolder" style="color:red;"></td>
+            </tr>
+            <tr>
+                <td colspan="6"><b>Add & Update SubPlot</b></td>
+            </tr>
+            <tr>
+                <td>Name:</td>
+                <td>
+                    @*<input type="text" style="height:28px;border-width:2px;" name="Name" id="Name" />*@
+                    <textarea rows="1" cols="20" name="Name" id="Name"></textarea>
 
-            </td>
-            <td>Coordinate:</td>
-            <td>
-                <input type="hidden" name="GeometryIdHolder" id="GeometryIdHolder" value="" />
-                <input type="text" style="height:28px;border-width:2px;" name="Coordinate" id="Coordinate" />
-            </td>
-            <td>Description:</td>
-            <td>
-                @*<input type="text" style="height:28px;border-width:2px;" name="Description" id="Description" />*@
-                <textarea rows="2" cols="20" name="Description" id="Description"></textarea>
-            </td>
-            <td>Reference Point:</td>
-            <td>
-                <input type="text" style="height:28px;border-width:2px;" name="ReferencePoint" id="ReferencePoint" />
-            </td>
-        </tr>
-        <tr>
-            <td>Geometry Type:</td>
-            <td>
-                @(Html.Telerik().DropDownList()
+                </td>
+                <td>Coordinate:</td>
+                <td>
+                    <input type="hidden" name="GeometryIdHolder" id="GeometryIdHolder" value="" />
+                    <input type="text" style="height:28px;border-width:2px;" name="Coordinate" id="Coordinate" />
+                </td>
+                <td>Description:</td>
+                <td>
+                    @*<input type="text" style="height:28px;border-width:2px;" name="Description" id="Description" />*@
+                    <textarea rows="2" cols="20" name="Description" id="Description"></textarea>
+                </td>
+                <td>Reference Point:</td>
+                <td>
+                    <input type="text" style="height:28px;border-width:2px;" name="ReferencePoint" id="ReferencePoint" />
+                </td>
+            </tr>
+            <tr>
+                <td>Geometry Type:</td>
+                <td>
+                    @(Html.Telerik().DropDownList()
        .Name("GeometryType")
        .BindTo(new SelectList(Model.geometryType))
        .HtmlAttributes(new { @style = "width:85%;" })
        .SelectedIndex(0))
-            </td>
-            <td>Color:</td>
-            <!--td>//(Html.Telerik().DropDownList()
-            .Name("Color")
-            .BindTo(new SelectList(Model.colorList))
-            .SelectedIndex(0))</td-->
-            <td>
-                <input type="text" id="Color" style="height:28px;border-width:2px;width:180px;" class="demo" data-opacity="1" value="#f00">
-            </td>
-            <td>Coordinate Type:</td>
-            <td>
-                @(Html.Telerik().DropDownList()
+                </td>
+                <td>Color:</td>
+                <!--td>//(Html.Telerik().DropDownList()
+                .Name("Color")
+                .BindTo(new SelectList(Model.colorList))
+                .SelectedIndex(0))</td-->
+                <td>
+                    <input type="text" id="Color" style="height:28px;border-width:2px;width:180px;" class="demo" data-opacity="1" value="#f00">
+                </td>
+                <td>Coordinate Type:</td>
+                <td>
+                    @(Html.Telerik().DropDownList()
        .Name("CoordinateType")
        .BindTo(new SelectList(Model.coordinateType))
        .HtmlAttributes(new { @style = "width:85%;" })
        .SelectedIndex(0))
-            </td>
-            <td><input type="button" id="newGeometry" value="New" onclick="addNewGeometry()"></td>
-            <td><input type="button" id="cancelUpdate" value="Cancel" onclick="cancelUpdate()" style="visibility:hidden;"></td>
-        </tr>
-    </table>
-</div>
-<div style="width:65%;float:left;">
-    <img id="plotChartPicture" src="@Model.ImageSource" width="800" height="800" />
-</div>
-<div style="width:35%;float:right;">
-    <table align="left" style="font-size: xx-small;">
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; font-weight: bold;"
-                colspan="3"></td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; font-weight: bold;">
-                Geometry<b>
-                    <br />
-                    Type
-                </b>
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif">
-                <b>
-                    Coordinates Type<br />
-                    xy
-                </b>
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif">
-                <b>
-                    Coordinates Type<br />
-                    polar
-                </b>
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                rectangle
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                xStart,yStart,xEnd,yEnd
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                (alphaLowerLeft,distLowerLeft),(alphaUpperRight,distUpperRight)
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                &nbsp;&nbsp; example
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                -31,32.5,-28,35.5
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                (100,20.5),(100,30)
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                linestring
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                (x1, x2, ..., xn),(y1, y2, ..., yn)
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                (alpha1,dist1), (alpha2,dist2), ... (alphaN,distN)
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                &nbsp;&nbsp; example
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                (31.5, 34, 33),(10,12.5,9)
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                (0,10),(0,15),(100,5.5)
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                circle&nbsp;&nbsp;
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                xOrigin,yOrigin, radius
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                (alpha,distance),radius
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                &nbsp;&nbsp; example
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                15,15,10.6
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                (0,15),10.6
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                error_rect&nbsp;&nbsp;
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                -
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
-                (alpha,distance),(xEast,yNorth,xWest,ySouth)
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                &nbsp;&nbsp; example
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                &nbsp;
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                (0,15),(10,13,5,4.8)
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
-                polygon
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
-                (x1,x2,x3,...,xn),(y1,y2,y3,...,yn)
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
-                (alpha1,dist1),(alpha2,dist2),(alpha3,dist3),...,(alphaN,distN)
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                &nbsp;&nbsp; example&nbsp;
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                (-10,10,12,-8),(2,-10,0,-10)
-            </td>
-            <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
-                (0,10),(0,15),(100,5.5),(50,10)
-            </td>
-        </tr>
-    </table>
-</div>
+                </td>
+                <td><input type="button" id="newGeometry" value="New" onclick="addNewGeometry()"></td>
+                <td><input type="button" id="cancelUpdate" value="Cancel" onclick="cancelUpdate()" style="visibility:hidden;"></td>
+            </tr>
+        </table>
+    </div>
+    <div style="width:65%;float:left;">
+        <img id="plotChartPicture" src="@Model.ImageSource" width="800" height="800" />
+    </div>
+    <div style="width:35%;float:right;">
+        <table align="left" style="font-size: xx-small;">
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; font-weight: bold;"
+                    colspan="3"></td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; font-weight: bold;">
+                    Geometry<b>
+                        <br />
+                        Type
+                    </b>
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif">
+                    <b>
+                        Coordinates Type<br />
+                        xy
+                    </b>
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif">
+                    <b>
+                        Coordinates Type<br />
+                        polar
+                    </b>
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    rectangle
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    xStart,yStart,xEnd,yEnd
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    (alphaLowerLeft,distLowerLeft),(alphaUpperRight,distUpperRight)
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    &nbsp;&nbsp; example
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    -31,32.5,-28,35.5
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    (100,20.5),(100,30)
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    linestring
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    (x1, x2, ..., xn),(y1, y2, ..., yn)
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    (alpha1,dist1), (alpha2,dist2), ... (alphaN,distN)
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    &nbsp;&nbsp; example
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    (31.5, 34, 33),(10,12.5,9)
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    (0,10),(0,15),(100,5.5)
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    circle&nbsp;&nbsp;
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    xOrigin,yOrigin, radius
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    (alpha,distance),radius
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    &nbsp;&nbsp; example
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    15,15,10.6
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    (0,15),10.6
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    error_rect&nbsp;&nbsp;
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    -
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif;">
+                    (alpha,distance),(xEast,yNorth,xWest,ySouth)
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    &nbsp;&nbsp; example
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    &nbsp;
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    (0,15),(10,13,5,4.8)
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
+                    polygon
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
+                    (x1,x2,x3,...,xn),(y1,y2,y3,...,yn)
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFFF;">
+                    (alpha1,dist1),(alpha2,dist2),(alpha3,dist3),...,(alphaN,distN)
+                </td>
+            </tr>
+            <tr>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    &nbsp;&nbsp; example&nbsp;
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    (-10,10,12,-8),(2,-10,0,-10)
+                </td>
+                <td style="font-size: 9pt; font-family: Arial, Helvetica, sans-serif; background-color: #FFFFCC;">
+                    (0,10),(0,15),(100,5.5),(50,10)
+                </td>
+            </tr>
+        </table>
+    </div>
 
 
-<script type="text/javascript">
+    <script type="text/javascript">
 
-    function onDataBound() {
-        resetAllTelerikIconTitles();
+        function onDataBound() {
+
+        var dataElement = $("div").find(".t-grid-content");
+        jQuery(dataElement).css("overflow-y", "scroll");
+
         addTooltips();
     }
+
+
+
+
+
 
     $(document).ready(function () {
 
         $(".plotids").eq(0).val(@defaultPlotId);
 
         var data = {
-            id: @defaultPlotId, // default 
+            id: @defaultPlotId, // default
             deactivePlot: false,
             beyondPlot: false,
             gridsize: "10"
@@ -361,15 +357,7 @@
                 keywords: $(this).attr('data-keywords') || '',
                 inline: $(this).attr('data-inline') === 'true',
                 letterCase: $(this).attr('data-letterCase') || 'lowercase',
-                //opacity: $(this).attr('data-opacity'),
                 position: $(this).attr('data-position') || 'bottom left',
-                //change: function(value, opacity) {
-                //        if (!value) return;
-                //        if (opacity) value += ', ' + opacity;
-                //        if (typeof console === 'object') {
-                //            console.log(value);
-                //        }
-                //    },
                 theme: 'default'
             });
 
@@ -377,19 +365,12 @@
 
     });
 
-    //function (hex, opacity) {
-    //    var log;
-    //    try {
-    //        log = hex ? hex : 'transparent';
-    //        if (opacity) log += ', ' + opacity;
-    //        console.log(log);
-    //    } catch (e) { }
-    //},
+
 
     function ComboBox_onChange(e) {
         var didntChange = $(".plotids").not(e);
         didntChange.val("");
-        
+
         UpdatePlotChart();
     }
 
@@ -528,7 +509,7 @@
             $("#edit-" + $('#GeometryIdHolder').val()).attr("src", "../../Areas/PMM/Images/edit.png");
             $(elem).parent().parent().addClass("edit");
         }
-           
+
 
         $('#CoordinateType').data('tDropDownList').value(coordinateType);
         $('#Coordinate').val(coordinate);
@@ -735,9 +716,9 @@
             }
         });
     }
-</script>
-<style>
-    .edit {
-        background-color: yellow;
-    }
-</style>
+    </script>
+    <style>
+        .edit {
+            background-color: yellow;
+        }
+    </style>
