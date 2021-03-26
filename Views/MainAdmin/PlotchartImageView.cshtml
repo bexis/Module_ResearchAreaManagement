@@ -49,6 +49,11 @@
 
     </table>
 </div>
+<div>
+    <br />
+    <input type="button" id="reloadImage" value="Reload" onclick="UpdatePlotChart()">
+
+</div>
 
 <div style="width:65%;float:left;">
     <img id="plotChartPicture" src="@Model.ImageSource" width="800" height="800" />
@@ -100,4 +105,49 @@
         window.open("/PMM/MainAdmin/getpdf?" + params, "_blank");
     }
 
+    function ComboBox_onChange(e) {
+        var didntChange = $(".plotids").not(e);
+        didntChange.val("");
+
+        UpdatePlotChart();
+    }
+
+    function Gridsize_ComboBox_onChange(e) {
+        UpdatePlotChart();
+    }
+
+    function UpdatePlotChart() {
+        var comboboxGridSize = $('#Gridsize').data('tDropDownList');
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var deactiveplot = $('#DeactivePlot').is(':checked');
+        var beyondborder = $('#BeyondBorder').is(':checked');
+        var gridSize = comboboxGridSize.value();
+
+        var data = {
+            id: plotId,
+            deactivePlot: deactiveplot,
+            beyondPlot: beyondborder,
+            gridsize: gridSize
+        }
+
+        $.ajax({
+            url: '/PMM/MainAdmin/_getPlotChart',
+            type: 'POST',
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            error: function (xhr) {
+                alert('Error: ' + xhr.statusText);
+
+            },
+            success: function (result) {
+                if (result) {
+                    $('#plotChartPicture').attr("src", result);
+                } else {
+
+                    alert("Dataset is locked. Please try again later.");
+                }
+            }
+        });
+    }
 </script>

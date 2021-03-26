@@ -39,6 +39,11 @@
         extends="./settingsRoot" />
 
     <Export tag="settings" id="adminPlotChart" order="16"
+        title="Plotchart Image" description="plotchart omage" icon=""
+        controller="MainAdmin" action="LoadPlotchartImage"
+        extends="./settingsRoot" />
+
+    <Export tag="settings" id="adminPlotChart" order="16"
        title="Manage Plot Charts" description="manage plot charts" icon=""
        controller="MainAdmin" action="Index"
        extends="./settingsRoot" />
