@@ -187,16 +187,18 @@ namespace BExIS.Pmm.Model
         {
             Plot plot = GetPlot(plotid);
 
-            if (!checkGeometry(geometrytype, coordinatetype, coordinate))
+           string coords = coordinate.Replace(" ", "");
+
+            if (!checkGeometry(geometrytype, coordinatetype, coords))
                 return null;
 
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
-            String geometryText = calCoordd(geometrytype, coordinate, bb, coordinatetype, referencePoint);
+            String geometryText = calCoordd(geometrytype, coords, bb, coordinatetype, referencePoint);
 
             using (GeometryManager gManager = new GeometryManager())
             using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
             {
-                GeometryInformation geometry = gManager.Create(plot.Id, coordinate, geometrytype, coordinatetype, color, geometryText, plot, name, description);
+                GeometryInformation geometry = gManager.Create(plot.Id, coords, geometrytype, coordinatetype, color, geometryText, plot, name, description);
                 gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Create", DateTime.Now);
 
                 return geometry;
@@ -598,14 +600,14 @@ namespace BExIS.Pmm.Model
 
                 if (geometry.GeometryType.Equals("polygon"))
                 {
-                    string[] tmpXY = geometry.Coordinate.Split(new[] { "),(" }, StringSplitOptions.None);
+                    string[] tmpXY = geometry.Coordinate.Replace(" ", "").Split(new[] { "),(" }, StringSplitOptions.None);
                     string[] x = tmpXY[0].Split(',');
                     string[] y = tmpXY[1].Split(',');
                     newRow["Label"] = x[2] + "," + y[2];
                 }
                 if (geometry.GeometryType.Equals("linestring"))
                 {
-                    string[] tmpXY = geometry.Coordinate.Split(new[] { "),(" }, StringSplitOptions.None);
+                    string[] tmpXY = geometry.Coordinate.Replace(" ", "").Split(new[] { "),(" }, StringSplitOptions.None);
                     string[] x = tmpXY[0].Split(',');
                     string[] y = tmpXY[1].Split(',');
 
@@ -638,7 +640,7 @@ namespace BExIS.Pmm.Model
 
                     Style = new SharpMap.Styles.LabelStyle()
                     {
-                        Font = new Font(FontFamily.GenericSerif, 40),
+                        Font = new Font(FontFamily.GenericSerif, 30),
                         HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Right,
                         VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
                         CollisionDetection = true,
