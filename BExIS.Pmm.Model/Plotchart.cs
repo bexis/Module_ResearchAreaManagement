@@ -592,12 +592,7 @@ namespace BExIS.Pmm.Model
 
                 //newRow["Label"] = Math.Round((plotLayer.Envelope.MaxX - (Convert.ToDouble(plot.Longitude))) * 67000) + "," + Math.Round((plotLayer.Envelope.MaxY - (Convert.ToDouble(plot.Latitude))) * 108800) + "\t \n";
                 
-                if(geometry.GeometryType.Equals("rectangle"))
-                {
-                    string[] xy = geometry.Coordinate.Split(',');
-                    newRow["Label"] = xy[2] + "," + xy[3];
-                }
-
+                
                 if (geometry.GeometryType.Equals("polygon"))
                 {
                     string[] tmpXY = geometry.Coordinate.Replace(" ", "").Split(new[] { "),(" }, StringSplitOptions.None);
@@ -624,13 +619,13 @@ namespace BExIS.Pmm.Model
                 plotLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
                 plotLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
-                dd.Rows.Clear(); 
-                dd.Rows.Add(newRow);
-                plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
+                //dd.Rows.Clear(); 
+                //dd.Rows.Add(newRow);
+                //plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
 
                 SharpMap.Layers.LabelLayer layLabel = new SharpMap.Layers.LabelLayer("Country labels")
                 {
-                    DataSource = plotLayer.DataSource,
+                    //DataSource = plotLayer.DataSource,
                     Enabled = true,
                     LabelColumn = "Label",
                     MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
@@ -648,11 +643,50 @@ namespace BExIS.Pmm.Model
                     }
                 };
 
-                layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
-                layLabel.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
-                layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+                //if rectangle find the right postion for label with the given coordinates 
+                if (geometry.GeometryType.Equals("rectangle"))
+                {
+                    double[] xy = Array.ConvertAll(geometry.Coordinate.Split(','), Double.Parse);
+                    layLabel.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
 
-                layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
+                    if (xy[0] < xy[2] && xy[1] < xy[3])
+                    {
+                        newRow["Label"] = xy[2] + "," + xy[3];
+                        layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Bottom;
+                        layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
+                    }
+                    else if (xy[0] > xy[2] && xy[1] > xy[3])
+                    {
+                        newRow["Label"] = xy[0] + "," + xy[1];
+                        layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Bottom;
+                        layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
+                    }
+                    else if (xy[0] > xy[2] && xy[1] < xy[3])
+                    {
+                        newRow["Label"] = xy[0] + "," + xy[1];
+                        layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Bottom;
+                        layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MinY));
+                    }
+                    else if (xy[0] < xy[2] && xy[1] > xy[3])
+                    {
+                        newRow["Label"] = xy[2] + "," + xy[3];
+                        layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
+                        layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MinY));
+                    }
+                }
+                else
+                {
+                    layLabel.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
+                    layLabel.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
+                    layLabel.Style.Offset = (new PointF((float)plotLayer.Envelope.MaxX, (float)plotLayer.Envelope.MaxY));
+                }
+
+                layLabel.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+               
+                dd.Rows.Clear();
+                dd.Rows.Add(newRow);
+                plotLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
+                layLabel.DataSource = plotLayer.DataSource;
 
                 String borderColor = "#000000";
                 if (geometry.GeometryType.ToLower() == "linestring")
