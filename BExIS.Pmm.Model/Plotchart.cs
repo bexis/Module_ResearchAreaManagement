@@ -814,7 +814,7 @@ namespace BExIS.Pmm.Model
             }
             else
             {
-                Div += "<table style='font-size:small;border:1px solid black;'><tr><td>Name</td><td>Geometry Type</td><td>Coordinate</td><td>Coordinate Type</td><td>Color</td><td>Description</td></tr>";
+                Div += "<table style='font-size:x-small;border:1px solid black;'><tr><td>Name</td><td>Geometry Type</td><td>Coordinate</td><td style='width:40px;'>Color</td><td>Description</td></tr>";
                 foreach (var geometry in plot.Geometries)
                 {
                     if (geometry.Color.Length < 9)
@@ -827,7 +827,7 @@ namespace BExIS.Pmm.Model
                             continue;
                     }
                     var color = Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber));
-                    Div += "<tr><td>" + geometry.Name + "</td><td>" + geometry.GeometryType + "</td><td>" + geometry.Coordinate + "</td><td>" + geometry.CoordinateType + "</td><td style='width:100px;background-color:rgba(" + color.R + "," + color.G + "," + color.B + "," + color.A + ")'></td><td>" + geometry.Description + "</td></tr>";
+                    Div += "<tr><td>" + geometry.Name + "</td><td>" + geometry.GeometryType + "</td><td>" + geometry.Coordinate + "</td><td style='width:40px;background-color:rgba(" + color.R + "," + color.G + "," + color.B + "," + color.A + ")'></td><td>" + geometry.Description + "</td></tr>";
                 }
                 Div += "</table></center></div>";
             }
