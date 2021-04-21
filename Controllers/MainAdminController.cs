@@ -252,6 +252,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                     continue;
                 plotList.Add(helper.GetPlot(Convert.ToInt64(id)));
             }
+            legend = !legend;
             return File(helper.generatePDF(plotList, 1, deactivePlot, beyondPlot, gridSize, legend), "application/pdf", "filename.pdf");
         }
 
