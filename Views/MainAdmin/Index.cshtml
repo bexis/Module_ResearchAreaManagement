@@ -412,7 +412,13 @@
         var beyondborder = $('#BeyondBorder').is(':checked');
         var legend = $('#Legend').is(':checked');
         var gridSize = comboboxGridSize.value();
-        var plotIds = $("#SelectedPlotsId").val();
+        //var plotIds = $("#SelectedPlotsId").val();
+        var plotIds = $('#plotchart_geometries input[type=checkbox]:checked').map(function () {
+            return this.value;
+        }).get();
+        plotIds.shift();
+        plotIds.join(",");
+        alert(plotIds);
         if (plotIds == ",")
             return;
         var params = "ids=" + plotIds + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize + "&legend=" + legend;
@@ -519,11 +525,13 @@
     }
 
     function selectAll(e) {
+        var pageSize = $('#plotchart_geometries > div.t-grid-pager.t-grid-top > div.t-pager.t-reset > div.t-page-size > div > div > span.t-input').text();
+        pageSize = pageSize + 1;
         if ($(e).is(':checked')) {
-            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').attr("checked", true) : $('#plotchart_geometries input:checkbox').attr("checked", false);
+            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", true) : $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", false);
             $("#SelectedPlotsId").val($("#AllPlotsId").val());
         } else {
-            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').attr("checked", true) : $('#plotchart_geometries input:checkbox').attr("checked", false);
+            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", true) : $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", false);
             $("#SelectedPlotsId").val(",");
         }
        
@@ -599,4 +607,5 @@
             }
         });
     }
+
 </script>
