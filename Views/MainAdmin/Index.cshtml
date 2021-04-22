@@ -288,6 +288,7 @@
     }
 
     function LoadPackageAndBindGrid() {
+
         //var plotId = comboboxPlotChart.value();
         //var deactiveplot = $('#DeactivePlot').is(':checked');
         //var beyondborder = $('#BeyondBorder').is(':checked');
@@ -374,6 +375,8 @@
     }
 
     function UpdateIcons() {
+        $('#plotchart_geometries > table > thead > tr > th:nth-child(1) > span > input[type=checkbox]').prop("checked", false);
+
         $('#plotchart_geometries input[type=hidden]').each(function () {
             if ($(this).val() == "2") {
                 $("#archive-" + $(this).attr("name")).attr("src", "../../Areas/PMM/Images/archived.png");
