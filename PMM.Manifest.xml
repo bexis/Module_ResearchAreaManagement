@@ -13,16 +13,13 @@
   </Dependencies>
   <Exports>
     <!--add proper menu items-->
-	
-    
-    
     <Export tag="menubar" id="pmmMenu" order="6"
-            title="Plots" description="PMM desc" icon=""
+            title="Plots" description="Plot related main menu entry" icon=""
             controller="main" action="SubPlots"
             extends="./menubarRoot" />
 
     <Export tag="menubar" id="pmmMenu_plotChart" order="10"
-            title="Plot Maps" description="PMM desc" icon=""
+            title="Plot Charts" description="View and download individual plot charts" icon=""
             controller="main" action="SubPlots"
             extends="./menubarRoot/pmmMenu" />
 
@@ -34,20 +31,19 @@
     <!--admin area-->
 
     <Export tag="settings" id="adminPlotChart" order="16"
-        title="Manage Subplots" description="manage subplots" icon=""
+        title="Manage Subplots" description="Manage the subplots" icon=""
         controller="MainAdmin" action="SubPlots"
         extends="./settingsRoot" />
 
     <Export tag="settings" id="adminPlotChart" order="16"
-        title="Plotchart Image" description="plotchart omage" icon=""
+        title="Plotchart Image" description="Show individual plotchart images only" icon=""
         controller="MainAdmin" action="LoadPlotchartImage"
         extends="./settingsRoot" />
 
     <Export tag="settings" id="adminPlotChart" order="16"
-       title="Manage Plot Charts" description="manage plot charts" icon=""
+       title="Manage Plot Charts" description="Manage the plots" icon=""
        controller="MainAdmin" action="Index"
        extends="./settingsRoot" />
-
 
   </Exports>
 </Manifest>
