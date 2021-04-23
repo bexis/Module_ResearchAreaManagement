@@ -496,9 +496,17 @@ namespace BExIS.Pmm.Model
             borderLayer.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
             borderLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
+            string lastModifyDate = "";
+            using (GeometryHistoryManager geometryHistoryManager = new GeometryHistoryManager())
+            {
+                var historyList = geometryHistoryManager.Repo.Query(a => a.PlotId == plot.Id).ToList();
+                if(historyList.Count() != 0)
+                    lastModifyDate = historyList.Select(b=>b.LogTime).Max().ToShortDateString();
+            }
 
-            if (!beyondPlot)
-                map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
+
+                if (!beyondPlot)
+                    map = AddGridToMap(map, plot, zoom, lastModifyDate, beyondPlot, gridSize);
 
             plot.Geometries = plot.Geometries.OrderByDescending(p => p.Geometry.Length).ToList();
 
@@ -724,7 +732,7 @@ namespace BExIS.Pmm.Model
 
             if (beyondPlot)
             {
-                map = AddGridToMap(map, plot, zoom, beyondPlot, gridSize);
+                map = AddGridToMap(map, plot, zoom, lastModifyDate, beyondPlot, gridSize);
                 for (int i = 0; i < map.Layers.Count - (gridSize * 2 * 2 - 1); i++)
                 {
                     if (i % 2 == 0)
@@ -901,12 +909,11 @@ namespace BExIS.Pmm.Model
         /// <param name="beyondPlot"></param>
         /// <param name="gridSize"></param>
         /// <returns></returns>
-        private SharpMap.Map AddGridToMap(SharpMap.Map map, Plot plot, int zoom, bool beyondPlot = false, int gridSize = 5)
+        private SharpMap.Map AddGridToMap(SharpMap.Map map, Plot plot, int zoom, string lastModifyDate, bool beyondPlot = false, int gridSize = 5)
         {
             GeoAPI.CoordinateSystems.ICoordinateSystem webmercator = ProjNet.CoordinateSystems.ProjectedCoordinateSystem.WebMercator;
 
             ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory ctFact = new ProjNet.CoordinateSystems.Transformations.CoordinateTransformationFactory();
-
 
             SharpMap.Layers.VectorLayer areaLayer = new SharpMap.Layers.VectorLayer("area");
             double[] bb = { Convert.ToDouble(plot.Longitude), Convert.ToDouble(plot.Latitude) };
@@ -986,6 +993,7 @@ namespace BExIS.Pmm.Model
                 SharpMap.Layers.VectorLayer borderLayer = new SharpMap.Layers.VectorLayer("area");
                 List<IGeometry> frameGeometry = new List<IGeometry>();
                 IGeometry test = SharpMap.Converters.WellKnownText.GeometryFromWKT.Parse(calCoordd("rectangle", (X1 * 1.1) + "," + (Y1 * 1.1) + "," + (X2 * 1.1) + "," + (Y2 * 1.1), bb));
+
                 frameGeometry.Add(test);
                 borderLayer.DataSource = new SharpMap.Data.Providers.GeometryProvider(frameGeometry);
                 borderLayer.Style.Fill = Brushes.Transparent;
@@ -997,8 +1005,15 @@ namespace BExIS.Pmm.Model
                 borderFdt.Columns.Add("Label");
                 SharpMap.Data.FeatureDataRow newRowBorder = borderFdt.NewRow();
                 newRowBorder.Geometry = test;
-                newRowBorder["Label"] = "Plot " + plot.PlotId + "\t \n";
-                borderFdt.Rows.Clear(); borderFdt.Rows.Add(newRowBorder); borderLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(borderFdt);
+                if(!String.IsNullOrEmpty(lastModifyDate))
+                    newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n" + "Last modify: " + lastModifyDate + "\n";
+                else
+                    newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n";
+
+                borderFdt.Rows.Clear();
+                borderFdt.Rows.Add(newRowBorder);
+                borderLayer.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(borderFdt);
+
                 SharpMap.Layers.LabelLayer layLabelBorder = new SharpMap.Layers.LabelLayer("Country labels")
                 {
                     DataSource = borderLayer.DataSource,
