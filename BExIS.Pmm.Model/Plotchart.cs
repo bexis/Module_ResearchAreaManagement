@@ -500,8 +500,8 @@ namespace BExIS.Pmm.Model
             using (GeometryHistoryManager geometryHistoryManager = new GeometryHistoryManager())
             {
                 var historyList = geometryHistoryManager.Repo.Query(a => a.PlotId == plot.Id).ToList();
-                if(historyList.Count() != 0)
-                    lastModifyDate = historyList.Select(b=>b.LogTime).Max().ToShortDateString();
+                if(historyList.Count != 0)
+                    lastModifyDate = historyList.Select(b=>b.LogTime).Max().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
 
 
@@ -1006,7 +1006,7 @@ namespace BExIS.Pmm.Model
                 SharpMap.Data.FeatureDataRow newRowBorder = borderFdt.NewRow();
                 newRowBorder.Geometry = test;
                 if(!String.IsNullOrEmpty(lastModifyDate))
-                    newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n" + "Last modify: " + lastModifyDate + "\n";
+                    newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n" + "Last modified: " + lastModifyDate + "\n";
                 else
                     newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n";
 
