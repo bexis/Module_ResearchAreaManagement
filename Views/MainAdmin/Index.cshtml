@@ -29,13 +29,14 @@
             <td>
                 <input type='hidden' value=',' name='SelectedPlotsId' id="SelectedPlotsId" />
                 <input type='hidden' name='AllPlotsId' id="AllPlotsId" value="@Model.allPlots" />
-                
+
                 <input type="checkbox" id="DeactivePlot" />include former subplots
                 <br />
                 <input type="checkbox" id="BeyondBorder" />draw beyond plot borders
                 <br />
                 <input type="checkbox" id="Legend" />PDF without legend
             </td>
+            <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
             <td>
                 Grid Size:
             </td>
@@ -46,7 +47,6 @@
        .SelectedIndex(0))
             </td>
             <td valign="bottom" width="50px"><a href="#" title="Export CSV" onclick="exportAllPlots()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>
-            <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
         </tr>
     </table>
     @(Html.Telerik().Grid<Plot>()
@@ -316,6 +316,7 @@
     }
 
     function updatePlot(id, geometryType, coordinate, coordinateType, name, latitude, longitude, referencePoint) {
+        console.log("test");
         removeErrors();
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
         
