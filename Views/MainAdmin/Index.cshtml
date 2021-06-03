@@ -36,17 +36,29 @@
                 <br />
                 <input type="checkbox" id="Legend" />PDF without legend
             </td>
-            <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
+
             <td>
                 Grid Size:
             </td>
+
             <td>
                 @(Html.Telerik().DropDownList()
        .Name("Gridsize")
        .BindTo(new SelectList(Model.gridsize))
-       .SelectedIndex(0))
+       .SelectedIndex(0)
+       )
             </td>
-            <td valign="bottom" width="50px"><a href="#" title="Export CSV" onclick="exportAllPlots()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>
+            <td style="border-right: #ebebeb solid thin">
+            <a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a>
+            </td>
+
+            <td valign="bottom" width="70px"><a href="#" title="Export CSV" onclick="exportAllPlots()">
+            <img src="~/Areas/PMM/Images/csv-48.png"  title="export all plots"> <small>export all plots</small></a>
+            </td>
+            <td valign="bottom" width="70px">
+                <a href="#" title="Export CSV" onclick="exportAllSubPlots()">
+                    <img src="~/Areas/PMM/Images/csv-48.png"  title="export all subplots"><small>export all subplots</small></a> 
+            </td>
         </tr>
     </table>
     @(Html.Telerik().Grid<Plot>()
@@ -312,7 +324,12 @@
     }
 
     function exportAllPlots() {
+        
         window.open("/PMM/MainAdmin/ExportAllPlots", "_blank");
+    }
+    function exportAllSubPlots() {
+       
+        window.open("/PMM/MainAdmin/ExportAllGeometries", "_blank");
     }
 
     function updatePlot(id, geometryType, coordinate, coordinateType, name, latitude, longitude, referencePoint) {
@@ -422,7 +439,6 @@
         }).get();
         plotIds.shift();
         plotIds.join(",");
-        alert(plotIds);
         if (plotIds == ",")
             return;
         var params = "ids=" + plotIds + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize + "&legend=" + legend;

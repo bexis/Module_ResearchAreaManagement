@@ -141,17 +141,22 @@ namespace BExIS.Pmm.Model
                 return output;
             }
         }
-
-        public String ExportAllGeometries()
+        /// <summary>
+        /// get all subplots/geometries as | separated string
+        /// </summary>
+        /// <returns>string</returns>
+        public string ExportAllGeometries()
         {
-            String output = "";
+            string output = "";
             using (GeometryManager gManager = new GeometryManager())
             {
                 List<GeometryInformation> geometryList = new List<GeometryInformation>();
                 geometryList = gManager.Repo.Get().ToList();
-                foreach (var geometry in geometryList)
+                string headerLine = "plotId|internal plotId|geometryId|geometry name|geometry type|coordinate|coordinate type|line width|color|description|status" + "\n";
+                output += headerLine;
+                foreach (var geometry in geometryList.OrderByDescending(a=>a.Plot.Id))
                 {
-                    String line = geometry.Id + ";" + geometry.Name + ";" + geometry.GeometryType + ";" + geometry.Coordinate + ";" + geometry.CoordinateType + ";" + geometry.LineWidth + ";" + geometry.Color + ";" + geometry.Description + ";" + geometry.Status + ";" + geometry.Plot.Id + "\n";
+                    string line = geometry.Plot.PlotId + "|" + geometry.Plot.Id + "|" + geometry.Id + "|" + geometry.Name + "|" + geometry.GeometryType + "|" + geometry.Coordinate + "|" + geometry.CoordinateType + "|" + geometry.LineWidth + "|" + geometry.Color + "|" + geometry.Description + "|" + geometry.Status + "\n";
                     output += line;
                 }
                 return output;
@@ -165,7 +170,7 @@ namespace BExIS.Pmm.Model
             Plot plot = plotChart.GetPlot(id);
             foreach (var geometry in plot.Geometries)
             {
-                String line = geometry.Id + ";" + geometry.Name + ";" + geometry.GeometryType + ";" + geometry.Coordinate + ";" + geometry.CoordinateType + ";" + geometry.LineWidth + ";" + geometry.Color + ";" + geometry.Description + ";" + geometry.Status + ";" + geometry.Plot.Id + "\n";
+                String line = plot.PlotId + ";" + geometry.Plot.Id + ";" + geometry.Id + ";" + geometry.Name + ";" + geometry.GeometryType + ";" + geometry.Coordinate + ";" + geometry.CoordinateType + ";" + geometry.LineWidth + ";" + geometry.Color + ";" + geometry.Description + ";" + geometry.Status + "\n";
                 output += line;
             }
             return output;

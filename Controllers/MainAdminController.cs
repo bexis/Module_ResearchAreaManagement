@@ -395,11 +395,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// export plots to a CSV file
         /// </summary>
         /// <returns>CSV file</returns>
-        public ActionResult ExportAllPlots()
+        public ActionResult ExportAllPlots(bool withSubplots = false)
         {
             ImportExport importExport = new ImportExport();
-            //byte[] csvData = importExport.ExportAllPlots();
             return File(Encoding.ASCII.GetBytes(importExport.ExportAllPlots()), "text/csv", "PlotList.csv");
+           
         }
 
         /// <summary>
@@ -409,7 +409,6 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         public ActionResult ExportAllGeometries()
         {
             ImportExport importExport = new ImportExport();
-            //byte[] csvData = importExport.ExportAllPlots();
             return File(Encoding.ASCII.GetBytes(importExport.ExportAllGeometries()), "text/csv", "SubplotList.csv");
         }
 
