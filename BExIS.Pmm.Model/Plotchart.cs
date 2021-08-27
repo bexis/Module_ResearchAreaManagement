@@ -198,7 +198,7 @@ namespace BExIS.Pmm.Model
             using (GeometryManager gManager = new GeometryManager())
             using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
             {
-                GeometryInformation geometry = gManager.Create(plot.Id, coords, geometrytype, coordinatetype, color, geometryText, plot, name, description);
+                GeometryInformation geometry = gManager.Create(plot.Id, coords, geometrytype, coordinatetype, color, geometryText, plot, name, description, DateTime.Now);
                 gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Create", DateTime.Now);
 
                 return geometry;
@@ -497,11 +497,11 @@ namespace BExIS.Pmm.Model
             borderLayer.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
 
             string lastModifyDate = "";
-            using (GeometryHistoryManager geometryHistoryManager = new GeometryHistoryManager())
+            using (GeometryManager geometryManager = new GeometryManager())
             {
-                var historyList = geometryHistoryManager.Repo.Query(a => a.PlotId == plot.Id).ToList();
-                if(historyList.Count != 0)
-                    lastModifyDate = historyList.Select(b=>b.LogTime).Max().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+                var geometrieyList = geometryManager.Repo.Query(a => a.Plot.Id == plot.Id).ToList();
+                if(geometrieyList.Count != 0)
+                    lastModifyDate = geometrieyList.Select(b=>b.Date).Max().ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
             }
 
 

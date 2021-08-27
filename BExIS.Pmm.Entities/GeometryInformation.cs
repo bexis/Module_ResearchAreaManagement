@@ -46,5 +46,7 @@ namespace BExIS.Pmm.Entities
         public virtual long PlotId { set; get; }
         public virtual string ReferencePoint { set; get; }
         public virtual Plot Plot { set; get; }
+
+        public virtual DateTime Date { set; get; }
     }
 }

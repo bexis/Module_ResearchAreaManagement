@@ -108,6 +108,11 @@
     <property name="ReferencePoint" type="string">
       <column name="ReferencePoint" />
     </property>
+    
+       <property name="Date" type="DateTime">
+      <column name="Date"/>
+    </property>
+
 
     <many-to-one class="BExIS.Pmm.Entities.Plot" name="Plot" column="PlotId"  index="idx_GeometryInformation_PlotId"/>
 
