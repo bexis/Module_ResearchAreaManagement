@@ -14,6 +14,8 @@ using System.Web;
 using BExIS.Pmm.Model;
 using System.Text;
 using BExIS.Modules.PMM.UI.Helper;
+using Vaiona.Web.Mvc.Models;
+using Vaiona.Web.Extensions;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -73,6 +75,8 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         // GET: PlotChart
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
+            ViewBag.Title = PresentationModel.GetViewTitleForTenant("Plot Charts", this.Session.GetTenant());
+
             var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
             ViewData["DefaultPlotID"] = defaultPlotId;
 
@@ -93,8 +97,6 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                 plotviewmodel.selectedPlot = plotList.Where(a => a.Id == Convert.ToInt64(defaultPlotId)).FirstOrDefault();
 
             plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
-            
-            ViewBag.Title = "BExIS - Plot Maps";
 
             return View(plotviewmodel);
         }
