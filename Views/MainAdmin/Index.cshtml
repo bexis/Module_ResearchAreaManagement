@@ -569,6 +569,11 @@
         var name = $('#Name').val();
         var id = $('#PlotIdHolder').val();
         var ReferencePoint = $('#ReferencePoint').val();
+
+        if(name.length < 1)
+        {
+            addErrors("Name is mandatory.", "#Name")
+        }
         
         if (!checkGeometry(GeometryType, CoordinateType, Coordinate)) 
             addErrors("Coordinate data format is not correct.", "#Coordinate")
