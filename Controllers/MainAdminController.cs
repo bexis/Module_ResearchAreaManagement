@@ -371,7 +371,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                     ImportExport importExport = new ImportExport();
                     List<ImportPlotObject> plotList = null;
                     List<ImportGeometryObject> subPlotList = null;
-                    if (type == "Plot")
+                    if (type == "plots")
                     {
                         plotList = importExport.PlotBatchImport(file.InputStream);
                         ViewData["Plot"] = plotList;

@@ -2,20 +2,41 @@
 @using Telerik.Web.Mvc.UI;
 
 <div style="height:1000px;">
-    @using (Html.BeginForm("ImportInformation", "Main",
-                                 FormMethod.Post, new { id = "uploadForm", type = "Plot", enctype = "multipart/form-data", area = "PMM" }))
+    <div>
+        <h2>Plotchart Import</h2>
+        @*<fieldset name="importType" style="width:300px; border: 1px solid #1F497D;">*@
+            @*<legend style="background: #1F497D;color: #fff;padding: 5px 10px ;font-size: 14px; border-radius: 5px;box-shadow: 0 0 0 5px #ddd; margin-left: 10px;">Import type</legend>*@
+            Import type:<br /><br />
+            <label for="subplots">Subplots</label>
+            <input type="radio" name="type" id="subplots" value="subplots" checked>
+            <label for="plots">Plots</label>
+            <input type="radio" name="type" id="plots" value="plots">
+        @*</fieldset>*@
+    </div>
+    <br />
+    <div>
+        <p>
+            Please select a file to be uploaded.
+        </p>
+    </div>
+    @using (Html.BeginForm("ImportInformation", "MainAdmin",
+                                 FormMethod.Post, new { id = "uploadForm", enctype = "multipart/form-data", area = "PMM" }))
     {
+        <input type="hidden" name="type" id="type" />
 
         @Html.Telerik().Upload().Name("attachments")
 
         <input type="submit" value="Send" class="t-button" />
-        <input type="hidden" value="Plot" name="type" id="type" class="t-button" />
+        @*<input type="hidden" value="Plot" name="type" id="type" class="t-button" />*@
         <input type="reset" value="Reset" class="t-button" />
 
     }
-   
-@if(ViewData["Plot"]!= null) { 
-            @(Html.Telerik().Grid<ImportPlotObject>((List<ImportPlotObject>)ViewData["Plot"])
+    <hr />
+
+    @if (ViewData["Plot"] != null)
+    {
+        <h3>Uploaded data:</h3>
+        @(Html.Telerik().Grid<ImportPlotObject>((List<ImportPlotObject>)ViewData["Plot"])
                  .Name("Plots")
                  .BindTo((List<ImportPlotObject>)ViewData["Plot"])
                  .Columns(columns =>
@@ -33,10 +54,11 @@
                      columns.Bound(c => c.Status);
                  }));
 
-}
-else if (ViewData["SubPlot"] != null)
-{
-    @(Html.Telerik().Grid<ImportGeometryObject>((List<ImportGeometryObject>)ViewData["SubPlot"])
+    }
+    else if (ViewData["SubPlot"] != null)
+    {
+        <h3>Uploaded data:</h3>
+        @(Html.Telerik().Grid<ImportGeometryObject>((List<ImportGeometryObject>)ViewData["SubPlot"])
                  .Name("Geometries")
                  .Columns(columns =>
                  {
@@ -54,6 +76,23 @@ else if (ViewData["SubPlot"] != null)
                      columns.Bound(c => c.Geometry.PlotId);
                      columns.Bound(c => c.Status);
                  }));
-}
+    }
 
-    </div>
+</div>
+
+<script>
+
+    var selectedType = $("input[name='type']:checked").val();
+
+    $(function () {
+
+        var selectedType = $("input[name='type']:checked").val();
+        $("input[name='type']").change(function () {
+            selectedType = $("input[name='type']:checked").val();
+            $('#type').val(selectedType);
+        });
+
+        $('#type').val(selectedType);
+    });
+
+</script>

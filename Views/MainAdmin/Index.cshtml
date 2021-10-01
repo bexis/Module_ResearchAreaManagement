@@ -59,6 +59,9 @@
                 <a href="#" title="Export CSV" onclick="exportAllSubPlots()">
                     <img src="~/Areas/PMM/Images/csv-48.png"  title="export all subplots"><small>export all subplots</small></a> 
             </td>
+            <td>
+                @Html.ActionLink("Import data", "ImportInformation", "MainAdmin", new { area = "PMM" }, new { @class = "bx-button function", title = "Import", style = "width: 100%;  margin-bottom: 5px;" })
+            </td>
         </tr>
     </table>
     @(Html.Telerik().Grid<Plot>()

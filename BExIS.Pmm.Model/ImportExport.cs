@@ -34,44 +34,48 @@ namespace BExIS.Pmm.Model
                 {
                     
                     var line = reader.ReadLine();
-                    var values = line.Split(';');
-                    Plot plot = new Plot();
-                    try
+                    if (index != 0)
                     {
-                        plot.PlotId = values[1];
-                        plot.GeometryType = values[2];
-                        plot.Coordinate = values[3];
-                        plot.CoordinateType = values[4];
-                        plot.Latitude = values[5];
-                        plot.Longitude = values[6];
-                        plot.Status = Convert.ToByte(values[7]);
-                        plot.Id = values[0] == "" ? -1 : Convert.ToInt32(values[0]);
-                    } catch
-                    {
-                        plot = null;
-                    }
-                     if (plot == null || plot.Id == -1)
-                    {
-                        if (plot != null && (plot.Status != 1 || plotChart.CheckDuplicatePlotName("create", plot.PlotId, 0) == "valid"))
-                            output = plotChart.AddPlot(plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
+                        var values = line.Split('|');
+                        Plot plot = new Plot();
+                        try
+                        {
+                            plot.PlotId = values[1];
+                            plot.GeometryType = values[2];
+                            plot.Coordinate = values[3];
+                            plot.CoordinateType = values[4];
+                            plot.Latitude = values[5];
+                            plot.Longitude = values[6];
+                            plot.Status = Convert.ToByte(values[7]);
+                            plot.Id = values[0] == "" ? -1 : Convert.ToInt32(values[0]);
+                        }
+                        catch
+                        {
+                            plot = null;
+                        }
+                        if (plot == null || plot.Id == -1)
+                        {
+                            if (plot != null && (plot.Status != 1 || plotChart.CheckDuplicatePlotName("create", plot.PlotId, 0) == "valid"))
+                                output = plotChart.AddPlot(plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
+                            else
+                                output = null;
+                            if (output == null)
+                                plotList.Add(new ImportPlotObject(index, plot, "Insert", false));
+                            else
+                                plotList.Add(new ImportPlotObject(index, plot, "Insert", true));
+                        }
                         else
-                            output = null;
-                        if (output == null)
-                            plotList.Add(new ImportPlotObject(index, plot, "Insert", false));
-                        else
-                            plotList.Add(new ImportPlotObject(index, plot, "Insert", true));
-                    }
-                    else
-                    {
-                        if (plot.Status != 1 || plotChart.CheckDuplicatePlotName("update", plot.PlotId, plot.Id) == "valid")
-                            output = plotChart.UpdatePlot(plot.Id, plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
-                        else
-                            output = null;
-                        
-                        if (output == null)
-                            plotList.Add(new ImportPlotObject(index, plot, "Update", false));
-                        else
-                            plotList.Add(new ImportPlotObject(index, plot, "Update", true));
+                        {
+                            if (plot.Status != 1 || plotChart.CheckDuplicatePlotName("update", plot.PlotId, plot.Id) == "valid")
+                                output = plotChart.UpdatePlot(plot.Id, plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
+                            else
+                                output = null;
+
+                            if (output == null)
+                                plotList.Add(new ImportPlotObject(index, plot, "Update", false));
+                            else
+                                plotList.Add(new ImportPlotObject(index, plot, "Update", true));
+                        }
                     }
                     index++;
                 }
@@ -90,35 +94,41 @@ namespace BExIS.Pmm.Model
                 int index = 0;
                 while (!reader.EndOfStream)
                 {
+                   
                     var line = reader.ReadLine();
-                    var values = line.Split(';');
-                    GeometryInformation geometry = new GeometryInformation();
-                    geometry.Id = values[0] == "" ? -1 : Convert.ToInt32(values[0]);
-                    geometry.Name = values[1];
-                    geometry.GeometryType = values[2];
-                    geometry.Coordinate = values[3];
-                    geometry.CoordinateType = values[4];
-                    geometry.LineWidth = Convert.ToByte(values[5]);
-                    geometry.Color = values[6];
-                    geometry.Description = values[7];
-                    geometry.Status = Convert.ToByte(values[8]);
-                    String plotId = values[9];////////////////////////////// some problem for plotid
+                    if (index != 0)
+                    {
+                        var values = line.Split('|');
+                        GeometryInformation geometry = new GeometryInformation();
+                        geometry.Id = values[2] == "" ? -1 : Convert.ToInt32(values[2]);
+                        geometry.Name = values[3];
+                        geometry.GeometryType = values[4];
+                        geometry.Coordinate = values[5];
+                        geometry.CoordinateType = values[6];
+                        geometry.LineWidth = Convert.ToByte(values[7]);
+                        geometry.Color = values[8];
+                        geometry.Description = values[9];
+                        geometry.Status = Convert.ToByte(values[10]);
+                        geometry.PlotId = Convert.ToInt32(values[1]);
 
-                    if (geometry.Id == -1)
-                    {
-                        output = plotChart.AddGeometry(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
-                        if (output == null)
-                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Insert", false));
+                        //String plotId = values[1];////////////////////////////// some problem for plotid
+
+                        if (geometry.Id == -1)
+                        {
+                            output = plotChart.AddGeometry(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
+                            if (output == null)
+                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Insert", false));
+                            else
+                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Insert", true));
+                        }
                         else
-                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Insert", true));
-                    }
-                    else
-                    {
-                        output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
-                        if (output == null)
-                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
-                        else
-                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", true));
+                        {
+                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
+                            if (output == null)
+                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
+                            else
+                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", true));
+                        }
                     }
                     index++;
                 }
@@ -129,7 +139,7 @@ namespace BExIS.Pmm.Model
         public String ExportAllPlots()
         {
             String output = "";
-            string headerLine = "plotId|internal plotId|geometry type|coordinate|coordinate type|Latitude|Longitude|status" + "\n";
+            string headerLine = "internal plotId|plotId|geometry type|coordinate|coordinate type|Latitude|Longitude|status" + "\n";
             output += headerLine;
             using (PlotManager pManager = new PlotManager())
             {
