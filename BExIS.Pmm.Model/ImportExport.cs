@@ -129,13 +129,15 @@ namespace BExIS.Pmm.Model
         public String ExportAllPlots()
         {
             String output = "";
+            string headerLine = "plotId|internal plotId|geometry type|coordinate|coordinate type|Latitude|Longitude|status" + "\n";
+            output += headerLine;
             using (PlotManager pManager = new PlotManager())
             {
                 List<Plot> plotList = new List<Plot>();
                 plotList = pManager.Repo.Get().ToList();
                 foreach (var plot in plotList)
                 {
-                    String Line = plot.Id + ";" + plot.PlotId + ";" + plot.GeometryType + ";" + plot.Coordinate + ";" + plot.CoordinateType + ";" + plot.Latitude + ";" + plot.Longitude + ";" + plot.Status + "\n";
+                    String Line = plot.Id + "|" + plot.PlotId + "|" + plot.GeometryType + "|" + plot.Coordinate + "|" + plot.CoordinateType + "|" + plot.Latitude + "|" + plot.Longitude + "|" + plot.Status + "\n";
                     output += Line;
                 }
                 return output;
@@ -168,9 +170,11 @@ namespace BExIS.Pmm.Model
             String output = "";
             Plotchart plotChart = new Plotchart();
             Plot plot = plotChart.GetPlot(id);
+            string headerLine = "plotId|internal plotId|geometryId|geometry name|geometry type|coordinate|coordinate type|line width|color|description|status" + "\n";
+            output += headerLine;
             foreach (var geometry in plot.Geometries)
             {
-                String line = plot.PlotId + ";" + geometry.Plot.Id + ";" + geometry.Id + ";" + geometry.Name + ";" + geometry.GeometryType + ";" + geometry.Coordinate + ";" + geometry.CoordinateType + ";" + geometry.LineWidth + ";" + geometry.Color + ";" + geometry.Description + ";" + geometry.Status + "\n";
+                string line = geometry.Plot.PlotId + "|" + geometry.Plot.Id + "|" + geometry.Id + "|" + geometry.Name + "|" + geometry.GeometryType + "|" + geometry.Coordinate + "|" + geometry.CoordinateType + "|" + geometry.LineWidth + "|" + geometry.Color + "|" + geometry.Description + "|" + geometry.Status + "\n";
                 output += line;
             }
             return output;
