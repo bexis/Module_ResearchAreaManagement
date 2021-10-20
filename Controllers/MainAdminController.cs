@@ -11,6 +11,8 @@ using Telerik.Web.Mvc;
 using System.IO;
 using System.Text;
 using BExIS.Pmm.Services;
+using BExIS.Security.Services.Utilities;
+using Vaiona.Utils.Cfg;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -385,6 +387,46 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                     //new StreamReader(inputFile.InputStream)
                 }
 
+                //send report Mail 
+                //cearte report file
+             
+                string uploadType = "";
+                var lines = new List<string>();
+
+                // Create a file to write import report.
+
+                if (ViewData["Plot"] != null)
+                {
+                    lines.Add("Index" + "|" + "Internal PlotId" + "|" + "PlotId" + "|" + "GeometryType" + "|" + "Coordinate" + "|" + "CoordinateType" + "|" + "Latitude" + "|" + "Longitude" + "|" + "Status");
+
+                    List<ImportPlotObject> list = (List<ImportPlotObject>)ViewData["Plot"];
+                     foreach ( var i in list)
+                     {
+                        lines.Add(i.Index + "|" + i.Plot.Id + "|" + i.Plot.PlotId + "|" + i.Plot.GeometryType + "|" + i.Plot.Coordinate + "|" + i.Plot.CoordinateType + "|" + i.Plot.Latitude + "|" + i.Plot.Longitude + "|" + i.UploadSuccessful);  
+                     }
+                          
+                           
+                }
+
+                if (ViewData["SubPlot"] != null)
+                {
+                     List<ImportGeometryObject> list = (List<ImportGeometryObject>)ViewData["SubPlot"];
+                     lines.Add("Index" + "|" + "Action" + "|" + "GeometryId" + "|" + "GeometryName" + "|" + "GeometryType" + "|" + "Coordinate" + "|" + "CoordinateType" + "|" + "LineWidth" + "|" + "Color" + "|" + "Description" + "|" + "Status" + "|" + "PlotId" + "|" + "UploadSuccessful"); 
+                     foreach (var i in list)
+                     {
+                         lines.Add(i.Index + "|" + i.Action + "|" + i.Geometry.Id + "|" + i.Geometry.Name + "|" + i.Geometry.GeometryType + "|" + i.Geometry.Coordinate + "|" + i.Geometry.CoordinateType + "|" + i.Geometry.LineWidth + "|" + i.Geometry.Color + "|" + i.Geometry.Description + "|" + i.Geometry.Status + "|" + i.Geometry.PlotId + "|" + i.UploadSuccessful);
+                     }
+                }
+
+                string dataPath = AppConfiguration.DataPath;
+                string storePath = Path.Combine(dataPath, "PMM", "Temp", "ImportReport_" + DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
+
+                System.IO.File.WriteAllLines(storePath, lines);
+
+                //send mail
+                //var es = new EmailService();
+                //string text = "";
+                //es.Send(uploadType + "Import", text, "bexis-sys@listserv.uni-jena.de");
             }
 
             // Redirect to a view showing the result of the form submission.
