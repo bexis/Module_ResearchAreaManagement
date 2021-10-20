@@ -66,15 +66,34 @@ namespace BExIS.Pmm.Model
                         }
                         else
                         {
-                            if (plot.Status != 1 || plotChart.CheckDuplicatePlotName("update", plot.PlotId, plot.Id) == "valid")
-                                output = plotChart.UpdatePlot(plot.Id, plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
-                            else
-                                output = null;
+                            switch (plot.Status)
+                            {
+                                case 1:
+                                    if (plot.Status != 1 || plotChart.CheckDuplicatePlotName("update", plot.PlotId, plot.Id) == "valid")
+                                        output = plotChart.UpdatePlot(plot.Id, plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
+                                    else
+                                        output = null;
 
-                            if (output == null)
-                                plotList.Add(new ImportPlotObject(index, plot, "Update", false));
-                            else
-                                plotList.Add(new ImportPlotObject(index, plot, "Update", true));
+                                    if (output == null)
+                                        plotList.Add(new ImportPlotObject(index, plot, "Update", false));
+                                    else
+                                    plotList.Add(new ImportPlotObject(index, plot, "Update", true));
+                                break;
+                                case 2:
+                                    output = plotChart.ArchivePlot(plot.Id);
+                                    if (output == null)
+                                        plotList.Add(new ImportPlotObject(index, plot, "Archive", false));
+                                    else
+                                        plotList.Add(new ImportPlotObject(index, plot, "Archive", true));
+                                break;
+                                case 3:
+                                    output = plotChart.DeletePlot(plot.Id);
+                                    if (output == null)
+                                        plotList.Add(new ImportPlotObject(index, plot, "Delete", false));
+                                    else
+                                        plotList.Add(new ImportPlotObject(index, plot, "Delete", true));
+                                break;
+                            }
                         }
                     }
                     index++;
@@ -123,11 +142,31 @@ namespace BExIS.Pmm.Model
                         }
                         else
                         {
-                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
-                            if (output == null)
-                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
-                            else
-                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", true));
+                            switch (geometry.Status)
+                            {
+                                case 1:                            
+                                    output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
+                                    if (output == null)
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
+                                    else
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", true));
+                                break;
+                                case 2:
+                                    output = plotChart.ArchiveGeometry(geometry.Id);
+                                    if (output == null)
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Archive", false));
+                                    else
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Archive", true));
+                                break;
+                                case 3:
+                                    bool delete = plotChart.DeleteGeometry(geometry.Id);
+                                    if (!delete)
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Delete", false));
+                                    else
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Delete", true));
+                                break;
+
+                            }
                         }
                     }
                     index++;
