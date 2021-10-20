@@ -30,7 +30,7 @@
                      columns.Bound(c => c.Plot.Latitude);
                      columns.Bound(c => c.Plot.Longitude);
                      columns.Bound(c => c.Plot.Status);
-                     columns.Bound(c => c.Status);
+                     columns.Bound(c => c.UploadSuccessful);
                  }));
 
 }
@@ -52,7 +52,7 @@ else if (ViewData["SubPlot"] != null)
                      columns.Bound(c => c.Geometry.Description);
                      columns.Bound(c => c.Geometry.Status);
                      columns.Bound(c => c.Geometry.PlotId);
-                     columns.Bound(c => c.Status);
+                     columns.Bound(c => c.UploadSuccessful);
                  }));
 }
 
