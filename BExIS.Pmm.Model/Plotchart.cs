@@ -239,7 +239,7 @@ namespace BExIS.Pmm.Model
                 geom.Description = description;
 
                 GeometryInformation geometry = gManager.Update(geom);
-                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);
+                gHManager.Create(geometry.Plot.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);
 
                 return geometry;
             }
@@ -263,7 +263,7 @@ namespace BExIS.Pmm.Model
                 string action = "";
                 if (geom.Status == 1) action = "Unarchive";
                 if (geom.Status == 2) action = "Archive";
-                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
+                gHManager.Create(geometry.Plot.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
 
                 return geometry;
             }
@@ -287,7 +287,7 @@ namespace BExIS.Pmm.Model
                 string action = "";
                 if (geom.Status == 1) action = "Undelete";
                 if (geom.Status == 3) action = "Delete";
-                gHManager.Create(geom.PlotId, geom.Coordinate, geom.GeometryType, geom.CoordinateType, geom.Color, geom.GeometryText, geom.Name, geom.Description, geom.Id, action, DateTime.Now);
+                gHManager.Create(geom.Plot.Id, geom.Coordinate, geom.GeometryType, geom.CoordinateType, geom.Color, geom.GeometryText, geom.Name, geom.Description, geom.Id, action, DateTime.Now);
 
                 return delete;
             }
