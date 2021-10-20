@@ -9,11 +9,11 @@ namespace BExIS.Pmm.Entities
             Index = index;
             Plot = plot;
             Action = action;
-            Status = status;
+            UploadSuccessful = status;
         }
         public int Index { set; get; }
         public Plot Plot { set; get; }
         public string Action { set; get; }
-        public bool Status { set; get; }
+        public bool UploadSuccessful { set; get; }
     }
 }
