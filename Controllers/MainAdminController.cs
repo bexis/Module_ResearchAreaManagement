@@ -13,6 +13,7 @@ using System.Text;
 using BExIS.Pmm.Services;
 using BExIS.Security.Services.Utilities;
 using Vaiona.Utils.Cfg;
+using BExIS.Security.Services.Subjects;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -397,6 +398,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
                 if (ViewData["Plot"] != null)
                 {
+                    uploadType = "plots";
                     lines.Add("Index" + "|" + "Internal PlotId" + "|" + "PlotId" + "|" + "GeometryType" + "|" + "Coordinate" + "|" + "CoordinateType" + "|" + "Latitude" + "|" + "Longitude" + "|" + "Status");
 
                     List<ImportPlotObject> list = (List<ImportPlotObject>)ViewData["Plot"];
@@ -410,6 +412,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
                 if (ViewData["SubPlot"] != null)
                 {
+                     uploadType = "subplots";
                      List<ImportGeometryObject> list = (List<ImportGeometryObject>)ViewData["SubPlot"];
                      lines.Add("Index" + "|" + "Action" + "|" + "GeometryId" + "|" + "GeometryName" + "|" + "GeometryType" + "|" + "Coordinate" + "|" + "CoordinateType" + "|" + "LineWidth" + "|" + "Color" + "|" + "Description" + "|" + "Status" + "|" + "PlotId" + "|" + "UploadSuccessful"); 
                      foreach (var i in list)
@@ -422,11 +425,21 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                 string storePath = Path.Combine(dataPath, "PMM", "Temp", "ImportReport_" + DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
 
                 System.IO.File.WriteAllLines(storePath, lines);
+                FileInfo reportFile = new FileInfo(storePath);
+                List<FileInfo> files = new List<FileInfo>();
+                files.Add(reportFile);
 
                 //send mail
-                //var es = new EmailService();
-                //string text = "";
-                //es.Send(uploadType + "Import", text, "bexis-sys@listserv.uni-jena.de");
+                string userMail;
+                using (UserManager userManager = new UserManager())
+                {
+                    userMail = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result.Email;
+                }
+                var es = new EmailService();
+                string text = "Import report as attachment.";
+                List<string> receiver = new List<string> { "bexis-sys@listserv.uni-jena.de", userMail };
+                es.Send("Plotchart " + uploadType + " import report", text, receiver, null, null, null, files);
+
             }
 
             // Redirect to a view showing the result of the form submission.
