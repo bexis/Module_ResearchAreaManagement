@@ -81,7 +81,7 @@
       <column name="Color" />
     </property>
 
-    <property name="LineWidth" type="Byte">
+    <property name="LineWidth" type="Int32">
       <column name="LineWidth" />
     </property>
 

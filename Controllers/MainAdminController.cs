@@ -293,9 +293,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// <param name="referencePoint"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult _newGeometry(long plotid,string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string referencePoint = "")
+        public ActionResult _newGeometry(long plotid,string coordinate, string geometrytype, string coordinatetype,int linewidth, string color, string name, string description, string referencePoint = "")
         {
-            GeometryInformation result = helper.AddGeometry(plotid, coordinate, geometrytype, coordinatetype, color, name, description, referencePoint);
+            GeometryInformation result = helper.AddGeometry(plotid, coordinate, geometrytype, coordinatetype,linewidth, color, name, description, referencePoint);
             return Json(result != null);
         }
 
@@ -313,9 +313,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         /// <param name="referencePoint"></param>
         /// <returns></returns>
         [HttpPost]
-        public ActionResult _updateGeometry(string plotid, string coordinate, string geometrytype, string coordinatetype, string color, long geometryId, string name, string description, string referencePoint = "")
+        public ActionResult _updateGeometry(string plotid, string coordinate, string geometrytype, string coordinatetype, int lineWidth, string color, long geometryId, string name, string description, string referencePoint = "")
         {
-            GeometryInformation result = helper.UpdateGeometry(geometryId, coordinate, geometrytype, coordinatetype, color, name, description, referencePoint);
+            GeometryInformation result = helper.UpdateGeometry(geometryId, coordinate, geometrytype, coordinatetype, lineWidth, color, name, description, referencePoint);
             return Json(result != null);
         }
 
@@ -421,25 +421,37 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                      }
                 }
 
-                string dataPath = AppConfiguration.DataPath;
-                string storePath = Path.Combine(dataPath, "PMM", "Temp", "ImportReport_" + DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
-
-                System.IO.File.WriteAllLines(storePath, lines);
-                FileInfo reportFile = new FileInfo(storePath);
-                List<FileInfo> files = new List<FileInfo>();
-                files.Add(reportFile);
-
-                //send mail
-                string userMail;
-                using (UserManager userManager = new UserManager())
+                FileInfo reportFile = null;
+                try
                 {
-                    userMail = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result.Email;
-                }
-                var es = new EmailService();
-                string text = "Import report as attachment.";
-                List<string> receiver = new List<string> { "bexis-sys@listserv.uni-jena.de", userMail };
-                es.Send("Plotchart " + uploadType + " import report", text, receiver, null, null, null, files);
+                    string dataPath = AppConfiguration.DataPath;
+                    string storePath = Path.Combine(dataPath, "PMM", "Temp", "ImportReport_" + DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
 
+                    System.IO.File.WriteAllLines(storePath, lines);
+                    reportFile = new FileInfo(storePath);
+                    List<FileInfo> files = new List<FileInfo>();
+                    files.Add(reportFile);
+
+
+                    //send mail
+                    string userMail;
+                    using (UserManager userManager = new UserManager())
+                    {
+                        userMail = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result.Email;
+                    }
+                    var es = new EmailService();
+                    string text = "Import report as attachment.";
+                    List<string> receiver = new List<string> { "bexis-sys@listserv.uni-jena.de", userMail };
+                    es.Send("Plotchart " + uploadType + " import report", text, receiver, null, null, null, files);
+                    files.Clear();
+                    
+                    
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("The process failed: {0}", e.ToString());
+
+                }
             }
 
             // Redirect to a view showing the result of the form submission.

@@ -37,7 +37,7 @@ namespace BExIS.Pmm.Entities
         public virtual string GeometryType { set; get; }
         public virtual IGeometry Geometry { set; get; }
         public virtual string Color { set; get; }
-        public virtual byte LineWidth { set; get; }
+        public virtual int LineWidth { set; get; }
         public virtual byte Status { set; get; }
         public virtual string Coordinate { set; get; }
         public virtual string CoordinateType { set; get; }

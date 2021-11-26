@@ -183,7 +183,7 @@ namespace BExIS.Pmm.Model
         /// <param name="description"></param>
         /// <param name="referencePoint"></param>
         /// <returns>new subplot</returns>
-        public GeometryInformation AddGeometry(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string referencePoint = "")
+        public GeometryInformation AddGeometry(long plotid, string coordinate, string geometrytype, string coordinatetype, int lineWidth, string color, string name, string description, string referencePoint = "")
         {
             Plot plot = GetPlot(plotid);
 
@@ -198,8 +198,8 @@ namespace BExIS.Pmm.Model
             using (GeometryManager gManager = new GeometryManager())
             using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
             {
-                GeometryInformation geometry = gManager.Create(plot.Id, coords, geometrytype, coordinatetype, color, geometryText, plot, name, description, DateTime.Now);
-                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Create", DateTime.Now);
+                GeometryInformation geometry = gManager.Create(plot.Id, coords, geometrytype, coordinatetype, lineWidth, color, geometryText, plot, name, description, DateTime.Now);
+                gHManager.Create(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Create", DateTime.Now);
 
                 return geometry;
             }
@@ -217,7 +217,7 @@ namespace BExIS.Pmm.Model
         /// <param name="description"></param>
         /// <param name="referencePoint"></param>
         /// <returns>updated subplot</returns>
-        public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype, string color, string name, string description, string referencePoint = "")
+        public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype,int lineWidth, string color, string name, string description, string referencePoint = "")
         {
             using (GeometryManager gManager = new GeometryManager())
             using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
@@ -234,12 +234,13 @@ namespace BExIS.Pmm.Model
                 geom.Coordinate = coordinate;
                 geom.GeometryType = geometrytype;
                 geom.CoordinateType = coordinatetype;
+                geom.LineWidth = lineWidth;
                 geom.Color = color;
                 geom.Name = name;
                 geom.Description = description;
 
                 GeometryInformation geometry = gManager.Update(geom);
-                gHManager.Create(geometry.Plot.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);
+                gHManager.Create(geometry.Plot.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);
 
                 return geometry;
             }
@@ -263,7 +264,7 @@ namespace BExIS.Pmm.Model
                 string action = "";
                 if (geom.Status == 1) action = "Unarchive";
                 if (geom.Status == 2) action = "Archive";
-                gHManager.Create(geometry.Plot.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
+                gHManager.Create(geometry.Plot.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, action, DateTime.Now);
 
                 return geometry;
             }
@@ -287,7 +288,7 @@ namespace BExIS.Pmm.Model
                 string action = "";
                 if (geom.Status == 1) action = "Undelete";
                 if (geom.Status == 3) action = "Delete";
-                gHManager.Create(geom.Plot.Id, geom.Coordinate, geom.GeometryType, geom.CoordinateType, geom.Color, geom.GeometryText, geom.Name, geom.Description, geom.Id, action, DateTime.Now);
+                gHManager.Create(geom.Plot.Id, geom.Coordinate, geom.GeometryType, geom.CoordinateType, geom.LineWidth, geom.Color, geom.GeometryText, geom.Name, geom.Description, geom.Id, action, DateTime.Now);
 
                 return delete;
             }

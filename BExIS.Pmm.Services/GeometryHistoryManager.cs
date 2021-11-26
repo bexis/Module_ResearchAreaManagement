@@ -53,7 +53,7 @@ namespace BExIS.Pmm.Services
         #endregion
 
         #region Methods
-        public GeometryX Create(long plotid, string coordinate, string geometrytype, string coordinatetype, string color, string geometrytext, string name, string description, long logedId, String action, DateTime dateTime, string referencePoint = "")
+        public GeometryX Create(long plotid, string coordinate, string geometrytype, string coordinatetype, int lineWidth, string color, string geometrytext, string name, string description, long logedId, String action, DateTime dateTime, string referencePoint = "")
         {
             //Contract.Requires(!string.IsNullOrWhiteSpace(plotId));
             //Contract.Requires(!string.IsNullOrWhiteSpace(plotType) != null);
@@ -75,7 +75,7 @@ namespace BExIS.Pmm.Services
                 CoordinateType = coordinatetype,
                 Color = color,
                 Status = 1,
-                LineWidth = 1,
+                LineWidth = lineWidth,
                 Name = name,
                 Description = description,
                 GeometryId = 1,

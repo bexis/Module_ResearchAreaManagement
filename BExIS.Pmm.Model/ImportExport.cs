@@ -153,7 +153,7 @@ namespace BExIS.Pmm.Model
 
                         if (geometry.Id == -1)
                         {
-                            output = plotChart.AddGeometry(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
+                            output = plotChart.AddGeometry(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description);
                             if (output == null)
                                 subPlotList.Add(new ImportGeometryObject(index, geometry, "Insert", false));
                             else
@@ -177,7 +177,7 @@ namespace BExIS.Pmm.Model
                                         }
                                         else
                                         {
-                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.Color, geometry.Name, geometry.Description);
+                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description);
                                             if (output == null)
                                                 subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
                                             else

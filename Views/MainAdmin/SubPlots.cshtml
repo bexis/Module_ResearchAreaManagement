@@ -127,11 +127,15 @@
        .HtmlAttributes(new { @style = "width:85%;" })
        .SelectedIndex(0))
                 </td>
+                <td>Line Width:</td>
+                <td>
+                    <input type="text" style="height:28px;border-width:2px;" name="LineWidth" id="LineWidth" value="1" />
+                </td>
                 <td>Color:</td>
                 <!--td>//(Html.Telerik().DropDownList()
-                .Name("Color")
-                .BindTo(new SelectList(Model.colorList))
-                .SelectedIndex(0))</td-->
+    .Name("Color")
+    .BindTo(new SelectList(Model.colorList))
+    .SelectedIndex(0))</td-->
                 <td>
                     <input type="text" id="Color" style="height:28px;border-width:2px;width:180px;" class="demo" data-opacity="1" value="#f00">
                 </td>
@@ -647,6 +651,7 @@
     function addNewGeometry() {
         var errorsPlaceHolder = $("#errorPlaceHolder");
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value();
+        var lineWidth = $('#LineWidth').val();
         var Color = $('#Color').val();
         var ColorOpacity = Math.floor($('#Color').attr("data-opacity") * 255).toString(16);
         ColorOpacity = ColorOpacity.length > 1 ? "" + ColorOpacity : "0" + ColorOpacity;
@@ -675,6 +680,7 @@
                 coordinate: Coordinate,
                 geometryType: GeometryType,
                 coordinateType: CoordinateType,
+                lineWidth: lineWidth,
                 color: Color,
                 geometryId: geometryid,
                 name: name,
@@ -687,6 +693,7 @@
                 coordinate: Coordinate,
                 geometryType: GeometryType,
                 coordinateType: CoordinateType,
+                lineWidth: lineWidth,
                 color: Color,
                 name: name,
                 description: description,
