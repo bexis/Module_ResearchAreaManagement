@@ -217,7 +217,7 @@ namespace BExIS.Pmm.Model
         /// <param name="description"></param>
         /// <param name="referencePoint"></param>
         /// <returns>updated subplot</returns>
-        public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype,int lineWidth, string color, string name, string description, string referencePoint = "")
+        public GeometryInformation UpdateGeometry(long geometryId, string coordinate, string geometrytype, string coordinatetype,int lineWidth, string color, string name, string description, DateTime dateLastModify, string referencePoint = "")
         {
             using (GeometryManager gManager = new GeometryManager())
             using (GeometryHistoryManager gHManager = new GeometryHistoryManager())
@@ -238,6 +238,7 @@ namespace BExIS.Pmm.Model
                 geom.Color = color;
                 geom.Name = name;
                 geom.Description = description;
+                geom.Date = dateLastModify;
 
                 GeometryInformation geometry = gManager.Update(geom);
                 gHManager.Create(geometry.Plot.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.GeometryText, geometry.Name, geometry.Description, geometry.Id, "Update", DateTime.Now);

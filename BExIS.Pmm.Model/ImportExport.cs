@@ -177,7 +177,7 @@ namespace BExIS.Pmm.Model
                                         }
                                         else
                                         {
-                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description);
+                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, DateTime.Now);
                                             if (output == null)
                                                 subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
                                             else

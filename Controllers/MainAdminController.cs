@@ -315,7 +315,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         [HttpPost]
         public ActionResult _updateGeometry(string plotid, string coordinate, string geometrytype, string coordinatetype, int lineWidth, string color, long geometryId, string name, string description, string referencePoint = "")
         {
-            GeometryInformation result = helper.UpdateGeometry(geometryId, coordinate, geometrytype, coordinatetype, lineWidth, color, name, description, referencePoint);
+            GeometryInformation result = helper.UpdateGeometry(geometryId, coordinate, geometrytype, coordinatetype, lineWidth, color, name, description, DateTime.Now, referencePoint);
             return Json(result != null);
         }
 
