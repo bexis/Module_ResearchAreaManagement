@@ -73,27 +73,34 @@ namespace BExIS.Pmm.Model
                                     using (PlotManager pManager = new PlotManager())
                                     {
                                         Plot tempPlot = pManager.Repo.Get(x => x.Id == plot.Id).First();
-                                        if(tempPlot.Status ==2)
+                                        if (tempPlot == null)
                                         {
-                                            output = plotChart.ArchivePlot(plot.Id);
-                                            if (output == null)
-                                                plotList.Add(new ImportPlotObject(index, plot, "Unarchive", false));
-                                            else
-                                                plotList.Add(new ImportPlotObject(index, plot, "Unarchive", true));
+                                            plotList.Add(new ImportPlotObject(index, plot, "Plot id not exists.", false));
                                         }
                                         else
                                         {
-                                            if (plot.Status != 1 || plotChart.CheckDuplicatePlotName("update", plot.PlotId, plot.Id) == "valid")
-                                                output = plotChart.UpdatePlot(plot.Id, plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
+                                            if (tempPlot.Status == 2)
+                                            {
+                                                output = plotChart.ArchivePlot(plot.Id);
+                                                if (output == null)
+                                                    plotList.Add(new ImportPlotObject(index, plot, "Unarchive", false));
+                                                else
+                                                    plotList.Add(new ImportPlotObject(index, plot, "Unarchive", true));
+                                            }
                                             else
-                                                output = null;
+                                            {
+                                                if (plot.Status != 1 || plotChart.CheckDuplicatePlotName("update", plot.PlotId, plot.Id) == "valid")
+                                                    output = plotChart.UpdatePlot(plot.Id, plot.Coordinate, plot.GeometryType, plot.CoordinateType, plot.PlotId, plot.Latitude, plot.Longitude);
+                                                else
+                                                    output = null;
 
-                                            if (output == null)
-                                                plotList.Add(new ImportPlotObject(index, plot, "Update", false));
-                                            else
-                                                plotList.Add(new ImportPlotObject(index, plot, "Update", true));
+                                                if (output == null)
+                                                    plotList.Add(new ImportPlotObject(index, plot, "Update", false));
+                                                else
+                                                    plotList.Add(new ImportPlotObject(index, plot, "Update", true));
+                                            }
+
                                         }
-
                                     }
                                 break;
                                 case 2:
@@ -166,7 +173,13 @@ namespace BExIS.Pmm.Model
                             switch (geometry.Status)
                             {
                                 case 1:
-                                        GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometry.Id).First();
+                                    GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometry.Id).First();
+                                    if (geom == null)
+                                    {
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Subplot id not exists", false));
+                                    }
+                                    else
+                                    {
                                         if (geom.Status == 2)
                                         {
                                             output = plotChart.ArchiveGeometry(geometry.Id);
@@ -183,6 +196,7 @@ namespace BExIS.Pmm.Model
                                             else
                                                 subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", true));
                                         }
+                                    }
                                     break;
                                 case 2:
                                     var geomTemp = gManager.Repo.Get(a => a.Id == geometry.Id).FirstOrDefault();
