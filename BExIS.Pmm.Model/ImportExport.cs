@@ -47,7 +47,8 @@ namespace BExIS.Pmm.Model
                             plot.Latitude = values[5];
                             plot.Longitude = values[6];
                             plot.Status = Convert.ToByte(values[7]);
-                            plot.Id = values[0] == "" ? -1 : Convert.ToInt32(values[0]);
+                            string id = values[0].Replace(" ", "");
+                            plot.Id = id == "" ? -1 : Convert.ToInt32(values[0]);
                         }
                         catch
                         {
