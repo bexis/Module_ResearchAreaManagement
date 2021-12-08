@@ -147,7 +147,8 @@ namespace BExIS.Pmm.Model
                     {
                         var values = line.Split('|');
                         GeometryInformation geometry = new GeometryInformation();
-                        geometry.Id = values[2] == "" ? -1 : Convert.ToInt32(values[2]);
+                        string id = values[2].Replace(" ", "");
+                        geometry.Id = id == "" ? -1 : Convert.ToInt32(id);
                         geometry.Name = values[3];
                         geometry.GeometryType = values[4];
                         geometry.Coordinate = values[5];
@@ -159,6 +160,10 @@ namespace BExIS.Pmm.Model
                         geometry.PlotId = Convert.ToInt32(values[1]);
 
                         //String plotId = values[1];////////////////////////////// some problem for plotid
+
+                        //check color
+                        if (geometry.Color.Length <= 7)
+                            geometry.Color = geometry.Color + "AA";
 
                         if (geometry.Id == -1)
                         {
@@ -173,7 +178,7 @@ namespace BExIS.Pmm.Model
                             switch (geometry.Status)
                             {
                                 case 1:
-                                    GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometry.Id).First();
+                                    GeometryInformation geom = gManager.Repo.Get(x => x.Id == geometry.Id).FirstOrDefault();
                                     if (geom == null)
                                     {
                                         subPlotList.Add(new ImportGeometryObject(index, geometry, "Subplot id not exists", false));
@@ -200,21 +205,28 @@ namespace BExIS.Pmm.Model
                                     break;
                                 case 2:
                                     var geomTemp = gManager.Repo.Get(a => a.Id == geometry.Id).FirstOrDefault();
-                                    if (geomTemp.Status == 2)
+                                    if (geomTemp == null)
                                     {
-                                        output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, DateTime.Now);
-                                        if (output == null)
-                                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
-                                        else
-                                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", true));
+                                        subPlotList.Add(new ImportGeometryObject(index, geometry, "Subplot id not exists", false));
                                     }
                                     else
                                     {
-                                        output = plotChart.ArchiveGeometry(geometry.Id);
-                                        if (output == null)
-                                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Archive", false));
+                                        if (geomTemp.Status == 2)
+                                        {
+                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, DateTime.Now);
+                                            if (output == null)
+                                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
+                                            else
+                                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", true));
+                                        }
                                         else
-                                            subPlotList.Add(new ImportGeometryObject(index, geometry, "Archive", true));
+                                        {
+                                            output = plotChart.ArchiveGeometry(geometry.Id);
+                                            if (output == null)
+                                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Archive", false));
+                                            else
+                                                subPlotList.Add(new ImportGeometryObject(index, geometry, "Archive", true));
+                                        }
                                     }
                                     break;
                                 case 3:

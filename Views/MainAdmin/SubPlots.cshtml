@@ -83,7 +83,7 @@
                     ).Title("Color").HtmlAttributes("style='background-color:pink;'");
                 columns.Bound(c => c.Description).Width("25%");
                 columns.Template(@<text></text>).ClientTemplate(
-                "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(this, <#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
+                "<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updateGeometry(this, <#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= LineWidth #>', '<#= Color #>' , '<#= Name #>' , '<#= Description #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
                 columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick='archiveGeometry(<#= Id #>)'><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
                 columns.Template(@<text></text>).ClientTemplate("<a title='delete' href='#'" + "class='btn btn-sm' onclick='deleteGeometry(<#= Id #>)'><img id='delete-<#= Id #>' src='../../Areas/PMM/Images/delete.png' width='16'></a>").Title("Delete").Width(60);
             }))
@@ -129,7 +129,7 @@
                 </td>
                 <td>Line Width:</td>
                 <td>
-                    <input type="text" style="height:28px;border-width:2px;" name="LineWidth" id="LineWidth" value="1" />
+                    <input type="text" style="height:28px;border-width:2px;" name="LineWidth" id="LineWidth" />
                 </td>
                 <td>Color:</td>
                 <!--td>//(Html.Telerik().DropDownList()
@@ -503,9 +503,9 @@
         window.open("/PMM/MainAdmin/ExportPlot?id=" + plotId, "_blank");
     }
 
-    function updateGeometry(elem, id, geometryType, coordinate, coordinateType, color, name, description, referencePoint) {
+        function updateGeometry(elem, id, geometryType, coordinate, coordinateType, lineWidth, color, name, description, referencePoint) {
         cancelUpdate();
-        var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
+         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
         var opacity = parseInt(color.substring(7, 9), 16) / 255;
         $('#Color').val(color.substring(0, 7)).keyup();
         var ColorOpacity = $('#Color').attr("data-opacity", opacity);
@@ -515,7 +515,7 @@
             $(elem).parent().parent().addClass("edit");
         }
 
-
+        $('#LineWidth').val(lineWidth);
         $('#CoordinateType').data('tDropDownList').value(coordinateType);
         $('#Coordinate').val(coordinate);
         $('#GeometryIdHolder').val(id);
@@ -655,6 +655,7 @@
         var Color = $('#Color').val();
         var ColorOpacity = Math.floor($('#Color').attr("data-opacity") * 255).toString(16);
         ColorOpacity = ColorOpacity.length > 1 ? "" + ColorOpacity : "0" + ColorOpacity;
+
         Color += ColorOpacity;
         var CoordinateType = $('#CoordinateType').data('tDropDownList').value();
         var Coordinate = $('#Coordinate').val();
