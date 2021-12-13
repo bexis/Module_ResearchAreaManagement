@@ -155,8 +155,9 @@ namespace BExIS.Pmm.Model
                         geometry.CoordinateType = values[6];
                         geometry.LineWidth = Convert.ToByte(values[7]);
                         geometry.Color = values[8];
-                        geometry.Description = values[9];
-                        geometry.Status = Convert.ToByte(values[10]);
+                        geometry.ReferencePoint = values[9];
+                        geometry.Description = values[10];
+                        geometry.Status = Convert.ToByte(values[11]);
                         geometry.PlotId = Convert.ToInt32(values[1]);
 
                         //String plotId = values[1];////////////////////////////// some problem for plotid
@@ -167,7 +168,7 @@ namespace BExIS.Pmm.Model
 
                         if (geometry.Id == -1)
                         {
-                            output = plotChart.AddGeometry(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description);
+                            output = plotChart.AddGeometry(geometry.PlotId, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, geometry.ReferencePoint);
                             if (output == null)
                                 subPlotList.Add(new ImportGeometryObject(index, geometry, "Insert", false));
                             else
@@ -195,7 +196,7 @@ namespace BExIS.Pmm.Model
                                         }
                                         else
                                         {
-                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, DateTime.Now);
+                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, DateTime.Now, geometry.ReferencePoint);
                                             if (output == null)
                                                 subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
                                             else
@@ -213,7 +214,7 @@ namespace BExIS.Pmm.Model
                                     {
                                         if (geomTemp.Status == 2)
                                         {
-                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, DateTime.Now);
+                                            output = plotChart.UpdateGeometry(geometry.Id, geometry.Coordinate, geometry.GeometryType, geometry.CoordinateType, geometry.LineWidth, geometry.Color, geometry.Name, geometry.Description, DateTime.Now, geometry.ReferencePoint);
                                             if (output == null)
                                                 subPlotList.Add(new ImportGeometryObject(index, geometry, "Update", false));
                                             else
@@ -277,11 +278,11 @@ namespace BExIS.Pmm.Model
             {
                 List<GeometryInformation> geometryList = new List<GeometryInformation>();
                 geometryList = gManager.Repo.Get().ToList();
-                string headerLine = "plotId|internal plotId|geometryId|geometry name|geometry type|coordinate|coordinate type|line width|color|description|status" + "\n";
+                string headerLine = "plotId|internal plotId|geometryId|geometry name|geometry type|coordinate|coordinate type|line width|color|reference point|description|status" + "\n";
                 output += headerLine;
                 foreach (var geometry in geometryList.OrderByDescending(a=>a.Plot.Id))
                 {
-                    string line = geometry.Plot.PlotId + "|" + geometry.Plot.Id + "|" + geometry.Id + "|" + geometry.Name + "|" + geometry.GeometryType + "|" + geometry.Coordinate + "|" + geometry.CoordinateType + "|" + geometry.LineWidth + "|" + geometry.Color + "|" + geometry.Description + "|" + geometry.Status + "\n";
+                    string line = geometry.Plot.PlotId + "|" + geometry.Plot.Id + "|" + geometry.Id + "|" + geometry.Name + "|" + geometry.GeometryType + "|" + geometry.Coordinate + "|" + geometry.CoordinateType + "|" + geometry.LineWidth + "|" + geometry.Color + "|" + geometry.ReferencePoint + "|" + geometry.Description + "|" + geometry.Status + "\n";
                     output += line;
                 }
                 return output;
@@ -293,11 +294,11 @@ namespace BExIS.Pmm.Model
             String output = "";
             Plotchart plotChart = new Plotchart();
             Plot plot = plotChart.GetPlot(id);
-            string headerLine = "plotId|internal plotId|geometryId|geometry name|geometry type|coordinate|coordinate type|line width|color|description|status" + "\n";
+            string headerLine = "plotId|internal plotId|geometryId|geometry name|geometry type|coordinate|coordinate type|line width|color|reference point|description|status" + "\n";
             output += headerLine;
             foreach (var geometry in plot.Geometries)
             {
-                string line = geometry.Plot.PlotId + "|" + geometry.Plot.Id + "|" + geometry.Id + "|" + geometry.Name + "|" + geometry.GeometryType + "|" + geometry.Coordinate + "|" + geometry.CoordinateType + "|" + geometry.LineWidth + "|" + geometry.Color + "|" + geometry.Description + "|" + geometry.Status + "\n";
+                string line = geometry.Plot.PlotId + "|" + geometry.Plot.Id + "|" + geometry.Id + "|" + geometry.Name + "|" + geometry.GeometryType + "|" + geometry.Coordinate + "|" + geometry.CoordinateType + "|" + geometry.LineWidth + "|" + geometry.Color + "|" + geometry.ReferencePoint + "|" + geometry.Description + "|" + geometry.Status + "\n";
                 output += line;
             }
             return output;
