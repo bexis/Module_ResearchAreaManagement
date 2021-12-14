@@ -465,7 +465,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         public ActionResult ExportAllPlots(bool withSubplots = false)
         {
             ImportExport importExport = new ImportExport();
-            return File(Encoding.ASCII.GetBytes(importExport.ExportAllPlots()), "text/csv", "PlotList.csv");
+            return File(Encoding.ASCII.GetBytes(importExport.ExportAllPlots()), "text/csv", "AllPlotList_" + DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
            
         }
 
@@ -476,7 +476,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         public ActionResult ExportAllGeometries()
         {
             ImportExport importExport = new ImportExport();
-            return File(Encoding.ASCII.GetBytes(importExport.ExportAllGeometries()), "text/csv", "SubplotList.csv");
+            return File(Encoding.ASCII.GetBytes(importExport.ExportAllGeometries()), "text/csv", "AllSubplotList_"+ DateTime.Now.ToString("yyyy-MM-dd") +".csv");
         }
 
         /// <summary>
@@ -487,7 +487,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         public ActionResult ExportPlot(long id)
         {
             ImportExport importExport = new ImportExport();
-            return File(Encoding.ASCII.GetBytes(importExport.ExportPlotGeometries(id)), "text/csv", "SubplotList.csv");
+            Plotchart plotChart = new Plotchart();
+            string plotid = plotChart.GetPlot(id).PlotId;
+            return File(Encoding.ASCII.GetBytes(importExport.ExportPlotGeometries(id)), "text/csv", plotid + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
         }
     }
 }
