@@ -51,6 +51,7 @@
 
             <td><a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a></td>
             <td valign="bottom"><a href="#" title="Export CSV" onclick="exportPlot()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>
+            @*<td valign="bottom"><a href="#" title="Export To GeoJson" onclick="ExportToJson()" class = "bx-button function"> Export to GeoJson</a></td>*@
         </tr>
 
     </table>
@@ -381,7 +382,12 @@
 
     function Gridsize_ComboBox_onChange(e){
         UpdatePlotChart();
-    }
+        }
+
+        function ExportToJson() {
+            var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+            window.open("/PMM/MainAdmin/ExportGeoJson?id=" + plotId, "_blank");
+        }
 
 
     function DownloadPdf() {
@@ -496,7 +502,9 @@
         });
 
         LoadPackageAndBindGrid();
-    }
+        }
+
+
 
     function exportPlot() {
         var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()

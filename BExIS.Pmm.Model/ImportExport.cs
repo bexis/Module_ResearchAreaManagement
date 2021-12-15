@@ -19,9 +19,9 @@ using Newtonsoft.Json.Linq;
 
 namespace BExIS.Pmm.Model
 {
-    public class ImportExport
+    static public class ImportExport
     {
-        public List<ImportPlotObject> PlotBatchImport(Stream inputFile)
+       static public List<ImportPlotObject> PlotBatchImport(Stream inputFile)
         {
             Plotchart plotChart = new Plotchart();
             Plot output;
@@ -129,7 +129,7 @@ namespace BExIS.Pmm.Model
             return plotList;
         }
 
-        public List<ImportGeometryObject> SubPlotBatchImport(Stream inputFile)
+       static public List<ImportGeometryObject> SubPlotBatchImport(Stream inputFile)
         {
             Plotchart plotChart = new Plotchart();
             GeometryInformation output;
@@ -250,7 +250,7 @@ namespace BExIS.Pmm.Model
             return subPlotList;
         }
 
-        public String ExportAllPlots()
+       static public String ExportAllPlots()
         {
             String output = "";
             string headerLine = "internal plotId|plotId|geometry type|coordinate|coordinate type|Latitude|Longitude|status" + "\n";
@@ -271,7 +271,7 @@ namespace BExIS.Pmm.Model
         /// get all subplots/geometries as | separated string
         /// </summary>
         /// <returns>string</returns>
-        public string ExportAllGeometries()
+       static public string ExportAllGeometries()
         {
             string output = "";
             using (GeometryManager gManager = new GeometryManager())
@@ -289,7 +289,7 @@ namespace BExIS.Pmm.Model
             }
         }
 
-        public String ExportPlotGeometries(long id)
+       static public String ExportPlotGeometries(long id)
         {
             String output = "";
             Plotchart plotChart = new Plotchart();
@@ -304,7 +304,46 @@ namespace BExIS.Pmm.Model
             return output;
         }
 
-        public String ExportToGeoJSON(long id)
+        static public String ExportAllToGeoJSON()
+        {
+            using (GeometryManager gManager = new GeometryManager())
+            {
+                List<GeometryInformation> geometryList = new List<GeometryInformation>();
+                geometryList = gManager.Repo.Get().ToList();
+
+                String output = "";
+
+                JArray featureArray = new JArray();
+                foreach (var geometry in geometryList.OrderByDescending(a => a.Plot.Id))
+                {
+                    try
+                    {
+                            var test = geometry.Geometry.ToString();
+                            var feature = GeometryFactory.WktToFeature(test);
+                            feature.Properties.Add("name", geometry.Plot.PlotId + " - " + geometry.Name);
+                            var fc = new FeatureCollection(new Terradue.GeoJson.Feature.Feature[] { feature }.ToList());
+
+                            output = JsonSerializer.SerializeToString(fc);
+                            output = output.Replace("{\"features\":[", "").Replace("],\"type\":\"FeatureCollection\"}", "");
+
+                            JObject jobject = JObject.Parse(output);
+                            if (!jobject.ToString().Equals("{}"))
+                                featureArray.Add(jobject);
+                    }
+                    catch (Exception e) { continue; }
+                
+                }
+                JObject geoJson = new JObject();
+                geoJson.Add("type", "FeatureCollection");
+                geoJson.Add("features", featureArray);
+                output = geoJson.ToString();
+
+                return output;
+            }
+        }
+
+
+        static public String ExportToGeoJSON(long id)
         {
             String output = "";
             Plotchart plotChart = new Plotchart();

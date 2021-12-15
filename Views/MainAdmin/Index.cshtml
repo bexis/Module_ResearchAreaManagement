@@ -49,18 +49,24 @@
        )
             </td>
             <td style="border-right: #ebebeb solid thin">
-            <a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a>
+                <a href="#" title="Download pdf" onclick="DownloadPdf()"> <img src="~/Areas/PMM/Images/pdf.png"> </a>
             </td>
 
-            <td valign="bottom" width="70px"><a href="#" title="Export CSV" onclick="exportAllPlots()">
-            <img src="~/Areas/PMM/Images/csv-48.png"  title="export all plots"> <small>export all plots</small></a>
+            <td valign="bottom" width="70px">
+                <a href="#" title="Export CSV" onclick="exportAllPlots()">
+                    <img src="~/Areas/PMM/Images/csv-48.png" title="export all plots"> <small>export all plots</small>
+                </a>
             </td>
             <td valign="bottom" width="70px">
                 <a href="#" title="Export CSV" onclick="exportAllSubPlots()">
-                    <img src="~/Areas/PMM/Images/csv-48.png"  title="export all subplots"><small>export all subplots</small></a> 
+                    <img src="~/Areas/PMM/Images/csv-48.png" title="export all subplots"><small>export all subplots</small>
+                </a>
             </td>
             <td>
                 @Html.ActionLink("Import data", "ImportInformation", "MainAdmin", new { area = "PMM" }, new { @class = "bx-button function", title = "Import", style = "width: 100%;  margin-bottom: 5px;" })
+            </td>
+            <td>
+            @*<a href="#" title="Export To GeoJson" onclick="ExportToJson()" class="bx-button function"> Export to GeoJson</a>*@
             </td>
         </tr>
     </table>
@@ -333,6 +339,10 @@
     function exportAllSubPlots() {
        
         window.open("/PMM/MainAdmin/ExportAllGeometries", "_blank");
+    }
+
+    function ExportToJson() {
+        window.open("/PMM/MainAdmin/ExportAllGeoJson", "_blank");
     }
 
     function updatePlot(id, geometryType, coordinate, coordinateType, name, latitude, longitude, referencePoint) {

@@ -188,7 +188,15 @@
     <Content Include="Scripts\girdExtra.js" />
     <Content Include="Scripts\jquery.minicolors.js" />
     <Content Include="Stylesheets\**" />
-    <Content Include="Views\**" />
+    <Content Include="Views\MainAdmin\ImportInformation.cshtml" />
+    <Content Include="Views\MainAdmin\Index.cshtml" />
+    <Content Include="Views\MainAdmin\SubPlots.cshtml" />
+    <Content Include="Views\Main\ImportInformation.cshtml" />
+    <Content Include="Views\Main\Index.cshtml" />
+    <Content Include="Views\Main\SubPlots.cshtml" />
+    <Content Include="Views\Shared\Error.cshtml" />
+    <Content Include="Views\Web.config" />
+    <Content Include="Views\_ViewStart.cshtml" />
     <None Include="packages.config" />
     <Content Include="Views\MainAdmin\PlotchartImageView.cshtml" />
     <None Include="web.Debug.config">
