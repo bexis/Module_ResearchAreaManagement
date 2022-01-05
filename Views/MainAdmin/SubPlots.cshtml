@@ -544,6 +544,7 @@
         $('#Coordinate').css("border-color", "#000000");
         $('#errorPlaceHolder').html("");
         $(".edit").removeClass("edit");
+        clearForm();
     }
 
     function archiveGeometry(id) {
@@ -653,7 +654,20 @@
                 }
             }
         });
-    }
+        }
+
+        function clearForm()
+        {
+            $('#Name').val("");
+            $('#Coordinate').val("");
+            $('#Description').val("");
+            $('#ReferencePoint').val("");
+            $('#GeometryType').val(1);
+            $('#LineWidth').val("");
+            $('#Color').val("");
+            $('#CoordinateType').val(1);
+
+        }
 
 
     function addNewGeometry() {
@@ -726,6 +740,7 @@
                     LoadPackageAndBindGrid(plotid);
                     UpdatePlotChart();
                     cancelUpdate();
+                    clearForm();
                 } else {
 
                     alert("Coordinate text is wrong!");
