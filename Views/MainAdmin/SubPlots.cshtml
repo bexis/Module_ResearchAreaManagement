@@ -673,7 +673,13 @@
     function addNewGeometry() {
         var errorsPlaceHolder = $("#errorPlaceHolder");
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value();
+        $('#LineWidth').css("border-color", "#000000");
         var lineWidth = $('#LineWidth').val();
+        if (lineWidth.length == 0) {
+            $('#LineWidth').css("border-color", "#FF0000");
+            errorsPlaceHolder.html("Please enter a line width. <br>");
+            return;
+        }
         var Color = $('#Color').val();
         var ColorOpacity = Math.floor($('#Color').attr("data-opacity") * 255).toString(16);
         ColorOpacity = ColorOpacity.length > 1 ? "" + ColorOpacity : "0" + ColorOpacity;
@@ -692,6 +698,7 @@
             errorsPlaceHolder.html("Coordinate data format is not correct.<br>");
             return;
         }
+
         errorsPlaceHolder.html("");
 
         var Url = '/PMM/MainAdmin/_newGeometry';
