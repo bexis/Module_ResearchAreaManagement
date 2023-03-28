@@ -318,7 +318,7 @@ namespace BExIS.Pmm.Model
         {
             using (PlotManager pcManager = new PlotManager())
             {
-                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-")).ToList(); // get all plot names without a "-" -> "old" plots
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-") && x.Status == 1).ToList(); // get all plot names without a "-" -> "old" plots
 
                 return plots;
             }
@@ -332,7 +332,7 @@ namespace BExIS.Pmm.Model
         {
             using (PlotManager pcManager = new PlotManager())
             {
-                IList<Plot> plots = pcManager.Repo.Query().Where(x => x.PlotId.Contains("-")).ToList(); // get all plot names with a "-" -> new experiments
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => x.PlotId.Contains("-") && x.Status == 1).ToList(); // get all plot names with a "-" -> new experiments
                 return plots;
             }
         }
