@@ -361,6 +361,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         [HttpPost]
         public ActionResult ImportInformation(IEnumerable<HttpPostedFileBase> attachments, String type)
         {
+            string dataPath = AppConfiguration.DataPath;
             // The Name of the Upload component is "attachments"                            
             if (attachments != null)
             {
@@ -368,7 +369,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                 {
                     // Some browsers send file names with full path. We only care about the file name.
                     var fileName = Path.GetFileName(file.FileName);
-                    var destinationPath = Path.Combine(Server.MapPath("~/App_Data"), fileName);
+                    var destinationPath = Path.Combine(dataPath, "PMM", "Temp", fileName);
 
                     file.SaveAs(destinationPath);
                     List<ImportPlotObject> plotList = null;
@@ -423,7 +424,6 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                 FileInfo reportFile = null;
                 try
                 {
-                    string dataPath = AppConfiguration.DataPath;
                     string storePath = Path.Combine(dataPath, "PMM", "Temp", "ImportReport_" + DateTime.Now.ToString("yyyy-MM-dd") + ".csv");
 
                     System.IO.File.WriteAllLines(storePath, lines);

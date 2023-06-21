@@ -318,7 +318,7 @@ namespace BExIS.Pmm.Model
         {
             using (PlotManager pcManager = new PlotManager())
             {
-                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-")).ToList(); // get all plot names without a "-" -> "old" plots
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-") && x.Status == 1).ToList(); // get all plot names without a "-" -> "old" plots
 
                 return plots;
             }
@@ -332,7 +332,7 @@ namespace BExIS.Pmm.Model
         {
             using (PlotManager pcManager = new PlotManager())
             {
-                IList<Plot> plots = pcManager.Repo.Query().Where(x => x.PlotId.Contains("-")).ToList(); // get all plot names with a "-" -> new experiments
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => x.PlotId.Contains("-") && x.Status == 1).ToList(); // get all plot names with a "-" -> new experiments
                 return plots;
             }
         }
@@ -448,9 +448,11 @@ namespace BExIS.Pmm.Model
                 {
                     beyondPlot = true;
                 }
-#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+
+
                 myMap = plot != null ? InitializeMap(new Size(3000, 3000), plot, zoom, deactiveGeometries, beyondPlot, gridSize) : null;
-#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
+
+
 
                 Image mapImage = CreateMap(myMap); //mapImage.Save("file.png", ImageFormat.Png);
                 string mimeType = "image/jpg";/* Get mime type somehow (e.g. "image/png") */;
@@ -1008,7 +1010,7 @@ namespace BExIS.Pmm.Model
                 SharpMap.Data.FeatureDataRow newRowBorder = borderFdt.NewRow();
                 newRowBorder.Geometry = test;
                 if(!String.IsNullOrEmpty(lastModifyDate))
-                    newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n" + "Last modified: " + lastModifyDate + "\n";
+                    newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n" + "Date: " + lastModifyDate + "\n";
                 else
                     newRowBorder["Label"] = "Plot " + plot.PlotId + "\t\n";
 

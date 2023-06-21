@@ -22,6 +22,13 @@
 <script src="@Url.Content("~/Areas/PMM/Scripts/jquery.minicolors.js")" type="text/javascript"></script>
 <script src="@Url.Content("~/Areas/PMM/Scripts/girdExtra.js")" type="text/javascript"></script>
 
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/select/1.3.4/css/select.dataTables.min.css">
+<script src="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.6.2/js/dataTables.select.min.js"></script>
+
+
+
 
 <div>
     <table style="width:800px;">
@@ -66,47 +73,121 @@
                 @Html.ActionLink("Import data", "ImportInformation", "MainAdmin", new { area = "PMM" }, new { @class = "bx-button function", title = "Import", style = "width: 100%;  margin-bottom: 5px;" })
             </td>
             <td>
-            @*<a href="#" title="Export To GeoJson" onclick="ExportToJson()" class="bx-button function"> Export to GeoJson</a>*@
+                @*<a href="#" title="Export To GeoJson" onclick="ExportToJson()" class="bx-button function"> Export to GeoJson</a>*@
             </td>
         </tr>
     </table>
-    @(Html.Telerik().Grid<Plot>()
-            .Name("plotchart_geometries")
-            .DataBinding(dataBinding => dataBinding
-             //Ajax binding
-             .Ajax()
-                   //The action method which will return JSON and its arguments
-                   .Select("_AjaxBindingPlots", "MainAdmin")
 
-            )
-            .Pageable(paging =>
-                paging
-                        .Style(pagerStyles).Enabled(true)
-                        .PageSize(10)
-                    .Position(GridPagerPosition.Both)
-                        .PageTo(1)
-                    )
-            .Sortable()
-            .ClientEvents(x => x.OnDataBound("UpdateIcons"))
-            .Filterable()
-            //.ClientEvents(events => events.OnRowSelect("PlotonRowSelect"))
-            //.ClientEvents(events => events.OnRowDataBound("PlotOnRowDataBound"))
-            .Columns(columns =>
+
+    <table id="plotcharts">
+        <thead>
+            <tr>
+                <th class="select-checkbox"><input id="checkBox" type="checkbox"></th>
+                <th>Id</th>
+                <th>PlotId</th>
+                <th>GeometryType</th>
+                <th>Coordinate</th>
+                <th>GeometryType</th>
+                <th>Latitude</th>
+                <th>Longitude</th>
+                <th>Edit</th>
+                <th>Archive</th>
+                <th>Export</th>
+                <th>PDF</th>
+                <th>List</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (int i = 0; i < Model.plotlist.Count(); i++)
             {
-            columns.Bound(x => x.Id).Format("<input type='checkbox'  value='{0}' onclick='OnChekBox(this)'>").Encoded(false).Width(60).Title("<input type='checkbox' onclick='selectAll(this)'>").Sortable(false).Filterable(false);
-            columns.Bound(c => c.PlotId);
-            columns.Bound(c => c.GeometryType).EditorViewData(new { geometryType = Model.geometryType });
-            columns.Bound(c => c.Coordinate);
-            columns.Bound(c => c.CoordinateType);
-            columns.Bound(c => c.Latitude);
-            columns.Bound(c => c.Longitude);
+                <tr id="@Model.plotlist[i].Id.ToString()">
+                    <td></td>
+                    <td>
+                        @Model.plotlist[i].Id
+                    </td>
+                    <td>
+                        @Model.plotlist[i].PlotId
+                    </td>
+                    <td>
+                        @Model.plotlist[i].GeometryType
+                    </td>
+                    <td>
+                        @Model.plotlist[i].Coordinate
+                    </td>
+                    <td>
+                        @Model.plotlist[i].CoordinateType
+                    </td>
+                    <td>
+                        @Model.plotlist[i].Latitude
+                    </td>
+                    <td>
+                        @Model.plotlist[i].Longitude
+                    </td>
+                    <td>
+                        <a title='edit' href='#' class='btn btn-sm' onclick='updatePlot(@Model.plotlist[i].Id, "@Model.plotlist[i].GeometryType" ,"@Model.plotlist[i].Coordinate" ," @Model.plotlist[i].CoordinateType" ,  "@Model.plotlist[i].PlotId" , "@Model.plotlist[i].Latitude", "@Model.plotlist[i].Longitude","@Model.plotlist[i].ReferencePoint")'><img id='edit-<#= @Model.plotlist[i].Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>
+                    </td>
+                    <td>
+                        <input type='hidden' value='@Model.plotlist[i].Status' name='@Model.plotlist[i].Id' /><a title='archive' href="#" class='btn btn-sm' onclick='archivePlot(@Model.plotlist[i].Id, "@Model.plotlist[i].PlotId")'><img id='archive-@Model.plotlist[i].Id' src='../../Areas/PMM/Images/archive.png' width='16'></a>
+                    </td>
+                    <td>
+                        <a title='download' href="#" class='btn btn-sm' onclick='exportPlot(@Model.plotlist[i].Id)' id='export-@Model.plotlist[i].Id'><img src='../../Areas/PMM/Images/download.png' width='16'></a>
+                    </td>
+                    <td>
+                        <a title='pdf' href="#" class='btn btn-sm' onclick='exportPlotPdf(@Model.plotlist[i].Id)' id='export-@Model.plotlist[i].Id'><img src='../../Areas/PMM/Images/pdf.png' width='16'></a>
+                    </td>
+                    <td>
+                        <a title='list' href="#" class='btn btn-sm' onclick='openPlot(@Model.plotlist[i].Id)' id='list-@Model.plotlist[i].Id'><img src='../../Areas/PMM/Images/list.png' width='16'></a>
+                    </td>
 
-            columns.Template(@<text></text>).ClientTemplate("<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updatePlot(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= PlotId #>', '<#= Latitude #>', '<#= Longitude #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
-            columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick=\"archivePlot(<#= Id #>, '<#= PlotId #>')\"><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
-            columns.Template(@<text></text>).ClientTemplate("<a title='download' href='#'" + "class='btn btn-sm' onclick='exportPlot(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/download.png' width='16'></a>").Title("Export").Width(60);
-            columns.Template(@<text></text>).ClientTemplate("<a title='pdf' href='#'" + "class='btn btn-sm' onclick='exportPlotPdf(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/pdf.png' width='16'></a>").Title("Pdf").Width(60);
-            columns.Template(@<text></text>).ClientTemplate("<a title='list' href='#'" + "class='btn btn-sm' onclick='openPlot(<#= Id #>)' id='list-<#= Id #>'><img src='../../Areas/PMM/Images/list.png' width='16'></a>").Title("List").Width(60);
-            }))
+                </tr>
+            }
+        </tbody>
+    </table>
+
+
+
+
+
+
+
+
+    @*@(Html.Telerik().Grid<Plot>()
+        .Name("plotchart_geometries")
+        .DataBinding(dataBinding => dataBinding
+         //Ajax binding
+         .Ajax()
+               //The action method which will return JSON and its arguments
+               .Select("_AjaxBindingPlots", "MainAdmin")
+
+        )
+        .Pageable(paging =>
+            paging
+                    .Style(pagerStyles).Enabled(true)
+                    .PageSize(10)
+                .Position(GridPagerPosition.Both)
+                    .PageTo(1)
+                )
+        .Sortable()
+        .ClientEvents(x => x.OnDataBound("UpdateIcons"))
+        .Filterable()
+        //.ClientEvents(events => events.OnRowSelect("PlotonRowSelect"))
+        //.ClientEvents(events => events.OnRowDataBound("PlotOnRowDataBound"))
+        .Columns(columns =>
+        {
+        columns.Bound(x => x.Id).Format("<input type='checkbox'  value='{0}' onclick='OnChekBox(this)'>").Encoded(false).Width(60).Title("<input type='checkbox' onclick='selectAll(this)'>").Sortable(false).Filterable(false);
+        columns.Bound(c => c.PlotId);
+        columns.Bound(c => c.GeometryType).EditorViewData(new { geometryType = Model.geometryType });
+        columns.Bound(c => c.Coordinate);
+        columns.Bound(c => c.CoordinateType);
+        columns.Bound(c => c.Latitude);
+        columns.Bound(c => c.Longitude);
+
+        columns.Template(@<text></text>).ClientTemplate("<a title='edit' href='#'" + "class='btn btn-sm' onclick=\"updatePlot(<#= Id #>, '<#= GeometryType #>' , '<#= Coordinate #>' , '<#= CoordinateType #>' , '<#= PlotId #>', '<#= Latitude #>', '<#= Longitude #>', '<#= ReferencePoint #>')\"><img id='edit-<#= Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>").Title("Edit").Width(60);
+        columns.Template(@<text></text>).ClientTemplate("<input type='hidden' value='<#= Status  #>' name='<#= Id #>'/><a title='archive' href='#'" + "class='btn btn-sm' onclick=\"archivePlot(<#= Id #>, '<#= PlotId #>')\"><img id='archive-<#= Id #>' src='../../Areas/PMM/Images/archive.png' width='16'></a>").Title("Archive").Width(70);
+        columns.Template(@<text></text>).ClientTemplate("<a title='download' href='#'" + "class='btn btn-sm' onclick='exportPlot(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/download.png' width='16'></a>").Title("Export").Width(60);
+        columns.Template(@<text></text>).ClientTemplate("<a title='pdf' href='#'" + "class='btn btn-sm' onclick='exportPlotPdf(<#= Id #>)' id='export-<#= Id #>'><img src='../../Areas/PMM/Images/pdf.png' width='16'></a>").Title("Pdf").Width(60);
+        columns.Template(@<text></text>).ClientTemplate("<a title='list' href='#'" + "class='btn btn-sm' onclick='openPlot(<#= Id #>)' id='list-<#= Id #>'><img src='../../Areas/PMM/Images/list.png' width='16'></a>").Title("List").Width(60);
+        }))*@
 </div>
 <div>
     <table style="width:1200px;">
@@ -135,7 +216,7 @@
             <td>
                 <input type="text" style="height:28px;border-width:2px;" name="ReferencePoint" id="ReferencePoint" />
             </td>
-            </tr>
+        </tr>
         <tr>
             <td>Geometry Type:</td>
             <td>
@@ -308,6 +389,37 @@
         LoadPackageAndBindGrid();
     }
 
+    $(document).ready(function () {
+        tbl = $("#plotcharts").DataTable({
+            columnDefs: [{
+                orderable: false,
+                className: 'select-checkbox',
+                targets: 0
+            }],
+            select: {
+                style: 'os',
+                selector: 'td:first-child'
+            },
+            order: [[1, 'asc']],
+            lengthMenu: [
+                [10, 25, 50, -1],
+                [10, 25, 50, 'All'],
+            ]
+        });
+
+    });
+
+    //select or deselect all
+    $('#checkBox').on('click', function () {
+        if ($('#checkBox').is(':checked')) {
+            tbl.rows().select();
+        }
+        else {
+            tbl.rows().deselect();
+        }
+    });
+
+
     function LoadPackageAndBindGrid() {
 
         //var plotId = comboboxPlotChart.value();
@@ -329,15 +441,15 @@
         var grid = $('#plotchart_geometries').data('tGrid');
         grid.ajaxRequest();
         // Reload The Package Details
-    
+
     }
 
     function exportAllPlots() {
-        
+
         window.open("/PMM/MainAdmin/ExportAllPlots", "_blank");
     }
     function exportAllSubPlots() {
-       
+
         window.open("/PMM/MainAdmin/ExportAllGeometries", "_blank");
     }
 
@@ -349,7 +461,7 @@
         console.log("test");
         removeErrors();
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value(geometryType.toLowerCase());
-        
+
         $('#CoordinateType').data('tDropDownList').value(coordinateType);
         $('#Coordinate').val(coordinate);
         if ($('#PlotIdHolder').val() != id && $('#PlotIdHolder').val() != "")
@@ -379,6 +491,7 @@
     }
 
     function archivePlot(id, name) {
+        console.log(id);
         var data = {
             plotid: id,
             name: name
@@ -416,8 +529,8 @@
             }
             else if (($(this).val() == "3"))
                 $("#delete-" + $(this).attr("name")).attr("src", "../../Areas/PMM/Images/deleted.png");
-                //$("#export-" + $(this).attr("name")).attr("onclick", "");
-                //$("#list-" + $(this).attr("name")).attr("onclick", "");
+            //$("#export-" + $(this).attr("name")).attr("onclick", "");
+            //$("#list-" + $(this).attr("name")).attr("onclick", "");
         });
     }
 
@@ -446,18 +559,16 @@
         var beyondborder = $('#BeyondBorder').is(':checked');
         var legend = $('#Legend').is(':checked');
         var gridSize = comboboxGridSize.value();
-        //var plotIds = $("#SelectedPlotsId").val();
-        var plotIds = $('#plotchart_geometries input[type=checkbox]:checked').map(function () {
-            return this.value;
-        }).get();
-        plotIds.shift();
-        plotIds.join(",");
-        if (plotIds == ",")
-            return;
+        
+        var plotIds = [];
+        $.each(tbl.rows('.selected').nodes(), function (i, item) {
+            plotIds.push(item.id);
+        });
+
         var params = "ids=" + plotIds + "&DeactivePlot=" + deactiveplot + "&beyondPlot=" + beyondborder + "&gridSize=" + gridSize + "&legend=" + legend;
         window.open("/PMM/MainAdmin/GetPDFBatch?" + params, "_blank");
     }
-    
+
     function openPlot(id) {
         window.open("/PMM/MainAdmin/SubPlots?plotId=" + id, "_blank");
     }
@@ -488,7 +599,7 @@
                 regGeometry = "false";
             }
         }
-            //polar - Coordinates
+        //polar - Coordinates
         else if (coordType == "polar") {
             if (geometryType == "rectangle") {
                 regGeometry = "^\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\),\\(-?\\d+(\\.\\d+)*,-?\\d+(\\.\\d+)*\\)$";
@@ -557,18 +668,18 @@
         $("#Name").css("border-color", "#000000");
     }
 
-    function selectAll(e) {
-        var pageSize = $('#plotchart_geometries > div.t-grid-pager.t-grid-top > div.t-pager.t-reset > div.t-page-size > div > div > span.t-input').text();
-        pageSize = pageSize + 1;
-        if ($(e).is(':checked')) {
-            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", true) : $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", false);
-            $("#SelectedPlotsId").val($("#AllPlotsId").val());
-        } else {
-            var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", true) : $('#plotchart_geometries input:checkbox').slice(0,pageSize).attr("checked", false);
-            $("#SelectedPlotsId").val(",");
-        }
-       
-    }
+    //function selectAll(e) {
+    //    var pageSize = $('#plotchart_geometries > div.t-grid-pager.t-grid-top > div.t-pager.t-reset > div.t-page-size > div > div > span.t-input').text();
+    //    pageSize = pageSize + 1;
+    //    if ($(e).is(':checked')) {
+    //        var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').slice(0, pageSize).attr("checked", true) : $('#plotchart_geometries input:checkbox').slice(0, pageSize).attr("checked", false);
+    //        $("#SelectedPlotsId").val($("#AllPlotsId").val());
+    //    } else {
+    //        var assetGrid = $(e).attr("checked") ? $('#plotchart_geometries input:checkbox').slice(0, pageSize).attr("checked", true) : $('#plotchart_geometries input:checkbox').slice(0, pageSize).attr("checked", false);
+    //        $("#SelectedPlotsId").val(",");
+    //    }
+
+    //}
 
 
     function addNewPlot() {
@@ -583,12 +694,11 @@
         var id = $('#PlotIdHolder').val();
         var ReferencePoint = $('#ReferencePoint').val();
 
-        if(name.length < 1)
-        {
+        if (name.length < 1) {
             addErrors("Name is mandatory.", "#Name")
         }
-        
-        if (!checkGeometry(GeometryType, CoordinateType, Coordinate)) 
+
+        if (!checkGeometry(GeometryType, CoordinateType, Coordinate))
             addErrors("Coordinate data format is not correct.", "#Coordinate")
         if (!$.isNumeric(Latitude))
             addErrors("Latitude is needed to be numeric.", "#Latitude")
@@ -596,7 +706,7 @@
             addErrors("Longitude is needed to be numeric.", "#Longitude")
         if (errorsPlaceHolder.html() != "")
             return;
-        
+
 
         var Url = '/PMM/MainAdmin/_newPlot';
         if ($("#newPlot").val() == "Update") {
