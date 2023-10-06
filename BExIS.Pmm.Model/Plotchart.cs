@@ -514,9 +514,112 @@ namespace BExIS.Pmm.Model
 
             plot.Geometries = plot.Geometries.OrderByDescending(p => p.Geometry.Length).ToList();
 
-            #region add plot middle cross layers
+            #region add plot border
 
-            string text1 = calCoordd("linestring", "(-1,1),(0,0)", bb, "xy", "");
+            string textBorder1="";
+            string textBorder2="";
+            string textBorder3="";
+            string textBorder4="";
+
+            if(plot.PlotId.Contains("W") && plot.PlotId.Length <= 5)
+            {
+                 textBorder1 = calCoordd("linestring", "(-50,-50),(50,-50)", bb, "xy", "");
+                 textBorder2 = calCoordd("linestring", "(50,50),(50,-50)", bb, "xy", "");
+
+                 textBorder3 = calCoordd("linestring", "(50,-50),(-50,-50)", bb, "xy", "");
+                 textBorder4 = calCoordd("linestring", "(50,-50),(50,50)", bb, "xy", "");
+            }
+            else if(plot.PlotId.Contains("G") && plot.PlotId.Length <= 5)
+            {
+                textBorder1 = calCoordd("linestring", "(-25,-25),(25,-25)", bb, "xy", "");
+                textBorder2 = calCoordd("linestring", "(25,25),(25,-25)", bb, "xy", "");
+
+                textBorder3 = calCoordd("linestring", "(25,-25),(-25,-25)", bb, "xy", "");
+                textBorder4 = calCoordd("linestring", "(25,-25),(25,25)", bb, "xy", "");
+            }
+            else
+            {
+                textBorder1 = calCoordd("linestring", "(-35,-35),(35,-35)", bb, "xy", "");
+                textBorder2 = calCoordd("linestring", "(35,35),(35,-35)", bb, "xy", "");
+
+                textBorder3 = calCoordd("linestring", "(35,-35),(-35,-35)", bb, "xy", "");
+                textBorder4 = calCoordd("linestring", "(35,-35),(35,35)", bb, "xy", "");
+            }
+
+            WKTReader readerBorder = new WKTReader();
+            IGeometry borderLine1 = readerBorder.Read(textBorder1);
+            IGeometry borderLine2 = readerBorder.Read(textBorder2);
+            IGeometry borderLine3 = readerBorder.Read(textBorder3);
+            IGeometry borderLine4 = readerBorder.Read(textBorder4);
+
+            List<IGeometry> geometriesPlotBorders = new List<IGeometry>();
+            geometriesPlotBorders.Add(borderLine1);
+            geometriesPlotBorders.Add(borderLine2);
+            geometriesPlotBorders.Add(borderLine3);
+            geometriesPlotBorders.Add(borderLine4);
+
+            foreach (var geo in geometriesPlotBorders)
+            {
+                var dd = new SharpMap.Data.FeatureDataTable();
+                dd.Columns.Add("Label");
+                SharpMap.Data.FeatureDataRow newRow = dd.NewRow();
+                newRow.Geometry = geo;
+
+                SharpMap.Layers.VectorLayer plotLayer1 = new SharpMap.Layers.VectorLayer("");
+                plotLayer1.DataSource = new SharpMap.Data.Providers.GeometryProvider(geo);
+                plotLayer1.CoordinateTransformation = ctFact.CreateFromCoordinateSystems(ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84, webmercator);
+                plotLayer1.ReverseCoordinateTransformation = ctFact.CreateFromCoordinateSystems(webmercator, ProjNet.CoordinateSystems.GeographicCoordinateSystem.WGS84);
+                String borderColor = "#000000";
+
+                Pen pen = new Pen(ColorTranslator.FromHtml(RGBAToArgb(borderColor)), 6);
+                pen.Width = 10;
+
+                int argb = Int32.Parse(RGBAToArgb(borderColor).Replace("#", ""), NumberStyles.HexNumber);
+                Color clr = Color.FromArgb(argb);
+                plotLayer1.Style.Fill = new SolidBrush(clr);
+                plotLayer1.Style.Outline = pen;
+                plotLayer1.Style.EnableOutline = true;
+
+                dd.Rows.Clear();
+                dd.Rows.Add(newRow);
+                plotLayer1.DataSource = new SharpMap.Data.Providers.GeometryFeatureProvider(dd);
+
+                SharpMap.Layers.LabelLayer layLabel1 = new SharpMap.Layers.LabelLayer("Country labels")
+                {
+                    DataSource = plotLayer1.DataSource,
+                    Enabled = true,
+                    LabelColumn = "Label",
+                    MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest,
+                    LabelFilter = SharpMap.Rendering.LabelCollisionDetection.ThoroughCollisionDetection,
+                    CoordinateTransformation = plotLayer1.CoordinateTransformation,
+                    PriorityColumn = "Label",
+
+                    Style = new SharpMap.Styles.LabelStyle()
+                    {
+                        Font = new Font(FontFamily.GenericSerif, 40),
+                        HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Right,
+                        VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top,
+                        CollisionDetection = true,
+                        Enabled = true,
+                    }
+                };
+
+                layLabel1.Style.VerticalAlignment = SharpMap.Styles.LabelStyle.VerticalAlignmentEnum.Top;
+                layLabel1.Style.HorizontalAlignment = SharpMap.Styles.LabelStyle.HorizontalAlignmentEnum.Left;
+                layLabel1.MultipartGeometryBehaviour = SharpMap.Layers.LabelLayer.MultipartGeometryBehaviourEnum.Largest;
+
+                layLabel1.Style.Offset = (new PointF((float)plotLayer1.Envelope.MaxX, (float)plotLayer1.Envelope.MaxY));
+
+                map.Layers.Add(plotLayer1);
+                map.Layers.Add(layLabel1);
+            }
+
+
+                #endregion
+
+                #region add plot middle cross layers
+
+                string text1 = calCoordd("linestring", "(-1,1),(0,0)", bb, "xy", "");
             string text2 = calCoordd("linestring", "(0,0),(-1,1)", bb, "xy", "");
             WKTReader reader = new WKTReader();
             IGeometry crossLine1 = reader.Read(text1);
@@ -705,12 +808,15 @@ namespace BExIS.Pmm.Model
                     borderColor = geometry.Color;
                 Pen pen = new Pen(ColorTranslator.FromHtml(RGBAToArgb(borderColor)), geometry.LineWidth);
                 pen.Width = geometry.LineWidth > 1 ? geometry.LineWidth * 3 : geometry.LineWidth;
-                float[] dashValues = { 8, 8 };
+                float[] dashValues = { 4, 4};
                 int transparency = 150;
+
                 if (geometry.Status == 2)
                 {
                     pen.DashPattern = dashValues;
-                    pen.Width = 3;
+                    if(pen.Width < 3)
+                        pen.Width = 3;
+
                     plotLayer.Style.Fill = new SolidBrush(Color.Transparent);
                     //plotLayer.Style.Fill = new SolidBrush(Color.FromArgb(Int32.Parse(RGBAToArgb(geometry.Color).Replace("#", ""), NumberStyles.HexNumber)));
                 }
@@ -1381,4 +1487,5 @@ namespace BExIS.Pmm.Model
 
 
     }
+
 }
