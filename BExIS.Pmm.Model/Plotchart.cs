@@ -516,47 +516,45 @@ namespace BExIS.Pmm.Model
 
             #region add plot border
 
-            string textBorder1="";
-            string textBorder2="";
-            string textBorder3="";
-            string textBorder4="";
+            string textBorder = calCoordd(plot.GeometryType, plot.Coordinate, bb, "xy", "");
 
-            if(plot.PlotId.Contains("W") && plot.PlotId.Length <= 5)
-            {
-                 textBorder1 = calCoordd("linestring", "(-50,-50),(50,-50)", bb, "xy", "");
-                 textBorder2 = calCoordd("linestring", "(50,50),(50,-50)", bb, "xy", "");
+            //string textBorder1="";
+            //string textBorder2="";
+            //string textBorder3="";
+            //string textBorder4="";
 
-                 textBorder3 = calCoordd("linestring", "(50,-50),(-50,-50)", bb, "xy", "");
-                 textBorder4 = calCoordd("linestring", "(50,-50),(50,50)", bb, "xy", "");
-            }
-            else if(plot.PlotId.Contains("G") && plot.PlotId.Length <= 5)
-            {
-                textBorder1 = calCoordd("linestring", "(-25,-25),(25,-25)", bb, "xy", "");
-                textBorder2 = calCoordd("linestring", "(25,25),(25,-25)", bb, "xy", "");
+            //if(plot.PlotId.Contains("W") && plot.PlotId.Length <= 5)
+            //{
+            //     textBorder1 = calCoordd("linestring", "(-50,-50),(50,-50)", bb, "xy", "");
+            //     textBorder2 = calCoordd("linestring", "(50,50),(50,-50)", bb, "xy", "");
 
-                textBorder3 = calCoordd("linestring", "(25,-25),(-25,-25)", bb, "xy", "");
-                textBorder4 = calCoordd("linestring", "(25,-25),(25,25)", bb, "xy", "");
-            }
-            else
-            {
-                textBorder1 = calCoordd("linestring", "(-35,-35),(35,-35)", bb, "xy", "");
-                textBorder2 = calCoordd("linestring", "(35,35),(35,-35)", bb, "xy", "");
+            //     textBorder3 = calCoordd("linestring", "(50,-50),(-50,-50)", bb, "xy", "");
+            //     textBorder4 = calCoordd("linestring", "(50,-50),(50,50)", bb, "xy", "");
+            //}
+            //else if(plot.PlotId.Contains("G") && plot.PlotId.Length <= 5)
+            //{
+            //    textBorder1 = calCoordd("linestring", "(-25,-25),(25,-25)", bb, "xy", "");
+            //    textBorder2 = calCoordd("linestring", "(25,25),(25,-25)", bb, "xy", "");
 
-                textBorder3 = calCoordd("linestring", "(35,-35),(-35,-35)", bb, "xy", "");
-                textBorder4 = calCoordd("linestring", "(35,-35),(35,35)", bb, "xy", "");
-            }
+            //    textBorder3 = calCoordd("linestring", "(25,-25),(-25,-25)", bb, "xy", "");
+            //    textBorder4 = calCoordd("linestring", "(25,-25),(25,25)", bb, "xy", "");
+            //}
+            //else
+            //{
+            //    textBorder1 = calCoordd("linestring", "(-35,-35),(35,-35)", bb, "xy", "");
+            //    textBorder2 = calCoordd("linestring", "(35,35),(35,-35)", bb, "xy", "");
+
+            //    textBorder3 = calCoordd("linestring", "(35,-35),(-35,-35)", bb, "xy", "");
+            //    textBorder4 = calCoordd("linestring", "(35,-35),(35,35)", bb, "xy", "");
+            //}
 
             WKTReader readerBorder = new WKTReader();
-            IGeometry borderLine1 = readerBorder.Read(textBorder1);
-            IGeometry borderLine2 = readerBorder.Read(textBorder2);
-            IGeometry borderLine3 = readerBorder.Read(textBorder3);
-            IGeometry borderLine4 = readerBorder.Read(textBorder4);
+            IGeometry borderLine1 = readerBorder.Read(textBorder);
+    
 
             List<IGeometry> geometriesPlotBorders = new List<IGeometry>();
             geometriesPlotBorders.Add(borderLine1);
-            geometriesPlotBorders.Add(borderLine2);
-            geometriesPlotBorders.Add(borderLine3);
-            geometriesPlotBorders.Add(borderLine4);
+
 
             foreach (var geo in geometriesPlotBorders)
             {
@@ -868,8 +866,11 @@ namespace BExIS.Pmm.Model
             }
             else
             {
+                int x = gridSize * 2 * 2;
+                if((gridSize * 2 * 2)>map.Layers.Count)
+                    x = map.Layers.Count;
 
-                for (int i = 0; i < gridSize * 2 * 2; i++)
+                for (int i = 0; i < x; i++)
                 {
                     if (i % 2 == 1)
                     {
