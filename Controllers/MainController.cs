@@ -16,6 +16,7 @@ using System.Text;
 using BExIS.Modules.PMM.UI.Helper;
 using Vaiona.Web.Mvc.Models;
 using Vaiona.Web.Extensions;
+using Vaiona.Web.Mvc.Modularity;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -77,7 +78,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         {
             ViewBag.Title = PresentationModel.GetViewTitleForTenant("Plot Charts", this.Session.GetTenant());
 
-            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
+            var settings = ModuleManager.GetModuleSettings("pmm");
+            var defaultPlotId = settings.GetValueByKey("DefaultPlotId").ToString();
+
             ViewData["DefaultPlotID"] = defaultPlotId;
 
 

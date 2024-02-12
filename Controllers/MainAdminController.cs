@@ -14,6 +14,7 @@ using BExIS.Pmm.Services;
 using BExIS.Security.Services.Utilities;
 using Vaiona.Utils.Cfg;
 using BExIS.Security.Services.Subjects;
+using Vaiona.Web.Mvc.Modularity;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -152,7 +153,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         public ActionResult LoadPlotchartImage(long? plotid)//String plotid, int zoom)
         {
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
-            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
+
+            var settings = ModuleManager.GetModuleSettings("pmm");
+            var defaultPlotId = settings.GetValueByKey("DefaultPlotId").ToString();
             ViewData["DefaultPlotID"] = defaultPlotId;
 
             var plotList = helper.GetPlotsOld();
@@ -180,7 +183,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         // GET: PlotChart
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
-            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
+            var settings = ModuleManager.GetModuleSettings("pmm");
+            var defaultPlotId = settings.GetValueByKey("DefaultPlotId").ToString();
+
             ViewData["DefaultPlotID"] = defaultPlotId;
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
