@@ -25,15 +25,35 @@
     <table style="width:800px;">
         <tr>
             <td>
-                Plot maps:
-                </br>
-                Experiment maps: 
+                <table>
+                    <tr>
+                        <td> Grassland maps:</td>
+                        <td> @Html.DropDownListFor(m => m.grasslandPlotlist, new SelectList(Model.grasslandPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })</td>
+                   </tr>
+                    <tr>
+                        <td>Forest maps:</td>
+                        <td>
+                            @Html.DropDownListFor(m => m.forestPlotlist, new SelectList(Model.forestPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                        </td>
+                    </tr>
+                 <tr>
+                     <td>
+                         Arable land maps:
+                     </td>
+                     <td>
+                         @Html.DropDownListFor(m => m.arablelandPlotlist, new SelectList(Model.arablelandPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                     </td>
+                 </tr>
+                 <tr>
+                     <td>FOX maps:</td>
+                     <td>
+                         @Html.DropDownListFor(m => m.foxPlotlist, new SelectList(Model.foxPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                     </td>
+                 </tr>
+                
+                </table>
             </td>
-            <td style="width:20px">
-                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
-                </br>
-                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlistNew, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
-            </td>
+           
             <td>
                 <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" /> include former subplots
                 <br />
@@ -174,7 +194,7 @@
 
     function DownloadPdf() {
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val() + $(".plotids").find("option:selected").eq(2).val() + $(".plotids").find("option:selected").eq(3).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -186,7 +206,7 @@
     function LoadPackageAndBindGrid() {
       
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val() + $(".plotids").find("option:selected").eq(2).val() + $(".plotids").find("option:selected").eq(3).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -209,7 +229,7 @@
     function Grid_onDataBinding(e) {
         var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val() + $(".plotids").find("option:selected").eq(2).val() + $(".plotids").find("option:selected").eq(2).val() 
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -227,7 +247,7 @@
     function UpdatePlotChart() {
         var comboboxPlotChart = $('#PlotChartList').data('tDropDownList');
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val() + $(".plotids").find("option:selected").eq(2).val() + $(".plotids").find("option:selected").eq(3).val()
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -238,7 +258,7 @@
             beyondPlot: beyondborder,
             gridsize: gridSize
         }
-
+        console.log(data);
         $.ajax({
             url: '/PMM/Main/_getPlotChart',
             type: 'POST',
