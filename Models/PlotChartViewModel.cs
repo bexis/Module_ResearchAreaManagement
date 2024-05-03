@@ -10,6 +10,8 @@ namespace BExIS.Web.Shell.Areas.PMM.Models
     {
         public string ImageSource { set; get; }
         public Plot selectedPlot { set; get; }
+
+        public List<Plot> plotlist { set; get; }
         public List<Plot> grasslandPlotlist { get; set; }
         public List<Plot> forestPlotlist { get; set; }
         public List<Plot> foxPlotlist { get; set; }

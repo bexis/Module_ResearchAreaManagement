@@ -34,9 +34,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             var plotList = helper.GetPlots();
-            plotviewmodel.grasslandPlotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
+            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
             plotviewmodel.isAdmin = true;
-            plotviewmodel.allPlots = "," + String.Join(",", plotviewmodel.grasslandPlotlist.Select(x => x.Id.ToString()).ToArray());
+            plotviewmodel.allPlots = "," + String.Join(",", plotviewmodel.plotlist.Select(x => x.Id.ToString()).ToArray());
             return View(plotviewmodel);
         }
 
@@ -152,11 +152,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         public ActionResult LoadPlotchartImage(long? plotid)//String plotid, int zoom)
         {
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
-            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
-            ViewData["DefaultPlotID"] = defaultPlotId;
 
-            //var plotList = helper.GetPlotsOld();
             plotviewmodel.grasslandPlotlist = helper.GetGrasslandPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
+            ViewData["DefaultPlotID"] = plotviewmodel.grasslandPlotlist.First().Id;
             plotviewmodel.forestPlotlist = helper.GetForestPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
 
             //var plotListNew = helper.GetPlotsNew();
