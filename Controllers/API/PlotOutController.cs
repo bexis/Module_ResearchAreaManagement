@@ -1,10 +1,16 @@
 ﻿using BExIS.App.Bootstrap.Attributes;
+using BExIS.Modules.Pmm.UI.Helper;
+using BExIS.Modules.Pmm.UI.Models;
 using BExIS.Security.Entities.Subjects;
 using BExIS.Security.Services.Authorization;
 using BExIS.Security.Services.Objects;
 using BExIS.Security.Services.Subjects;
 using BExIS.Utils.Route;
+using Microsoft.Web.Helpers;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -12,6 +18,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Web.Http;
 using Vaiona.Persistence.Api;
+
 
 namespace BExIS.Modules.PMM.UI.Controllers
 {
@@ -32,6 +39,21 @@ namespace BExIS.Modules.PMM.UI.Controllers
             string token = this.Request.Headers.Authorization?.Parameter;
 
             return getData(token, "plot", "");
+        }
+
+        // GET: api/Plot
+        /// <summary>
+        /// Get a list of all plots
+        /// </summary>
+        /// <returns>List of plots with geometry</returns>
+        [BExISApiAuthorize]
+        [GetRoute("api/PlotWithType")]
+        //  [HttpGet]
+        public HttpResponseMessage GetPlotsWithType()
+        {
+            string token = this.Request.Headers.Authorization?.Parameter;
+
+            return getData(token, "plots_withtype", "");
         }
 
 
@@ -80,6 +102,8 @@ namespace BExIS.Modules.PMM.UI.Controllers
         }
 
 
+
+
         private HttpResponseMessage getData( string token, string type, string id)
         {
 
@@ -120,7 +144,13 @@ namespace BExIS.Modules.PMM.UI.Controllers
                         {
                             data = getSubplotsGrouped(id);
                         }
-                        
+                        else if(type == "plots_withtype")
+                        {
+                            var tempData = getPlots();
+                            data = getPlotsWithType(tempData);
+
+                        }
+
 
                         // return result as JSON
                         var response = Request.CreateResponse(HttpStatusCode.OK);
@@ -169,6 +199,85 @@ namespace BExIS.Modules.PMM.UI.Controllers
                 return "";
             }
         }
+
+        private string getPlotsWithType(string plotResult)
+        {
+           Plots plots = JsonConvert.DeserializeObject<Plots>(plotResult);
+
+            //get ep ref data set to find mips and vips
+            string epRefDatasetId = Settings.get("epRefDataset").ToString();
+            var datasetObject = DataAccess.GetDatasetInfo(epRefDatasetId, GetServerInformation());
+            DataTable epPlotRefTable = DataAccess.GetData(epRefDatasetId, long.Parse(datasetObject.DataStructureId), GetServerInformation());
+
+            //get new experiment plots datasets
+            string foxRefDatasetId = Settings.get("foxRefDataset").ToString();
+            var datasetObjectFox = DataAccess.GetDatasetInfo(foxRefDatasetId, GetServerInformation());
+            DataTable foxPlotRefTable = DataAccess.GetData(foxRefDatasetId, long.Parse(datasetObjectFox.DataStructureId), GetServerInformation());
+
+            string gNewExpRefDatasetId = Settings.get("gNewExpDataset").ToString();
+            var datasetObjectgNewExp = DataAccess.GetDatasetInfo(gNewExpRefDatasetId, GetServerInformation());
+            DataTable gNewExpPlotRefTable = DataAccess.GetData(gNewExpRefDatasetId, long.Parse(datasetObjectgNewExp.DataStructureId), GetServerInformation());
+
+            //create lists with new experiment plot ids
+            List<string> foxPlots = foxPlotRefTable.AsEnumerable().Select(a => a.Field<string>("Joint Experiment ID")).ToList();
+            List<string> glnewExpPlots = gNewExpPlotRefTable.AsEnumerable().Select(a => a.Field<string>("Joint Experiment ID")).ToList();
+            List <string> epPlots = epPlotRefTable.AsEnumerable().Select(a => a.Field<string>("EP_PlotID")).ToList();
+
+            foreach (var plot in plots.features)
+            {
+                if(epPlots.Contains(plot.properties.plotid))
+                {
+                    DataRow row = epPlotRefTable.AsEnumerable().Where(a => a.Field<string>("EP_PlotID") == plot.properties.plotid).FirstOrDefault();
+
+                    if (row.Field<string>("VIP") == "yes")
+                       plot.properties.plotType = "VIP";
+
+                    if (row.Field<string>("MIP") == "yes")
+                        plot.properties.plotType = "MIP";
+                    else
+                        plot.properties.plotType = "EP";
+
+                }
+                else if(foxPlots.Contains(plot.properties.plotid))
+                {
+                    plot.properties.plotType = "Fox";
+                } 
+                else if(glnewExpPlots.Contains(plot.properties.plotid))
+                {
+                    DataRow row = gNewExpPlotRefTable.AsEnumerable().Where(a => a.Field<string>("Joint Experiment ID") == plot.properties.plotid).FirstOrDefault();
+                    if (row.Field<string>("REX I") == "yes")
+                        plot.properties.plotType = "REX I";
+                    if (row.Field<string>("REX II") == "yes")
+                        plot.properties.plotType = "REX II";
+                }
+
+                if(plot.properties.plotid.Contains("EG"))
+                {
+                    plot.properties.habitat = "Grassland";
+                }
+                else
+                    plot.properties.habitat = "Forest";
+            }
+
+            return JsonConvert.SerializeObject(plots);
+        }
+
+        /// <summary>
+        /// Get server information form json file in workspace
+        /// </summary>
+        /// <returns></returns>
+        private ServerInformation GetServerInformation()
+        {
+            ServerInformation serverInformation = new ServerInformation();
+            var uri = System.Web.HttpContext.Current.Request.Url;
+            //serverInformation.ServerName = "http://be2020-dev.inf-bb.uni-jena.de:2010/";
+            serverInformation.Token = "k4ywfsj6X32sXE62XybjtvJk5fs2JqNXyBmzkR7apBMgigwz9hiW3mFyR6uW7qy5";
+            serverInformation.ServerName = uri.GetLeftPart(UriPartial.Authority) + "/";
+            //serverInformation.Token = GetUserToken();
+
+            return serverInformation;
+        }
+
 
         // get list of subplots (all or for one explo)
         private string getSubplots(string id)

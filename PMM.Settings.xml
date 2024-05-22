@@ -8,5 +8,11 @@
   !--Setting to define party type name-->
   <entry key="DefaultPlotId" value="673" type="Int16"/>
 
+
+	<entry key="epRefDataset" value="20826" type="int"/>
+	<entry key="gpRefDataset" value="20907" type="int"/>
+	<entry key="foxRefDataset" value="31040" type="int"/>
+	<entry key="gNewExpDataset" value="31307" type="int"/>
+
   
 </settings>
