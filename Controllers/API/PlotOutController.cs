@@ -220,7 +220,7 @@ namespace BExIS.Modules.PMM.UI.Controllers
 
             //create lists with new experiment plot ids
             List<string> foxPlots = foxPlotRefTable.AsEnumerable().Select(a => a.Field<string>("Joint Experiment ID")).ToList();
-            List<string> glnewExpPlots = gNewExpPlotRefTable.AsEnumerable().Select(a => a.Field<string>("Joint Experiment ID")).ToList();
+            List<string> glnewExpPlots = gNewExpPlotRefTable.AsEnumerable().Select(a => a.Field<string>("EP ID")).ToList();
             List <string> epPlots = epPlotRefTable.AsEnumerable().Select(a => a.Field<string>("EP_PlotID")).ToList();
 
             foreach (var plot in plots.features)
@@ -238,17 +238,19 @@ namespace BExIS.Modules.PMM.UI.Controllers
                         plot.properties.plotType = "EP";
 
                 }
-                else if(foxPlots.Contains(plot.properties.plotid))
+                if(foxPlots.Contains(plot.properties.plotid))
                 {
                     plot.properties.plotType = "Fox";
                 } 
-                else if(glnewExpPlots.Contains(plot.properties.plotid))
+                if(glnewExpPlots.Contains(plot.properties.plotid))
                 {
-                    DataRow row = gNewExpPlotRefTable.AsEnumerable().Where(a => a.Field<string>("Joint Experiment ID") == plot.properties.plotid).FirstOrDefault();
+                    DataRow row = gNewExpPlotRefTable.AsEnumerable().Where(a => a.Field<string>("EP ID") == plot.properties.plotid).FirstOrDefault();
                     if (row.Field<string>("REX I") == "yes")
-                        plot.properties.plotType = "REX I";
+                        plot.properties.plotType += ", REX I";
                     if (row.Field<string>("REX II") == "yes")
-                        plot.properties.plotType = "REX II";
+                        plot.properties.plotType += ", REX II";
+                    if (row.Field<string>("LUX") == "yes")
+                        plot.properties.plotType += ", LUX";
                 }
 
                 if(plot.properties.plotid.Contains("EG"))
