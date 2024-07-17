@@ -686,6 +686,12 @@
             return;
         }
         var Color = $('#Color').val();
+        if (Color.length == 0) {
+            $('#Color').css("border-color", "#FF0000");
+            errorsPlaceHolder.html("Please enter a color. <br>");
+            return;
+        }
+
         var ColorOpacity = Math.floor($('#Color').attr("data-opacity") * 255).toString(16);
         ColorOpacity = ColorOpacity.length > 1 ? "" + ColorOpacity : "0" + ColorOpacity;
 
