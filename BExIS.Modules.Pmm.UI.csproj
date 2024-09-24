@@ -145,7 +145,7 @@
     <Content Include="PMM.Manifest.xml" />
     <Content Include="PMM.Settings.xml" />
     <Content Include="Pmm.Settings.json" />
-    <None Include="Properties\PublishProfiles\BexisServer_2010-testsite.pubxml" />
+    <None Include="Properties\PublishProfiles\BexisServer_2030-testsite.pubxml" />
     <None Include="Properties\PublishProfiles\BexisServer_BE-Website.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="web.config" />
