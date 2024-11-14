@@ -35,7 +35,7 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             var plotList = helper.GetPlots();
-            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
+            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId);
             plotviewmodel.isAdmin = true;
             plotviewmodel.allPlots = "," + String.Join(",", plotviewmodel.plotlist.Select(x => x.Id.ToString()).ToArray());
             return View(plotviewmodel);
