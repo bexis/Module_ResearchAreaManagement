@@ -17,7 +17,35 @@
       "description": "",
       "type": "Int16",
       "options": []
+    },
+    {
+      "key": "epRefDataset",
+      "title": "EP Ref Dataset",
+      "value": "20826",
+      "type": "Int32",
+      "description": ""
+    },
+    {
+      "key": "gpRefDataset",
+      "title": "GP Ref Dataset",
+      "value": "20907",
+      "type": "Int32",
+      "description": ""
+    },
+    {
+      "key": "foxRefDataset",
+      "title": "FOX Ref Dataset",
+      "value": "31040",
+      "type": "Int32",
+      "description": ""
+    },
+    {
+      "key": "gNewExpDataset",
+      "title": "New graslang exp Ref Dataset",
+      "value": "31307",
+      "type": "Int32",
+      "description": ""
     }
-   
+
   ]
 }
