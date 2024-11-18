@@ -1,4 +1,4 @@
-﻿@using BExIS.Pmm.Entities;
+﻿﻿@using BExIS.Pmm.Entities;
 @using Telerik.Web.Mvc.UI;
 @model BExIS.Web.Shell.Areas.PMM.Models.PlotChartViewModel
 
@@ -100,43 +100,43 @@
         <tbody>
             @for (int i = 0; i < Model.plotlist.Count(); i++)
             {
-                <tr id="@Model.plotlist[i].Id.ToString()">
+                <tr id="@Model.plotlist.ElementAt(i).Id.ToString()">
                     <td></td>
                     <td>
-                        @Model.plotlist[i].Id
+                        @Model.plotlist.ElementAt(i).Id
                     </td>
                     <td>
-                        @Model.plotlist[i].PlotId
+                        @Model.plotlist.ElementAt(i).PlotId
                     </td>
                     <td>
-                        @Model.plotlist[i].GeometryType
+                        @Model.plotlist.ElementAt(i).GeometryType
                     </td>
                     <td>
-                        @Model.plotlist[i].Coordinate
+                        @Model.plotlist.ElementAt(i).Coordinate
                     </td>
                     <td>
-                        @Model.plotlist[i].CoordinateType
+                        @Model.plotlist.ElementAt(i).CoordinateType
                     </td>
                     <td>
-                        @Model.plotlist[i].Latitude
+                        @Model.plotlist.ElementAt(i).Latitude
                     </td>
                     <td>
-                        @Model.plotlist[i].Longitude
+                        @Model.plotlist.ElementAt(i).Longitude
                     </td>
                     <td>
-                        <a title='edit' href='#' class='btn btn-sm' onclick='updatePlot(@Model.plotlist[i].Id, "@Model.plotlist[i].GeometryType" ,"@Model.plotlist[i].Coordinate" ," @Model.plotlist[i].CoordinateType" ,  "@Model.plotlist[i].PlotId" , "@Model.plotlist[i].Latitude", "@Model.plotlist[i].Longitude","@Model.plotlist[i].ReferencePoint")'><img id='edit-<#= @Model.plotlist[i].Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>
+                        <a title='edit' href='#' class='btn btn-sm' onclick='updatePlot(@Model.plotlist.ElementAt(i).Id, "@Model.plotlist.ElementAt(i).GeometryType" ,"@Model.plotlist.ElementAt(i).Coordinate" ," @Model.plotlist.ElementAt(i).CoordinateType" ,  "@Model.plotlist.ElementAt(i).PlotId" , "@Model.plotlist.ElementAt(i).Latitude", "@Model.plotlist.ElementAt(i).Longitude","@Model.plotlist.ElementAt(i).ReferencePoint")'><img id='edit-<#= @Model.plotlist.ElementAt(i).Id #>' src='../../Areas/PMM/Images/edit.png' width='16'></a>
                     </td>
                     <td>
-                        <input type='hidden' value='@Model.plotlist[i].Status' name='@Model.plotlist[i].Id' /><a title='archive' href="#" class='btn btn-sm' onclick='archivePlot(@Model.plotlist[i].Id, "@Model.plotlist[i].PlotId")'><img id='archive-@Model.plotlist[i].Id' src='../../Areas/PMM/Images/archive.png' width='16'></a>
+                        <input type='hidden' value='@Model.plotlist.ElementAt(i).Status' name='@Model.plotlist.ElementAt(i).Id' /><a title='archive' href="#" class='btn btn-sm' onclick='archivePlot(@Model.plotlist.ElementAt(i).Id, "@Model.plotlist.ElementAt(i).PlotId")'><img id='archive-@Model.plotlist.ElementAt(i).Id' src='../../Areas/PMM/Images/archive.png' width='16'></a>
                     </td>
                     <td>
-                        <a title='download' href="#" class='btn btn-sm' onclick='exportPlot(@Model.plotlist[i].Id)' id='export-@Model.plotlist[i].Id'><img src='../../Areas/PMM/Images/download.png' width='16'></a>
+                        <a title='download' href="#" class='btn btn-sm' onclick='exportPlot(@Model.plotlist.ElementAt(i).Id)' id='export-@Model.plotlist.ElementAt(i).Id'><img src='../../Areas/PMM/Images/download.png' width='16'></a>
                     </td>
                     <td>
-                        <a title='pdf' href="#" class='btn btn-sm' onclick='exportPlotPdf(@Model.plotlist[i].Id)' id='export-@Model.plotlist[i].Id'><img src='../../Areas/PMM/Images/pdf.png' width='16'></a>
+                        <a title='pdf' href="#" class='btn btn-sm' onclick='exportPlotPdf(@Model.plotlist.ElementAt(i).Id)' id='export-@Model.plotlist.ElementAt(i).Id'><img src='../../Areas/PMM/Images/pdf.png' width='16'></a>
                     </td>
                     <td>
-                        <a title='list' href="#" class='btn btn-sm' onclick='openPlot(@Model.plotlist[i].Id)' id='list-@Model.plotlist[i].Id'><img src='../../Areas/PMM/Images/list.png' width='16'></a>
+                        <a title='list' href="#" class='btn btn-sm' onclick='openPlot(@Model.plotlist.ElementAt(i).Id)' id='list-@Model.plotlist.ElementAt(i).Id'><img src='../../Areas/PMM/Images/list.png' width='16'></a>
                     </td>
 
                 </tr>
@@ -559,7 +559,7 @@
         var beyondborder = $('#BeyondBorder').is(':checked');
         var legend = $('#Legend').is(':checked');
         var gridSize = comboboxGridSize.value();
-        
+
         var plotIds = [];
         $.each(tbl.rows('.selected').nodes(), function (i, item) {
             plotIds.push(item.id);
