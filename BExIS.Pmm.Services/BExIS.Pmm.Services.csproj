@@ -14,10 +14,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BExIS.Pmm.Services</RootNamespace>
     <AssemblyName>BExIS.Pmm.Services</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -45,12 +46,6 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
-    <Reference Include="Vaiona.Entities">
-      <HintPath>..\..\..\..\..\Libraries\Vaiona\Vaiona.Entities.dll</HintPath>
-    </Reference>
-    <Reference Include="Vaiona.Persistence.Api">
-      <HintPath>..\..\..\..\..\Libraries\Vaiona\Vaiona.Persistence.Api.dll</HintPath>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="GeometryManager.cs" />
@@ -60,12 +55,21 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\..\..\Components\Vaiona\Vaiona.Entities\Vaiona.Entities.csproj">
+      <Project>{0815d220-3625-4e23-bbbc-8152345637fe}</Project>
+      <Name>Vaiona.Entities</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\..\Components\Vaiona\Vaiona.Persistence.Api\Vaiona.Persistence.Api.csproj">
+      <Project>{640bf81d-354a-4bf0-85fc-f0ad587cf8a2}</Project>
+      <Name>Vaiona.Persistence.Api</Name>
+    </ProjectReference>
     <ProjectReference Include="..\BExIS.Pmm.Entities\BExIS.Pmm.Entities.csproj">
       <Project>{29f7ddae-22f0-4a3e-a5e3-a25869ebf3eb}</Project>
       <Name>BExIS.Pmm.Entities</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

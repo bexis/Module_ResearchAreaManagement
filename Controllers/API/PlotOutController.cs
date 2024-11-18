@@ -121,7 +121,7 @@ namespace BExIS.Modules.PMM.UI.Controllers
                 
 
                 // get user from token
-                User user = userManager.Users.Where(u => u.Token.Equals(token)).FirstOrDefault();
+                User user = ControllerContext.RouteData.Values["user"] as User;
 
                 if (user != null)
                 {
@@ -366,7 +366,7 @@ namespace BExIS.Modules.PMM.UI.Controllers
 
  
 
-                if (featurePermissionManager.HasAccess(user.Id, feature.Id))
+                if (featurePermissionManager.HasAccessAsync(user.Id, feature.Id).Result)
                 {
                     return true;
                 }

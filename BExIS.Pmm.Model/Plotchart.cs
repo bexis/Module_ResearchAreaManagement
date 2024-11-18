@@ -491,7 +491,9 @@ namespace BExIS.Pmm.Model
                 }
 
 
+#pragma warning disable CA2000 // Objekte verwerfen, bevor Bereich verloren geht
                 myMap = plot != null ? InitializeMap(new Size(3000, 3000), plot, zoom, deactiveGeometries, beyondPlot, gridSize) : null;
+#pragma warning restore CA2000 // Objekte verwerfen, bevor Bereich verloren geht
 
 
 

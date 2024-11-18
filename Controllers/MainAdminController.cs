@@ -14,6 +14,7 @@ using BExIS.Pmm.Services;
 using BExIS.Security.Services.Utilities;
 using Vaiona.Utils.Cfg;
 using BExIS.Security.Services.Subjects;
+using Vaiona.Web.Mvc.Modularity;
 
 namespace BExIS.Modules.Pmm.UI.Controllers
 {
@@ -34,7 +35,9 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             var plotList = helper.GetPlots();
-            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
+
+            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId);
+
             plotviewmodel.isAdmin = true;
             plotviewmodel.allPlots = "," + String.Join(",", plotviewmodel.plotlist.Select(x => x.Id.ToString()).ToArray());
             return View(plotviewmodel);
@@ -153,6 +156,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         {
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
 
+            var settings = ModuleManager.GetModuleSettings("pmm");
+            var defaultPlotId = settings.GetValueByKey("DefaultPlotId").ToString();
+            ViewData["DefaultPlotID"] = defaultPlotId;
+
+
             plotviewmodel.grasslandPlotlist = helper.GetGrasslandPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
             ViewData["DefaultPlotID"] = plotviewmodel.grasslandPlotlist.First().Id;
             plotviewmodel.forestPlotlist = helper.GetForestPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
@@ -183,8 +191,12 @@ namespace BExIS.Modules.Pmm.UI.Controllers
         // GET: PlotChart
         public ActionResult SubPlots(long? plotid)//String plotid, int zoom)
         {
-            var defaultPlotId = Helper.Settings.get("DefaultPlotId").ToString();
-            
+
+            var settings = ModuleManager.GetModuleSettings("pmm");
+            var defaultPlotId = settings.GetValueByKey("DefaultPlotId").ToString();
+
+            ViewData["DefaultPlotID"] = defaultPlotId;
+
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
             //var plotList = helper.GetPlotsOld();
