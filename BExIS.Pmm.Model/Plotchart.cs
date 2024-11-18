@@ -310,15 +310,30 @@ namespace BExIS.Pmm.Model
         }
 
 
+
+        ///// <summary>
+        ///// get list of plots
+        ///// </summary>
+        ///// <returns>plots list</returns>
+        //public IList<Plot> GetPlotsOld()
+        //{
+        //    using (PlotManager pcManager = new PlotManager())
+        //    {
+        //        IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-") && x.Status == 1).ToList(); // get all plot names without a "-" -> "old" plots
+
+        //        return plots;
+        //    }
+        //}
+
         /// <summary>
         /// get list of plots
         /// </summary>
         /// <returns>plots list</returns>
-        public IList<Plot> GetPlotsOld()
+        public IList<Plot> GetGrasslandPlots()
         {
             using (PlotManager pcManager = new PlotManager())
             {
-                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-") && x.Status == 1).ToList(); // get all plot names without a "-" -> "old" plots
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-") && x.PlotId.Contains("EG") && x.Status == 1).ToList(); // get all plot names without a "-" and "EG" == grassland
 
                 return plots;
             }
@@ -328,7 +343,21 @@ namespace BExIS.Pmm.Model
         /// get list of plots
         /// </summary>
         /// <returns>plots list</returns>
-        public IList<Plot> GetPlotsNew()
+        public IList<Plot> GetForestPlots()
+        {
+            using (PlotManager pcManager = new PlotManager())
+            {
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-") && x.PlotId.Contains("EW") && x.Status == 1).ToList(); // get all plot names without a "-" and "EG" == grassland
+
+                return plots;
+            }
+        }
+
+        /// <summary>
+        /// get list of plots
+        /// </summary>
+        /// <returns>plots list</returns>
+        public IList<Plot> GetFoxPlots()
         {
             using (PlotManager pcManager = new PlotManager())
             {
@@ -336,6 +365,20 @@ namespace BExIS.Pmm.Model
                 return plots;
             }
         }
+
+        /// <summary>
+        /// get list of plots
+        /// </summary>
+        /// <returns>plots list</returns>
+        public IList<Plot> GetArablelandPlots()
+        {
+            using (PlotManager pcManager = new PlotManager())
+            {
+                IList<Plot> plots = pcManager.Repo.Query().Where(x => !x.PlotId.Contains("-") && x.PlotId.Contains("EA") && x.Status == 1).ToList(); // get all plot names without a "-" and "EG" == grassland
+                return plots;
+            }
+        }
+
 
         /// <summary>
         /// get a plot by the plot name

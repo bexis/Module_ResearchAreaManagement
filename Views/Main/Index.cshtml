@@ -1,6 +1,6 @@
 ﻿@using BExIS.Pmm.Entities;
 @using Telerik.Web.Mvc.UI;
-@model BExIS.Web.Shell.Areas.PMM.Models.PlotChartViewModel
+@model BExIS.Modules.Pmm.UI.Models.PlotChartViewModel
 
 @{
 
@@ -21,7 +21,7 @@
 <div>
     <table>
         <tr>
-        <td valign="bottom"><a href="#" title="Export CSV" onclick="exportAllPlots()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>
+            <td valign="bottom"><a href="#" title="Export CSV" onclick="exportAllPlots()"> <img src="~/Areas/PMM/Images/csv-48.png" width="40"> </a></td>
         </tr>
     </table>
     @(Html.Telerik().Grid<Plot>()
@@ -57,22 +57,22 @@
             columns.Template(@<text></text>).ClientTemplate("<a title='list' href='#'" + "class='btn btn-sm' onclick='openPlot(<#= Id #>)' id='list-<#= Id #>'><img src='../../Areas/PMM/Images/list.png' width='16'></a>").Title("List").Width(60);
             }))
 </div>
-    
+
 
 <script type="text/javascript">
 
     function ComboBox_onChange(e) {
         LoadPackageAndBindGrid();
-    }
+}
 
     function LoadPackageAndBindGrid() {
-        var grid = $('#plotchart_geometries').data('tGrid');
-        grid.ajaxRequest();
-    }
+var grid = $('#plotchart_geometries').data('tGrid');
+    grid.ajaxRequest();
+}
 
     function exportAllPlots() {
         window.open("/PMM/Main/ExportAllPlots", "_blank");
-    }
+}
 
     function UpdateIcons() {
         $('#plotchart_geometries input[type=hidden]').each(function () {
@@ -84,14 +84,14 @@
             else if (($(this).val() == "3"))
                 $("#delete-" + $(this).attr("name")).attr("src", "../../Areas/PMM/Images/deleted.png");
         });
-    }
+}
 
     function exportPlot(id) {
         window.open("/PMM/Main/ExportPlot?id=" + id, "_blank");
-    }
+}
 
     function openPlot(id) {
         window.open("/PMM/Main/SubPlots?plotId=" + id, "_blank");
-    }
+}
 
 </script>

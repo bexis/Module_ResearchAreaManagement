@@ -7,7 +7,7 @@ using System.IO;
 using BExIS.IO.Transform.Output;
 using BExIS.Dlm.Services.Data;
 using BExIS.Dlm.Services.DataStructure;
-using BExIS.Web.Shell.Areas.PMM.Models;
+using BExIS.Modules.Pmm.UI.Models;
 using Telerik.Web.Mvc;
 using BExIS.Pmm.Entities;
 using System.Web;
@@ -81,23 +81,29 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             var settings = ModuleManager.GetModuleSettings("pmm");
             var defaultPlotId = settings.GetValueByKey("DefaultPlotId").ToString();
 
-            ViewData["DefaultPlotID"] = defaultPlotId;
 
 
             PlotChartViewModel plotviewmodel = new PlotChartViewModel();
-            var plotList = helper.GetPlotsOld();
-            plotviewmodel.plotlist = plotList.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
+            //var plotList = helper.GetPlotsOld();
+            plotviewmodel.grasslandPlotlist = helper.GetGrasslandPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
+            ViewData["DefaultPlotID"] = plotviewmodel.grasslandPlotlist.First().Id;
+            plotviewmodel.forestPlotlist = helper.GetForestPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
 
-            var plotListNew = helper.GetPlotsNew();
-            plotviewmodel.plotlistNew = plotListNew.ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter());
+            //var plotListNew = helper.GetPlotsNew();
+            plotviewmodel.foxPlotlist = helper.GetFoxPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
+
+            plotviewmodel.arablelandPlotlist = helper.GetArablelandPlots().ToList().OrderBy(x => x.PlotId, new BExIS.Modules.PMM.UI.Helper.NaturalSorter()).ToList();
+
 
             plotviewmodel.selectedPlot = null;
-            var list_plotlist = plotviewmodel.plotlist.ToList();
+            var list_plotlist = plotviewmodel.grasslandPlotlist.ToList();
             if (plotid != null && list_plotlist.Count > 0 && list_plotlist.First(x => x.Id == plotid) != null)
                 plotviewmodel.selectedPlot = plotid != null ? list_plotlist.First(x => x.Id == plotid) : list_plotlist.First();
 
             if (plotviewmodel.selectedPlot == null)
-                plotviewmodel.selectedPlot = plotList.Where(a => a.Id == Convert.ToInt64(defaultPlotId)).FirstOrDefault();
+                //plotviewmodel.selectedPlot = plotviewmodel.grasslandPlotlist.Where(a => a.Id == Convert.ToInt64(defaultPlotId)).FirstOrDefault();
+                plotviewmodel.selectedPlot = plotviewmodel.grasslandPlotlist.First();
+
 
             plotviewmodel.ImageSource = helper.ProducePlot(helper.GetPlot(plotviewmodel.selectedPlot.Id), 1, false);
 
