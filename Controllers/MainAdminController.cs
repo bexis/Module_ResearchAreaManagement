@@ -448,15 +448,18 @@ namespace BExIS.Modules.Pmm.UI.Controllers
                     {
                         userMail = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result.Email;
                     }
-                    var es = new EmailService();
-                    string text = "Import report as attachment.";
-                    List<string> receiver = new List<string> { "bexis-sys@listserv.uni-jena.de", userMail };
-                    es.Send("Plotchart " + uploadType + " import report", text, receiver, null, null, null, files);
+                    using (var es = new EmailService())
+                    {
+                        string text = "Import report as attachment.";
+                        List<string> receiver = new List<string> { "bexis-sys@listserv.uni-jena.de", userMail };
+                        es.Send("Plotchart " + uploadType + " import report", text, receiver, null, null, null, files);
+                    }
+
                     files.Clear();
-                    
-                    
+
+
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("The process failed: {0}", e.ToString());
 
