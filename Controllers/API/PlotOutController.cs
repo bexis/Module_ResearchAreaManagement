@@ -232,13 +232,14 @@ namespace BExIS.Modules.PMM.UI.Controllers
                 {
                     DataRow row = epPlotRefTable.AsEnumerable().Where(a => a.Field<string>("EP_PlotID") == plot.properties.plotid).FirstOrDefault();
 
+                    plot.properties.plotType = "EP";
+
                     if (row.Field<string>("VIP") == "yes")
-                        plot.properties.plotType = "VIP";
+                        plot.properties.plotType += ", VIP";
 
                     if (row.Field<string>("MIP") == "yes")
-                        plot.properties.plotType = "MIP";
-                    else
-                        plot.properties.plotType = "EP";
+                        plot.properties.plotType += ", MIP";
+
 
                 }
                 if (foxPlots.Contains(plot.properties.plotid))
