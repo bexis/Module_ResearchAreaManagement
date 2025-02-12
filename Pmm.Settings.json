@@ -45,6 +45,23 @@
       "value": "31307",
       "type": "Int32",
       "description": ""
+    },
+
+    {
+      "key": "username",
+      "title": "Username",
+      "value": "epetzold",
+      "description": "",
+      "type": "String",
+      "options": []
+    },
+    {
+      "key": "password",
+      "title": "Password",
+      "value": "2021.B2.Go$On",
+      "description": "",
+      "type": "String",
+      "options": []
     }
 
   ]

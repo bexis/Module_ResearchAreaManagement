@@ -10,7 +10,7 @@ namespace BExIS.Modules.Pmm.UI.Models
     public class ServerInformation
     {
         public string ServerName { get; set; }
-        public string Token { get; set; }
+        public string UsernamePassword { get; set; }
 
     }
 

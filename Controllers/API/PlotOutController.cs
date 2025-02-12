@@ -276,10 +276,10 @@ namespace BExIS.Modules.PMM.UI.Controllers
         {
             ServerInformation serverInformation = new ServerInformation();
             var uri = System.Web.HttpContext.Current.Request.Url;
-            //serverInformation.ServerName = "http://be2020-dev.inf-bb.uni-jena.de:2010/";
-            serverInformation.Token = this.Request.Headers.Authorization?.Parameter;
+            User user = ControllerContext.RouteData.Values["user"] as User;
             serverInformation.ServerName = uri.GetLeftPart(UriPartial.Authority) + "/";
-            //serverInformation.Token = GetUserToken();
+            var settings = ModuleManager.GetModuleSettings("pmm");
+            serverInformation.UsernamePassword = settings.GetValueByKey("username") + ":" + settings.GetValueByKey("password");
 
             return serverInformation;
         }

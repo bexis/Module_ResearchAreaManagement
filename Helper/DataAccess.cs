@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Web;
 
 namespace BExIS.Modules.Pmm.UI.Helper
@@ -23,8 +24,9 @@ namespace BExIS.Modules.Pmm.UI.Helper
         {
             string link = serverInformation.ServerName + "/api/data/" + datasetId;
             HttpWebRequest request = WebRequest.Create(link) as HttpWebRequest;
-            request.Headers.Add("Authorization", "Bearer " + serverInformation.Token);
-            // request.ContentType = "application/json";
+            request.UseDefaultCredentials = true;
+            string myCredentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(serverInformation.UsernamePassword));
+            request.Headers.Add("Authorization", "Basic " + myCredentials);
 
             DataStructureObject dataStructureObject = GetDataStructure(structureId, serverInformation);
 
@@ -91,7 +93,8 @@ namespace BExIS.Modules.Pmm.UI.Helper
         {
             string link = serverInformation.ServerName + "/api/structures/" + structId;
             HttpWebRequest request = WebRequest.Create(link) as HttpWebRequest;
-            request.Headers.Add("Authorization", "Bearer " + serverInformation.Token);
+            string myCredentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(serverInformation.UsernamePassword));
+            request.Headers.Add("Authorization", "Basic " + myCredentials);
 
             DataStructureObject dataStructureObject = new DataStructureObject();
 
@@ -124,7 +127,8 @@ namespace BExIS.Modules.Pmm.UI.Helper
         {
             string link = serverInformation.ServerName + "/api/dataset/" + datasetId;
             HttpWebRequest request = WebRequest.Create(link) as HttpWebRequest;
-            request.Headers.Add("Authorization", "Bearer " + serverInformation.Token);
+            string myCredentials = Convert.ToBase64String(ASCIIEncoding.ASCII.GetBytes(serverInformation.UsernamePassword));
+            request.Headers.Add("Authorization", "Basic " + myCredentials);
 
             DatasetObject datasetObject = new DatasetObject();
 
