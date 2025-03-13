@@ -1,0 +1,3 @@
+[submodule "BExIS.Modules.PMM.UI.Svelte"]
+	path = BExIS.Modules.PMM.UI.Svelte
+	url = https://github.com/bexis/BExIS.Modules.PMM.UI.Svelte
