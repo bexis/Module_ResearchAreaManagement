@@ -34,12 +34,18 @@ namespace BExIS.Modules.Pmm.UI.Helper
                 if (researchAreasFeature == null)
                     researchAreasFeature = featureManager.Create("Research Areas", "Research Areas", rootResearchAreaFeature);
 
+                Feature researchAreasMapFeature = features.FirstOrDefault(f => f.Name.Equals("Research Areas"));
+                if (researchAreasMapFeature == null)
+                    researchAreasMapFeature = featureManager.Create("Research Areas Map", "Research Areas Map", rootResearchAreaFeature);
+
                 Feature researchAreasAdminFeature = features.FirstOrDefault(f => f.Name.Equals("Research Areas Admin"));
                 if (researchAreasAdminFeature == null)
                     researchAreasAdminFeature = featureManager.Create("Research Areas Admin", "Research Areas Admin", rootResearchAreaFeature);
 
 
                 operationManager.Create("PMM", "Main", "*", researchAreasFeature);
+
+                operationManager.Create("PMM", "Map", "*", researchAreasMapFeature);
 
                 operationManager.Create("PMM", "MainAdmin", "*", researchAreasAdminFeature);
 
