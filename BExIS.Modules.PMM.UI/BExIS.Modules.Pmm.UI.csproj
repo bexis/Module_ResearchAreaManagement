@@ -67,7 +67,6 @@
     <Content Include="Pmm.Settings.json" />
     <None Include="Properties\PublishProfiles\BexisServer_2030-testsite.pubxml" />
     <None Include="Properties\PublishProfiles\BexisServer_BE-Website.pubxml" />
-    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="web.config" />
     <Content Include="Content\**" />
     <Content Include="Images\**" />

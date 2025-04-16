@@ -31,10 +31,10 @@ namespace BExIS.Modules.Pmm.UI.Helper
             DataStructureObject dataStructureObject = GetDataStructure(structureId, serverInformation);
 
             DataTable data = new DataTable();
-            foreach (var variable in dataStructureObject.Variables)
+            foreach (var variable in dataStructureObject.variables)
             {
-                DataColumn col = new DataColumn(variable.Label);
-                col.DataType = System.Type.GetType("System." + variable.SystemType);
+                DataColumn col = new DataColumn(variable.label);
+                col.DataType = System.Type.GetType("System." + variable.systemType);
                 col.AllowDBNull = true;
                 data.Columns.Add(col);
             }
