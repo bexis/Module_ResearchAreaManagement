@@ -85,6 +85,7 @@
     <None Include="packages.config" />
     <Content Include="Views\MainAdmin\PlotchartImageView.cshtml" />
     <Content Include="Views\Map\Index.cshtml" />
+    <None Include="Properties\PublishProfiles\BexisServer_v4-ProdTestsite.pubxml" />
     <None Include="web.Debug.config">
       <DependentUpon>web.config</DependentUpon>
     </None>
