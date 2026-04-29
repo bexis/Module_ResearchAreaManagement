@@ -20,6 +20,13 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 {
     public class MainAdminController : Controller
     {
+        private readonly UserManager _userManager;
+
+        public MainAdminController(UserManager userManager)
+        {
+            _userManager = userManager;
+        }
+
         private BExIS.Pmm.Model.Plotchart helper;
         public MainAdminController()
         {
@@ -444,10 +451,8 @@ namespace BExIS.Modules.Pmm.UI.Controllers
 
                     //send mail
                     string userMail;
-                    using (UserManager userManager = new UserManager())
-                    {
-                        userMail = userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result.Email;
-                    }
+
+                    userMail = _userManager.FindByNameAsync(HttpContext.User.Identity.Name).Result.Email;
                     using (var es = new EmailService())
                     {
                         string text = "Import report as attachment.";

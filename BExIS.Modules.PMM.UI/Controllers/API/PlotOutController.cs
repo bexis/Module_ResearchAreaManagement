@@ -25,6 +25,12 @@ namespace BExIS.Modules.PMM.UI.Controllers
 
     public class PlotOutController : ApiController
     {
+        private readonly UserManager _userManager;
+
+        public PlotOutController(UserManager userManager)
+        {
+            _userManager = userManager;
+        }
 
         // GET: api/Plot
         /// <summary>
@@ -106,10 +112,6 @@ namespace BExIS.Modules.PMM.UI.Controllers
 
         private HttpResponseMessage getData(string token, string type, string id)
         {
-
-            using (UserManager userManager = new UserManager())
-            {
-
                 // check token
                 if (String.IsNullOrEmpty(token))
                 {
@@ -174,7 +176,6 @@ namespace BExIS.Modules.PMM.UI.Controllers
 
                     return request;
                 }
-            }
         }
 
 
@@ -349,7 +350,6 @@ namespace BExIS.Modules.PMM.UI.Controllers
         {
             var featurePermissionManager = new FeaturePermissionManager();
             var operationManager = new OperationManager();
-            var userManager = new UserManager();
 
             try
             {
@@ -382,7 +382,6 @@ namespace BExIS.Modules.PMM.UI.Controllers
             {
                 featurePermissionManager.Dispose();
                 operationManager.Dispose();
-                userManager.Dispose();
             }
         }
     }
