@@ -21,15 +21,11 @@ namespace BExIS.Modules.Pmm.UI.Controllers
     public class MainAdminController : Controller
     {
         private readonly UserManager _userManager;
+        private BExIS.Pmm.Model.Plotchart helper;
 
         public MainAdminController(UserManager userManager)
         {
             _userManager = userManager;
-        }
-
-        private BExIS.Pmm.Model.Plotchart helper;
-        public MainAdminController()
-        {
             helper = new BExIS.Pmm.Model.Plotchart();
         }
 
