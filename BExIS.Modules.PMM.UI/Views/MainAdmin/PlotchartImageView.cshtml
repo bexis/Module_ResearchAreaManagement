@@ -16,15 +16,34 @@
 <div>
     <table style="width:800px;">
         <tr>
-            <td>
-                Plot maps:
-                </br>
-                Experiment maps:
-            </td>
             <td style="width:20px">
-                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
-                </br>
-                @Html.DropDownListFor(m => m.plotlist, new SelectList(Model.plotlistNew, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                <table>
+                    <tr>
+                        <td> Grassland maps:</td>
+                        <td> @Html.DropDownListFor(m => m.grasslandPlotlist, new SelectList(Model.grasslandPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })</td>
+                    </tr>
+                    <tr>
+                        <td>Forest maps:</td>
+                        <td>
+                            @Html.DropDownListFor(m => m.forestPlotlist, new SelectList(Model.forestPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Arable land maps:
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(m => m.arablelandPlotlist, new SelectList(Model.arablelandPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>FOX maps:</td>
+                        <td>
+                            @Html.DropDownListFor(m => m.foxPlotlist, new SelectList(Model.foxPlotlist, "Id", "PlotId"), "", new { @class = "plotids t-dropdown", onchange = "ComboBox_onChange(this)" })
+                        </td>
+                    </tr>
+
+                </table>
             </td>
             <td>
                 <input type="checkbox" id="DeactivePlot" onchange="UpdatePlotChart()" /> include former subplots
@@ -94,9 +113,15 @@
 
       });
 
+    function getSelectedPlotId() {
+        return $(".plotids").filter(function () {
+            return $(this).val() !== "";
+        }).first().val();
+    }
+
     function DownloadPdf() {
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var plotId = getSelectedPlotId();
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -118,7 +143,7 @@
 
     function UpdatePlotChart() {
         var comboboxGridSize = $('#Gridsize').data('tDropDownList');
-        var plotId = $(".plotids").find("option:selected").eq(0).val() + $(".plotids").find("option:selected").eq(1).val()
+        var plotId = getSelectedPlotId();
         var deactiveplot = $('#DeactivePlot').is(':checked');
         var beyondborder = $('#BeyondBorder').is(':checked');
         var gridSize = comboboxGridSize.value();
@@ -129,6 +154,7 @@
             beyondPlot: beyondborder,
             gridsize: gridSize
         }
+        console.log("data", data);
 
         $.ajax({
             url: '/PMM/MainAdmin/_getPlotChart',
