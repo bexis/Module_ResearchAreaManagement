@@ -679,6 +679,7 @@
         var errorsPlaceHolder = $("#errorPlaceHolder");
         var GeometryType = $('#GeometryType').data('tDropDownList'); GeometryType = GeometryType.value();
         $('#LineWidth').css("border-color", "#000000");
+
         var lineWidth = $('#LineWidth').val();
         if (lineWidth.length == 0) {
             $('#LineWidth').css("border-color", "#FF0000");
@@ -689,6 +690,14 @@
         if (Color.length == 0) {
             $('#Color').css("border-color", "#FF0000");
             errorsPlaceHolder.html("Please enter a color. <br>");
+            return;
+        }
+
+        $('#Name').css("border-color", "#000000");
+        var name = $('#Name').val();
+        if (name.length == 0) {
+            $('#Name').css("border-color", "#FF0000");
+            errorsPlaceHolder.html("Please enter a name. <br>");
             return;
         }
 
