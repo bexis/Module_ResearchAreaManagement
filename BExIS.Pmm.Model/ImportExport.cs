@@ -342,6 +342,48 @@ namespace BExIS.Pmm.Model
             }
         }
 
+        static public String ExportToGeoJSON(List<string> plots)
+        {
+            using (GeometryManager gManager = new GeometryManager())
+            {
+                List<GeometryInformation> geometryList = new List<GeometryInformation>();
+                geometryList = gManager.Repo.Get().ToList();
+                String output = "";
+
+                JArray featureArray = new JArray();
+                foreach (var plot in plots)
+                {
+                    List<GeometryInformation> geometryListPlot = geometryList.Where(a => a.Plot.PlotId == plot).ToList();
+
+                    foreach (var geometry in geometryListPlot)
+                    {
+                        try
+                        {
+                            var test = geometry.Geometry.ToString();
+                            var feature = GeometryFactory.WktToFeature(test);
+                            feature.Properties.Add("name", geometry.Plot.PlotId + " - " + geometry.Name);
+                            var fc = new FeatureCollection(new Terradue.GeoJson.Feature.Feature[] { feature }.ToList());
+
+                            output = JsonSerializer.SerializeToString(fc);
+                            output = output.Replace("{\"features\":[", "").Replace("],\"type\":\"FeatureCollection\"}", "");
+
+                            JObject jobject = JObject.Parse(output);
+                            if (!jobject.ToString().Equals("{}"))
+                                featureArray.Add(jobject);
+                        }
+                        catch (Exception e) { continue; }
+
+                    }
+                }
+
+                JObject geoJson = new JObject();
+                geoJson.Add("type", "FeatureCollection");
+                geoJson.Add("features", featureArray);
+                output = geoJson.ToString();
+
+                return output;
+            }
+        }
 
         static public String ExportToGeoJSON(long id)
         {

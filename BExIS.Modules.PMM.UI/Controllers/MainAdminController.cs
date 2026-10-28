@@ -510,6 +510,22 @@ namespace BExIS.Modules.Pmm.UI.Controllers
             
         }
 
+        public ActionResult ExportGeoJsonByIds(string ids)
+        {
+            Plotchart plotChart = new Plotchart();
+            List<string> plotids = new List<string>();
+            foreach (var id in ids.Split(','))
+            {
+                if (id.Equals(""))
+                    continue;
+
+                plotids.Add(helper.GetPlot(Convert.ToInt64(id)).PlotId);
+            }
+                
+            return File(Encoding.ASCII.GetBytes(ImportExport.ExportToGeoJSON(plotids)), "json", "AllSubplotsByIdsGeoJson" + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".json");
+
+        }
+
         public ActionResult ExportAllGeoJson()
         {
             return File(Encoding.ASCII.GetBytes(ImportExport.ExportAllToGeoJSON()), "json", "AllSubplotsGeoJson_" + "_" + DateTime.Now.ToString("yyyy-MM-dd") + ".json");
